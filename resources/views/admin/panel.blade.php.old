@@ -1,0 +1,9 @@
+@extends('mihoroscopo.layouts.app')
+
+    <h1>Panel de Administración</h1>
+    <form action="{{ route('admin.update') }}" method="POST">
+        @csrf
+        <textarea name="content" rows="15" cols="80">Contenido del artículo aquí...</textarea>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    <a href="{{ route('admin.logout') }}">Cerrar sesión</a>

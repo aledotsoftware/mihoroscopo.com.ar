@@ -1,0 +1,14 @@
+@extends('admin.layouts.appClean')
+
+@section('content')
+    <h1>Gestionar Preferencias</h1>
+    <form action="{{ route('subscription.preferences', ['id' => $id]) }}" method="POST">
+        @csrf
+        <input type="hidden" name="subscription_id" value="{{ $id }}">
+        <label for="email_notifications">Recibir notificaciones por email:</label>
+        <input type="checkbox" id="email_notifications" name="email_notifications" checked>
+
+        <br><br>
+        <button type="submit">Guardar Preferencias</button>
+    </form>
+@endsection

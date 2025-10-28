@@ -1,0 +1,3 @@
+open ftp://u487445196.devplayground:I/~#JPRA|~lYT+i4@82.112.247.160
+synchronize remote P:\mi-horoscopo /public_html
+exit

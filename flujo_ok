@@ -1,0 +1,554 @@
+Suscripciones
+Una suscripción es una herramienta en línea que te permite recibir pagos de forma automática y recurrente. Al integrar las suscripciones, el cliente podrá suscribirse a productos y/o servicios con facturación recurrente según el período y medio de pago seleccionado en el momento de la compra.
+Element for view
+Disponibilidad por país
+Argentina
+Brasil
+Chile
+Colombia
+México
+Perú
+Uruguay
+Suscripciones con plan asociado
+Las suscripciones con plan asociado se usan cuando es necesario usar la misma suscripción en diferentes ocasiones y organizarlas en grupos identificables. Por ejemplo, una suscripción mensual y anual a un gimnasio.
+
+Suscripciones sin plan asociado
+Las suscripciones sin plan asociado se utilizan en situaciones en las que distintas suscripciones tienen características diferentes, ya que son específicas de cada pagador. Por ejemplo, una suscripción que, según las opciones seleccionadas por el pagador, tenga modificado su precio final.
+
+Ventajas
+Crea un plan que se adecue al producto o servicio.
+Frecuencia personalizable
+Cobra cuotas mensuales o recibe pagos con otra frecuencia, desde semanal hasta anual.
+Prueba gratuita
+Ofrece un período de prueba gratuito para que los clientes conozcan tu servicio.
+Valor abierto
+Si lo deseas, permite que ellos elijan el monto que pagarán. Es ideal para recibir donaciones.
+
+Tipos de pago aceptados
+Crédito
+Débito
+Mercado Pago
+
+Requisitos previos
+Para realizar la integración de suscripciones, debes cumplir con los requisitos que se enumeran a continuación.
+
+Requisitos	Descripción
+Aplicación	Las aplicaciones son las diversas integraciones contenidas en una o varias tiendas. Puedes crear una aplicación para cada solución que implementes a fin de tener todo organizado y mantener un control que facilite la gestión. Consulta Panel del desarrollador para obtener más información sobre cómo crear una aplicación.
+Cuenta de vendedor Mercado Pago o Mercado Libre	Para integrar suscripciones en tu sitio web, necesitas una cuenta de vendedor en Mercado Pago o Mercado Libre. Si aún no la tienes, haz clic aquí para crearla.
+Credenciales	Contraseñas únicas con las que identificamos una integración en su cuenta. Para realizar las integraciones se requerirá la Public key y el Access token. haz clic aquí para obtener más información.
+Integración con Javascript SDK - Card token ID	La integración con Javascript SDK de Mercado Pago te permite crear un token con los datos de la tarjeta y enviarlo a tu backend para ser utilizado en los pagos. Para obtener más información, haz clic aquí.
+Monto mínimo de transacción	El monto mínimo permitido para crear una suscripción es de $15,00 y el máximo de $250.000,00
+Si se cumplieron todos los requisitos previos, podrás realizar la integración de la suscripción.
+
+
+Suscripciones con plan asociado
+Las suscripciones con plan asociado se utilizan cuando es necesario utilizar la misma suscripción en diferentes ocasiones para organizarlas en grupos identificables. Por ejemplo, para una suscripción mensual y anual a un gimnasio.
+
+La integración de suscripciones con plan asociado se realiza en dos pasos. En el primero es necesario crear un plan que irá asociado a la suscripción y en el segundo, la creación de la suscripción.
+
+Crear plan
+El plan de suscripción te permite definir, entre otros atributos, el título, el valor y la frecuencia de las suscripciones creadas por el vendedor. Para crear un plan y asociarlo con una suscripción, mira el endpoint /preapproval_plan, completa los atributos necesarios y ejecuta el request o, si prefieres, usa el curl a continuación.
+
+Nota
+Al ejecutar la API, se creará el plan y tendrás acceso a preapproval_plan_id, que en la respuesta de la API se mostrará como id. Este atributo es obligatorio para crear la suscripción.
+          
+curl -X POST \
+
+      'https://api.mercadopago.com/preapproval_plan' \
+      -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+      -H 'Content-Type: application/json' \ 
+      -d '{
+  "reason": "Yoga classes",
+  "auto_recurring": {
+    "frequency": 1,
+    "frequency_type": "months",
+    "repetitions": 12,
+    "billing_day": 10,
+    "billing_day_proportional": true,
+    "free_trial": {
+      "frequency": 1,
+      "frequency_type": "months"
+    },
+    "transaction_amount": 10,
+    "currency_id": "ARS"
+  },
+  "payment_methods_allowed": {
+    "payment_types": [
+      {}
+    ],
+    "payment_methods": [
+      {}
+    ]
+  },
+  "back_url": "https://www.yoursite.com"
+}'
+
+        
+Importante
+Una Suscripción con plan asociado siempre deberá ser creada con su card_token_id y en status Authorized.
+¡Listo! Ya creaste el plan de su suscripción con plan asociado. Para finalizar la integración, ahora deberás crear una suscripción.
+
+Crear suscripción
+La suscripción es una autorización del pagador para cargos recurrentes con un medio de pago definido (tarjeta de crédito, por ejemplo). Al suscribirse a un producto/servicio, el cliente acepta que se le cobre periódicamente un cierto monto por el período de tiempo definido.
+
+Para crear una suscripción, primero deberás contar con el valor preapproval_plan_id.
+
+Luego, podrás continuar la integración por dos caminos: puedes acceder al endpoint /preapproval y completar los atributos como se indica en la tabla de parámetros, o también puedes usar el curl que te compartimos a continuación.
+
+          
+curl -X POST \
+      'https://api.mercadopago.com/preapproval' \
+      -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+      -H 'Content-Type: application/json' \ 
+      -d '{
+  "preapproval_plan_id": "2c938084726fca480172750000000000",
+  "reason": "Yoga classes",
+  "external_reference": "YG-1234",
+  "payer_email": "test_user@testuser.com",
+  "card_token_id": "e3ed6f098462036dd2cbabe314b9de2a",
+  "auto_recurring": {
+    "frequency": 1,
+    "frequency_type": "months",
+    "start_date": "2020-06-02T13:07:14.260Z",
+    "end_date": "2022-07-20T15:59:52.581Z",
+    "transaction_amount": 10,
+    "currency_id": "ARS"
+  },
+  "back_url": "https://www.mercadopago.com.ar",
+  "status": "authorized"
+}'
+
+        
+Cuando termines de llenar los atributos, ejecuta el request y ¡listo! Ya habrás creado la suscripción con el plan asociado.
+
+
+
+Suscripciones sin plan asociado
+Las suscripciones sin plan asociado se utilizan cuando distintas suscripciones tienen características diferentes por ser específicas de cada pagador. Por ejemplo: una suscripción de un solo mes con un descuento específico.
+
+Este modelo de suscripción se puede realizar de dos formas.
+
+Con pago autorizado
+Permiten generar y facturar la cuota de una suscripción en función de la periodicidad definida, lo que hace que el motor de suscripciones programe y cree automáticamente pagos en función del método de pago definido en el momento de la creación de la firma.
+
+Accede a suscripciones con pago autorizado
+
+Con pago pendiente
+Son un modelo de suscripción donde no se define un método de pago en el momento de su creación. Cuando esto ocurre, los pagos pasan automáticamente al estado pending y dependen de que el usuario busque una forma de completar el pago.
+
+Accede a suscripciones con pago pendiente
+
+Suscripciones con pago autorizado
+Las suscripciones con pago autorizado permiten generar y facturar la cuota de una suscripción en función de la periodicidad definida, lo que hace que el motor de suscripciones programe y cree automáticamente pagos en función del método de pago definido en el momento de la creación de la firma.
+
+Para ofrecer suscripciones sin plan asociado y con pago autorizado, envía un POST con los atributos necesarios al endpoint /preapproval y presta atención al parámetro status, que debe ser rellenado con el valor authorized. Si prefieres, usa el curl a continuación.
+
+          
+curl -X POST \
+      'https://api.mercadopago.com/preapproval'\
+       -H 'Content-Type: application/json' \
+       -H 'Authorization: Bearer TEST-2151****' \ 
+       -H 'X-scope: stage' \
+       --data-raw '{
+            "back_url": "https://www.google.com",
+            "reason": "Test Subscription",
+            "auto_recurring": {
+                "frequency": 1,
+                "frequency_type": "months",
+                "start_date": "2020-06-02T13:07:14.260Z",
+                "end_date": "2022-07-20T15:59:52.581Z",
+                "transaction_amount": 10,
+                "currency_id": "ARS"
+            },
+            "payer_email": "test_user+1020927396@testuser.com",
+            "card_token_id": "{{CARD_TOKEN}}",
+            "status": "authorized"
+}'
+
+        
+Después de completar los campos, ejecuta el request.
+
+Importante
+Para acreditar la validez de la tarjeta, Mercado Pago realizará un cobro con un importe mínimo. Si el pago es exitoso, procederemos a la devolución de dicho pago. El valor puede diferir según cada país.
+Lógica de reintentos de cobro
+Al automatizar la recurrencia de tus cobros, se crean pagos autorizados que tendrán una fecha de débito configurada en base a la periodicidad que se definió en la suscripción. Luego de suscribirse, el pago de la primera cuota se acreditará en 1 hora.
+
+Estados de pago
+En el momento en que se cobre la cuota pueden surgir tres alternativas en base al resultado de su pago:
+
+El pago es realizado exitosamente por lo que la cuota quedará processed y ya no se reintentará cobrarla.
+
+El pago se está procesando por lo que la cuota quedará en waiting for gateway hasta que se resuelva el pago.
+
+El pago es rechazado por lo que la cuota quedará en recycling siempre y cuando no esté expirada o no haya alcanzado el máximo de reintentos. Caso contrario, quedará en processed.
+
+Pagos rechazados
+Cuando una cuota queda en el estado recycling entra en un esquema de reintentos con un máximo de 4 posibilidades, en los que se vuelve a realizar el cobro de la cuota. El resultado puede ser cualquiera de los tres puntos mencionados arriba.
+
+Si el pago resulta rechazado, se actualiza a una nueva fecha de cobro sumando 1 de las 4 posibilidades dentro de los diez días como ventana de tiempo de reintento a la última fecha de disponible.
+
+Por defecto se reintenta dentro de una ventana de 10 días. En caso de que la cuota tenga fecha de expiración, la ventana de tiempo se ajusta a esa fecha y mantiene la lógica de 4 reintentos.
+
+Pagos en proceso
+Si una cuota se encuentra en el estado waiting for gateway, y cuando se resuelve el pago resulta rechazada y se cumplió la fecha de expiración, la cuota automáticamente pasará a ser procesada con el estado processed. Caso contrario, entrará al esquema de reintento.
+
+En el caso de que no se pueda cobrar la cuota en el cuarto reintento, la cuota automáticamente quedará en el estado processed asociada a un pago rechazado.
+
+Luego de 3 cuotas con pagos rechazados se da de baja automáticamente la suscripción y la cuenta del vendedor será notificada de la cancelación de la suscripción por e-mail.
+
+Gestión de suscripciones
+A través de la gestión de suscripciones es posible pausar, cancelar o reactivar una suscripción ya creada, además de realizar otros cambios específicos dentro de su configuración inicial.
+
+En la siguiente tabla encontrarás más información sobre las posibilidades de gestión.
+
+Tipo	Descripción
+Buscar suscripción	Permite buscar suscripciones independientemente de su estado (activa, en pausa, cancelada). Para hacerlo, envía un GET con los parámetros necesarios al endpoint /preapproval/search y ejecuta la solicitud.
+Modificar monto	Permite modificar el monto de una suscripción existente. Envía el nuevo monto a través de auto_recurring.transaction_amount y auto_recurring.currency_id en un PUT al endpoint /preapproval/{id}.
+Modificar tarjeta del medio de pago principal	Permite modificar la tarjeta asociada a la suscripción existente. Envía un PUT con el nuevo token en atributo card_token_id para el endpoint /preapproval/{id}.
+Modificar medio de pago secundario	Permite agregar un segundo medio de pago a una suscripción existente. Envía un PUT en el endpoint /preapproval/{id} con los parámetros card_token_id_secondary y payment_method_id_secondary en caso de que el método secundario sea una tarjeta, y sólo payment_method_id_secondary para otros medios de pago.
+Cancelar o pausar suscripción	Permite cancelar o pausar una suscripción existente. Para cancelarla, envía un PUT con el atributo status y el valor cancelled al endpoint /preapproval/{id} y ejecuta la solicitud. Para pausarla, envía un PUT con el atributo status y el valor paused al mismo endpoint y ejecuta la solicitud.
+Reactivar una suscripción	Permite reactivar una suscripción en pausa y establecer una fecha límite para su finalización. Para hacerlo, envía un PUT con los parámetros necesarios al endpoint /preapproval/{id} y ejecuta la solicitud.
+Cambiar la fecha de facturación	Para las suscripciones con una frecuencia de pago mensual, puedes elegir un día fijo del mes para que se produzca la facturación. Para hacerlo, envía un PUT con los parámetros necesarios al endpoint /preapproval/{id} y ejecuta la solicitud.
+Establecer monto proporcional	Puedes establecer un monto proporcional para facturar una suscripción en particular. Para hacerlo, envía un PUT con los parámetros necesarios al endpoint /preapproval/{id} y ejecuta la solicitud.
+Ofrecer prueba gratuita	Es posible ofrecer un período de prueba gratuito para que los clientes puedan probar el producto y/o servicio antes de comprarlo. Para ello, envía un PUT con los parámetros free_trial, frequency y frequency_type con el número y el tipo (días/meses) al endpoint /preapproval_plan/{id} y ejecuta la solicitud.
+
+
+
+
+
+Flujo de Datos para Gestión de Suscripción Mensual
+Registro del Cliente y Envío del Correo Electrónico
+
+Cliente Envía su Email
+Entrada: Cliente ingresa su email a través de un formulario en tu sitio web.
+Salida: Almacena el email del cliente en tu base de datos.
+Creación del Plan de Suscripción
+
+Definir Plan de Suscripción
+
+Descripción: Crea un plan de suscripción mensual para el envío de información.
+Parámetros:
+reason: Descripción del plan (ej. "Envío mensual de información").
+auto_recurring:
+frequency: 1
+frequency_type: "months"
+repetitions: 12 (o el número deseado de meses)
+billing_day: Día del mes para el cobro
+free_trial: (opcional) Configura un período de prueba gratuito si lo deseas.
+transaction_amount: Monto a cobrar por mes
+currency_id: "ARS" (o la moneda que prefieras)
+payment_methods_allowed: Define métodos de pago permitidos.
+back_url: URL de retorno después de completar la suscripción.
+bash
+Copiar código
+curl -X POST \
+    'https://api.mercadopago.com/preapproval_plan' \
+    -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+    -H 'Content-Type: application/json' \
+    -d '{
+  "reason": "Envío mensual de información",
+  "auto_recurring": {
+    "frequency": 1,
+    "frequency_type": "months",
+    "repetitions": 12,
+    "billing_day": 1,
+    "free_trial": {
+      "frequency": 1,
+      "frequency_type": "months"
+    },
+    "transaction_amount": 10,
+    "currency_id": "ARS"
+  },
+  "back_url": "https://www.yoursite.com"
+}'
+Guardar preapproval_plan_id
+
+Salida: Obtén el preapproval_plan_id del plan creado para usarlo en la suscripción.
+Creación de la Suscripción
+
+Crear Suscripción
+
+Descripción: Autoriza un cargo recurrente usando el preapproval_plan_id.
+Parámetros:
+preapproval_plan_id: El ID del plan creado anteriormente.
+reason: Descripción de la suscripción.
+payer_email: Email del cliente.
+card_token_id: Token de tarjeta obtenido del frontend usando el SDK de Mercado Pago.
+auto_recurring:
+frequency: 1
+frequency_type: "months"
+start_date: Fecha de inicio
+end_date: Fecha de fin
+transaction_amount: Monto a cobrar mensualmente
+currency_id: "ARS"
+back_url: URL a la que el usuario será redirigido después de la suscripción.
+status: "authorized"
+bash
+Copiar código
+curl -X POST \
+    'https://api.mercadopago.com/preapproval' \
+    -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+    -H 'Content-Type: application/json' \
+    -d '{
+  "preapproval_plan_id": "YOUR_PLAN_ID",
+  "reason": "Envío mensual de información",
+  "payer_email": "customer@example.com",
+  "card_token_id": "YOUR_CARD_TOKEN_ID",
+  "auto_recurring": {
+    "frequency": 1,
+    "frequency_type": "months",
+    "start_date": "2024-09-01T00:00:00Z",
+    "end_date": "2025-09-01T00:00:00Z",
+    "transaction_amount": 10,
+    "currency_id": "ARS"
+  },
+  "back_url": "https://www.yoursite.com",
+  "status": "authorized"
+}'
+Guardar Detalles de Suscripción
+
+Salida: Guarda el ID de la suscripción y la información relevante para gestionar futuros cambios.
+Envío de Información al Email
+
+Programar Envío de Correos
+Descripción: Implementa un cron job o un servicio programado en tu aplicación para enviar la información al email del cliente cada mes.
+Frecuencia: Mensual (o según el periodo de la suscripción).
+Gestión de Suscripciones
+
+Actualizar Suscripción
+
+Descripción: Permite modificar la suscripción, como cambiar el monto, tarjeta, o pausar/cancelar.
+Endpoints:
+Modificar monto: PUT /preapproval/{id}
+Cambiar tarjeta: PUT /preapproval/{id}
+Cancelar o pausar: PUT /preapproval/{id}
+Reintentos de Pago
+
+Descripción: Maneja los reintentos de cobro en caso de fallo, según la lógica de reintentos de Mercado Pago.
+Este flujo cubre desde la creación del plan de suscripción hasta la gestión y envío de la información al cliente. Si necesitas ajustar algún detalle o agregar funcionalidades adicionales, házmelo saber.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Para implementar el flujo de suscripciones mensuales en tu aplicación PHP con Laravel 11, necesitarás varios archivos y configuraciones. Aquí te detallo los archivos necesarios y su contenido:
+
+1. Archivo de Configuración de MercadoPago
+Nombre del archivo: config/mercadopago.php
+
+Contenido:
+
+php
+Copiar código
+<?php
+
+return [
+    'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+    'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
+];
+Descripción: Archivo para almacenar las credenciales de Mercado Pago. Asegúrate de definir las variables en tu archivo .env.
+
+2. Archivo de Controlador
+Nombre del archivo: app/Http/Controllers/SubscriptionController.php
+
+Contenido:
+
+php
+Copiar código
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+class SubscriptionController extends Controller
+{
+    public function createPlan(Request $request)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . config('mercadopago.access_token'),
+            'Content-Type' => 'application/json'
+        ])->post('https://api.mercadopago.com/preapproval_plan', [
+            'reason' => 'Envío mensual de información',
+            'auto_recurring' => [
+                'frequency' => 1,
+                'frequency_type' => 'months',
+                'repetitions' => 12,
+                'billing_day' => 1,
+                'billing_day_proportional' => true,
+                'transaction_amount' => 10,
+                'currency_id' => 'ARS',
+                'free_trial' => [
+                    'frequency' => 1,
+                    'frequency_type' => 'months'
+                ]
+            ],
+            'payment_methods_allowed' => [
+                'payment_types' => [],
+                'payment_methods' => []
+            ],
+            'back_url' => 'https://www.yoursite.com'
+        ]);
+
+        $data = $response->json();
+        return response()->json($data);
+    }
+
+    public function createSubscription(Request $request)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . config('mercadopago.access_token'),
+            'Content-Type' => 'application/json'
+        ])->post('https://api.mercadopago.com/preapproval', [
+            'preapproval_plan_id' => $request->preapproval_plan_id,
+            'reason' => 'Envío mensual de información',
+            'payer_email' => $request->payer_email,
+            'card_token_id' => $request->card_token_id,
+            'auto_recurring' => [
+                'frequency' => 1,
+                'frequency_type' => 'months',
+                'start_date' => now()->toISOString(),
+                'end_date' => now()->addYear()->toISOString(),
+                'transaction_amount' => 10,
+                'currency_id' => 'ARS'
+            ],
+            'back_url' => 'https://www.yoursite.com',
+            'status' => 'authorized'
+        ]);
+
+        $data = $response->json();
+        return response()->json($data);
+    }
+}
+Descripción: Controlador que maneja la creación de planes y suscripciones. Usa el cliente HTTP de Laravel para interactuar con la API de Mercado Pago.
+
+3. Archivo de Rutas
+Nombre del archivo: routes/web.php
+
+Contenido:
+
+php
+Copiar código
+use App\Http\Controllers\SubscriptionController;
+
+Route::post('/create-plan', [SubscriptionController::class, 'createPlan']);
+Route::post('/create-subscription', [SubscriptionController::class, 'createSubscription']);
+Descripción: Define las rutas para crear planes y suscripciones.
+
+4. Archivo de Middleware para Validación de la Tarjeta
+Nombre del archivo: app/Http/Middleware/ValidateCardToken.php
+
+Contenido:
+
+php
+Copiar código
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class ValidateCardToken
+{
+    public function handle(Request $request, Closure $next)
+    {
+        // Validación básica para el token de la tarjeta
+        if (!$request->has('card_token_id') || empty($request->input('card_token_id'))) {
+            return response()->json(['error' => 'Card token is required'], 400);
+        }
+
+        return $next($request);
+    }
+}
+Descripción: Middleware para validar el token de la tarjeta antes de crear la suscripción.
+
+5. Archivo de Configuración de Variables de Entorno
+Nombre del archivo: .env
+
+Contenido:
+
+makefile
+Copiar código
+MERCADOPAGO_ACCESS_TOKEN=YOUR_ACCESS_TOKEN
+MERCADOPAGO_PUBLIC_KEY=YOUR_PUBLIC_KEY
+Descripción: Archivo para definir las credenciales de Mercado Pago.
+
+6. Archivo de Tareas Programadas (opcional)
+Nombre del archivo: app/Console/Commands/SendSubscriptionInfo.php
+
+Contenido:
+
+php
+Copiar código
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
+
+class SendSubscriptionInfo extends Command
+{
+    protected $signature = 'subscription:send-info';
+    protected $description = 'Send subscription information to users';
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function handle()
+    {
+        // Lógica para enviar correos a usuarios suscritos
+        // Puedes usar un job para manejar esto en segundo plano
+        $users = \App\Models\User::where('subscription_status', 'active')->get();
+
+        foreach ($users as $user) {
+            Mail::raw('Aquí está la información de su suscripción.', function ($message) use ($user) {
+                $message->to($user->email)
+                        ->subject('Información de suscripción');
+            });
+        }
+
+        $this->info('Información de suscripción enviada.');
+    }
+}
+Descripción: Tarea programada para enviar correos electrónicos a los usuarios suscritos.
+
+Resumen
+config/mercadopago.php: Configuración de credenciales.
+app/Http/Controllers/SubscriptionController.php: Controlador para manejar la creación de planes y suscripciones.
+routes/web.php: Definición de rutas.
+app/Http/Middleware/ValidateCardToken.php: Middleware para validar el token de la tarjeta.
+.env: Variables de entorno para credenciales.
+app/Console/Commands/SendSubscriptionInfo.php: Comando para enviar información a suscriptores (opcional).
+Asegúrate de ajustar los detalles según tus necesidades y de probar cada parte del flujo para garantizar su correcto funcionamiento.
+
+
