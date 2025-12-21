@@ -759,11 +759,15 @@ a {
   font-weight: bold;
   color: #6f530e;
   cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1;
 }
 
 .landing .modal .modal-content .close:hover,
 .landing .modal .modal-content .close:focus {
-  color: fff;
+  color: #947118;
   text-decoration: none;
   cursor: pointer;
 }
