@@ -115,7 +115,7 @@
 
 
             <div class="wrapper-email">
-                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" />
+                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" type="email" />
 
             </div>
 
@@ -131,8 +131,8 @@
         <div class="wrapper-info" id="section-zodiac">
             <br>
             <h3 class="type-text hid">Guía Astrológica Gratis</h3>
-            <h5 class="type-text">Selecciona tu Signo Astrológico</h5>
-            <select name="zodiac_sign" id="select-zodiac-sign" class="select-custom" required>
+            <h5 class="type-text" id="label-zodiac-sign">Selecciona tu Signo Astrológico</h5>
+            <select name="zodiac_sign" id="select-zodiac-sign" class="select-custom" required aria-labelledby="label-zodiac-sign">
                 <option value="" disabled selected>Selecciona tu signo</option>
                 <option value="aries">Aries</option>
                 <option value="tauro">Tauro</option>
@@ -162,9 +162,9 @@
             <h3 class="type-text hid">Guía Astrológica Gratis</h3>
 
 
-            <h5 class="type-text">Ingresa tu Nombre</h5>
+            <h5 class="type-text" id="label-name">Ingresa tu Nombre</h5>
             <div class="wrapper-email">
-                <input class="email-input" id="input-name" placeholder="Tu Nombre" />
+                <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" />
             </div>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-name">
@@ -183,8 +183,8 @@
 
 
 
-            <h5 class="type-text hid">Selecciona tu Suscripción</h5>
-            <select class="select-custom" id="select-subscription">
+            <h5 class="type-text hid" id="label-subscription">Selecciona tu Suscripción</h5>
+            <select class="select-custom" id="select-subscription" aria-labelledby="label-subscription">
                 <option value="" disabled selected>Selecciona tu suscripción</option>
 
                 <option value="{{ env('SUBSCRIPTION_DAILY_FREQUENCY_TYPE') }}">
@@ -214,10 +214,10 @@
         </div>
     </main>
 
-    <div id="modal" class="modal">
+    <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-message">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="modal-message">
+            <button class="close" aria-label="Cerrar">&times;</button>
+            <p id="modal-message" role="alert">
 
             </p>
         </div>
@@ -517,6 +517,9 @@
                 const selectedSign = selectZodiac.value;
                 const newSrc = `{{ asset('landing-v1/public/img/${selectedSign}.webp') }}`;
 
+                // Capitalize first letter for alt text
+                const altText = selectedSign.charAt(0).toUpperCase() + selectedSign.slice(1);
+
                 // Hacer la imagen actual transparente
                 imgLanding.style.opacity = 0;
                 imgLanding.style.display = "block";
@@ -526,6 +529,7 @@
                 // Cambiar la fuente de la imagen después de un breve tiempo
                 setTimeout(() => {
                     imgLanding.src = newSrc; // Cambiar la fuente de la imagen
+                    imgLanding.alt = altText; // Update alt text for accessibility
                     imgLanding.style.opacity = 1; // Volver a mostrar la imagen
                 }, 0); // Tiempo para que la imagen se vuelva transparente
             });
