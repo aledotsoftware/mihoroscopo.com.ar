@@ -1,0 +1,78 @@
+graph TD
+    classDef user fill:#7c3aed,stroke:#a78bfa,stroke-width:2px,color:#fff;
+    classDef db fill:#ea580c,stroke:#fb923c,stroke-width:2px,color:#fff;
+    classDef cron fill:#ca8a04,stroke:#facc15,stroke-width:2px,stroke-dasharray: 5 5,color:#000;
+    classDef thirdparty fill:#0891b2,stroke:#22d3ee,stroke-width:2px,color:#fff;
+    classDef service fill:#2563eb,stroke:#60a5fa,stroke-width:2px,color:#fff;
+
+    %% ═══════════════════════════════════════
+    %% CAPA 1: ADQUISICIÓN DE TRÁFICO
+    %% ═══════════════════════════════════════
+    User((👤 Usuario /<br/>Tráfico Ads)):::user -->|Click en anuncio<br/>gclid / wbraid| Landing[🌐 Landing Page<br/>/landing]:::service
+    Landing -->|Elige signo + datos| API_Sub[📡 API Subscribe<br/>/api/v1/subscribe]:::service
+
+    %% ═══════════════════════════════════════
+    %% CAPA 2: DECISIÓN DE PAGO POR PAÍS
+    %% ═══════════════════════════════════════
+    API_Sub --> GeoDecision{🌎 ¿País = AR?}
+
+    GeoDecision -->|Sí| MP[💳 MercadoPago<br/>ARS]:::thirdparty
+    GeoDecision -->|No| DLG[💳 dLocalGo<br/>USD / Moneda Local]:::thirdparty
+
+    MP -->|init_point + subscription_id| DB_Sub[(🗄️ DB: subscriptions +<br/>extradata_horoscopes)]:::db
+    DLG -->|init_point + external_reference| DB_Sub
+
+    %% ═══════════════════════════════════════
+    %% CAPA 3: ADMINISTRACIÓN Y CONTENIDO
+    %% ═══════════════════════════════════════
+    AdminUser((👨‍💼 Equipo /<br/>Redactores)):::user -->|Login + Publicación| AdminPanel[⚙️ Panel Admin<br/>/admin]:::service
+    AdminPanel -->|Carga predicciones diarias| DB_Content[(🗄️ DB: Contenido Diario<br/>Horóscopo, Rituales, Amor,<br/>Compatibilidad, Guía Astral)]:::db
+    AdminPanel -->|Artículos SEO| DB_Blog[(🗄️ DB: Articles /<br/>Blog Posts)]:::db
+    DB_Blog -->|/blog/slug| BlogPublic[📝 Blog Público<br/>/blog]:::service
+
+    %% ═══════════════════════════════════════
+    %% CAPA 4: PROCESOS DIARIOS AUTOMÁTICOS
+    %% ═══════════════════════════════════════
+    subgraph CRON["⏰ Procesos Diarios — Laravel Console Kernel"]
+        CronEmails[📧 send:daily-content-emails]:::cron
+        CronRemarketing[📨 send:daily-remarketing-emails]:::cron
+        CronConversions[📊 app:generate-ads-conversions]:::cron
+        CronUpdateSubs[🔄 app:update-subscriptions]:::cron
+    end
+
+    DB_Sub -.->|Usuarios activos + signo zodiacal| CronEmails
+    DB_Sub -.->|Usuarios pendientes / cancelados| CronRemarketing
+    DB_Content -.->|Predicción del día x signo| CronEmails
+    DB_Sub -.->|Usuarios con gclid válido| CronConversions
+    DB_Sub -.->|Verificar estados de pago| CronUpdateSubs
+
+    %% ═══════════════════════════════════════
+    %% CAPA 5: SALIDAS Y DISTRIBUCIÓN
+    %% ═══════════════════════════════════════
+    CronEmails -->|Envía contenido personalizado| Mailer[✉️ Servicio de Correo<br/>SMTP]:::service
+    CronRemarketing -->|Envía recordatorios de pago| Mailer
+
+    Mailer -->|Email llega| UserInbox((📬 Bandeja<br/>del Usuario)):::user
+
+    CronEmails -->|Registra sent/failed| DB_Logs[(🗄️ DB: Email Logs)]:::db
+    CronEmails -->|Resumen del envío| Discord[🤖 Discord Bot]:::thirdparty
+    Discord --> DiscordTeam((💬 Chat del Equipo)):::user
+
+    CronConversions -->|Reporta conversión offline| GoogleAds[📈 Google Ads<br/>Conversion API]:::thirdparty
+    GoogleAds -->|Optimiza pauta publicitaria| AdsAlgorithm((🧠 Algoritmo<br/>de Google)):::thirdparty
+
+    %% ═══════════════════════════════════════
+    %% CAPA 6: AUTOGESTIÓN DEL SUSCRIPTOR
+    %% ═══════════════════════════════════════
+    UserInbox -.->|Click en enlace del email| Preferences[🔧 Autogestión<br/>/subscription/preferences]:::service
+    Preferences -.->|Actualizar plan / cambiar signo| DB_Sub
+    Preferences -.->|Cancelar suscripción| Unsub[❌ Unsubscribe<br/>/subscription/unsubscribe]:::service
+    Unsub -.->|status = cancelled| DB_Sub
+    Preferences -.->|Reactivar| Reactivate[🔄 Reactivar<br/>/subscription/reactivate]:::service
+    Reactivate -.->|status = authorized| DB_Sub
+
+    %% ═══════════════════════════════════════
+    %% CAPA 7: TRACKING DE APERTURA
+    %% ═══════════════════════════════════════
+    UserInbox -.->|Pixel invisible /logo| Tracking[👁️ Email Tracking<br/>EmailTrackingController]:::service
+    Tracking -.->|Registra apertura| DB_Logs
