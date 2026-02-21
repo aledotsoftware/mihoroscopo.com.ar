@@ -10,6 +10,8 @@ use App\Models\Notification; // Asegúrate de importar el modelo Notification
 use App\Models\Payment;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
+use App\Mail\SubscriptionConfirmationMail;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationController extends Controller
 {
@@ -451,6 +453,7 @@ class NotificationController extends Controller
             if ($subscriptionModel->first_send != 1) {
                 // Verifica si el email existe antes de usarlo
                 if (!empty($subscriptionModel->email)) {
+                    Mail::to($subscriptionModel->email)->send(new SubscriptionConfirmationMail($subscriptionModel));
                     Artisan::call('send:daily-content-emails', ['email' => $subscriptionModel->email]);
 
                     $subscriptionModel->first_send = 1;

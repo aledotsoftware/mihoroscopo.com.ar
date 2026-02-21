@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Carbon\Carbon;
 use App\Services\DiscordService;
 use App\Models\ExtradataHoroscope;
@@ -44,10 +45,7 @@ class SendDailyContentEmails extends Command
 
     public function handle()
     {
-        $email = $this->argument('email'); // Captura el argumento 'email' var_dump($email
-
-
-        echo $email;
+        $email = $this->argument('email'); // Captura el argumento 'email'
 
         // Inicializar el archivo de log
         file_put_contents($this->logPath, "Inicio del proceso: " . Carbon::now() . "\n", FILE_APPEND);
@@ -55,10 +53,8 @@ class SendDailyContentEmails extends Command
         if ($email) {
             $subscription = DB::table('subscriptions')
                 ->where('email', $email)
-              
                 ->first();
         
-                var_dump($subscription);
             if ($subscription) {
                 $this->sendEmail($subscription);
                 $this->discordService->sendDiscordMessage(
@@ -90,12 +86,6 @@ class SendDailyContentEmails extends Command
     {
         // Proceso de enviar email
 
-        // var_dump($subscription);
-
-        // var_dump($subscription->email);
-
-        //  if (in_array($subscription->email, ['aleavellaneda1@gmail.com', 'avellanedanicolasraul@gmail.com'])) {
-            echo "se envia el mail";
             $date = Carbon::now()->format('d/m/Y');
             $dateForDatabase = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
 
@@ -151,6 +141,10 @@ class SendDailyContentEmails extends Command
                         'status' => 'sent'
                     ]);
 
+                    $trackedUnsubscribeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $unsubscribeLink]);
+                    $trackedUpgradeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $upgradeLink]);
+                    $trackedPreferencesLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $preferencesLink]);
+
                     $content = [
                         'email_id' => $emailLog->id,
                         'name' => $extradataHoroscope->name ?? 'Todo bien?',
@@ -165,9 +159,9 @@ class SendDailyContentEmails extends Command
                         'content_lunar_ritual' => $contentLunarRitual[$zodiacSign] ?? '',
                         'content_prosperity_ritual' => $contentProsperityRitual[$zodiacSign] ?? '',
                         'content_zodiac_compatibility' => $contentZodiacCompatibility[$zodiacSign] ?? '',
-                        'upgrade_link' => $upgradeLink,
-                        'unsubscribe_link' => $unsubscribeLink,
-                        'preferences_link' => $preferencesLink,
+                        'upgrade_link' => $trackedUpgradeLink,
+                        'unsubscribe_link' => $trackedUnsubscribeLink,
+                        'preferences_link' => $trackedPreferencesLink,
                     ];
 
                     Mail::to($subscription->email)->send(new \App\Mail\DailyContentEmail($content));

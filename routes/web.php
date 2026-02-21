@@ -121,6 +121,7 @@ Route::middleware([EnsureAdminAuthenticated::class])->group(function () {
 
 
 
+Route::get('/email/track/click', [EmailTrackingController::class, 'trackClick'])->name('email.track.click')->middleware('signed');
 Route::get('/logo', [EmailTrackingController::class, 'trackOpen'])->name('logo');
 
 
