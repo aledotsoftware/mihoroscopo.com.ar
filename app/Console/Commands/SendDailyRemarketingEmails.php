@@ -86,7 +86,7 @@ class SendDailyRemarketingEmails extends Command
 
 
             // Enviar el correo
-           // Mail::to($subscription->email)->send(new \App\Mail\DailyRemarketingEmail($content));
+           Mail::to($subscription->email)->send(new \App\Mail\DailyRemarketingEmail($content));
 
             // Loguear contenido enviado
             $this->logMessage(json_encode($content, JSON_PRETTY_PRINT));

@@ -70,7 +70,6 @@ class SendDailyContentEmails extends Command
         } else {
             $subscriptions = DB::table('subscriptions')
                 ->where('status', 'authorized')
-                ->orWhere('status', 'pending')
                 ->get();
 
             $subscriptionCount = $subscriptions->count();

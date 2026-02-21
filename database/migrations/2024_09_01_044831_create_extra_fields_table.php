@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('extra_fields', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->unsignedBigInteger('subscription_id')->index('fk_subscription_id');
-            $table->integer('service_id')->index('fk_service_id');
-            $table->integer('field_definition_id')->index('fk_field_definition_id');
+            $table->unsignedBigInteger('subscription_id')->index();
+            $table->integer('service_id')->index();
+            $table->integer('field_definition_id')->index();
             $table->string('field_value')->nullable();
             $table->timestamp('created_at')->nullable()->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();

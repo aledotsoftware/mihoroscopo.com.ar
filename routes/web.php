@@ -26,10 +26,6 @@ use App\Http\Controllers\SubscriptionController;
 
 
 // Ruta para la landing page
-Route::get('/', [LandingController::class, 'index'])->name('index');
-
-
-// Ruta para la landing page
 Route::get('/landing', [LandingController::class, 'show'])->name('landing');
 
 

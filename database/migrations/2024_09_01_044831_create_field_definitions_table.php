@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('field_definitions', function (Blueprint $table) {
             $table->integer('id', true);
             $table->string('name');
-            $table->integer('service_id')->index('fk_service_id');
+            $table->integer('service_id')->index();
 
             $table->unique(['name', 'service_id'], 'unique_field_definition');
         });

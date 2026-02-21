@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string|null $email
  * @property int $service_id
+ * @property int|null $payment_provider_id
  * @property string|null $subscription_id
  * @property string $status
  * @property int|null $first_send
@@ -48,6 +49,7 @@ class Subscription extends Model
 
 	protected $casts = [
 		'service_id' => 'int',
+		'payment_provider_id' => 'int',
 		'first_send' => 'int',
 		'valid_until' => 'datetime',
 		'charged_quantity' => 'int',
@@ -61,6 +63,7 @@ class Subscription extends Model
 	protected $fillable = [
 		'email',
 		'service_id',
+		'payment_provider_id',
 		'subscription_id',
 		'status',
 		'first_send',

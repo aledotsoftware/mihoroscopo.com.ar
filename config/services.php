@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'dlocalgo' => [
+        'key' => env('DLOCALGO_API_KEY'),
+        'url' => env('DLOCALGO_API_URL', 'https://api.dlocalgo.com'),
+    ],
+
 ];

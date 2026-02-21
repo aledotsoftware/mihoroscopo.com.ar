@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('field_values', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('field_definition_id')->index('fk_field_definition_id');
+            $table->integer('field_definition_id')->index();
             $table->string('value');
 
             $table->unique(['field_definition_id', 'value'], 'unique_field_value');

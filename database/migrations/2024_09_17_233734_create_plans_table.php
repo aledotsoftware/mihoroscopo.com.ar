@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->integer('service')->index('service');
+            $table->integer('service')->index();
             $table->string('name');
             $table->integer('frequency');
             $table->enum('frequency_type', ['days', 'weeks', 'months']);

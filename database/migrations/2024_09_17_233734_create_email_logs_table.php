@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('email_logs', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->unsignedBigInteger('subscription_id')->index('subscription_id');
+            $table->unsignedBigInteger('subscription_id')->index();
             $table->enum('service_type', ['horoscope', 'otro_servicio']);
-            $table->integer('content_id')->index('content_id');
+            $table->integer('content_id')->index();
             $table->timestamp('sent_at')->nullable()->useCurrent();
             $table->dateTime('opened_at')->nullable();
             $table->enum('status', ['sent', 'failed']);

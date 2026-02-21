@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('email')->nullable();
-            $table->integer('service_id')->index('fk_service_id');
+            $table->integer('service_id')->index();
             $table->string('subscription_id');
             $table->string('status')->default('pending');
             $table->string('external_reference', 23);

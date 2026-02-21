@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Exception;
-
 use Illuminate\Support\Facades\Http;
 
 class DlocalGoService
@@ -12,21 +11,23 @@ class DlocalGoService
     /**
      * Obtiene los detalles de una suscripción en DlocalGo.
      *
-     * @param string $subscriptionId El ID de la suscripción(Mercado pago) a consultar.
-     * @return array La respuesta de la API de Mercado Pago en formato array.
+     * @param string $subscriptionId El ID de la suscripción a consultar.
+     * @return array La respuesta de la API de DlocalGo en formato array.
      * @throws Exception Si ocurre un error en la solicitud o en la respuesta.
      */
     public function getSubscription($subscriptionId)
     {
+        $apiKey = config('services.dlocalgo.key');
+        $baseUrl = config('services.dlocalgo.url');
 
         // Configuración de cURL
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.mercadopago.com/preapproval/' . $subscriptionId,
+            CURLOPT_URL => $baseUrl . '/v1/subscription/' . $subscriptionId,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer APP_USR-8219629790209665-062910-420b6ac831a33108c2677609f5d97655-212784792',
+                'Authorization: Bearer ' . $apiKey,
                 'Content-Type: application/json'
             ),
         ));
@@ -45,13 +46,13 @@ class DlocalGoService
 
         // Procesar la respuesta
         if ($httpCode == 200) {
-
-
             $response = json_decode($response, true);
-
             return $response;
         } else {
-            throw new Exception("Error: " . $response . " Código HTTP: " . $httpCode);
+            // Intenta obtener mensaje de error del cuerpo si es JSON
+            $decoded = json_decode($response, true);
+            $msg = $decoded['message'] ?? $response;
+            throw new Exception("Error dLocalGo: " . $msg . " Código HTTP: " . $httpCode);
         }
     }
 }
