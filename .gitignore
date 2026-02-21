@@ -20,3 +20,12 @@ yarn-error.log
 /.idea
 /.vscode
 app/Providers/AppServiceProvider copy 2.php
+
+# Sensitive files
+*.zip
+*.sql
+deploy.txt
+comandos.txt
+tudexnetworks-clientsecret.json
+.env.*
+!.env.example
