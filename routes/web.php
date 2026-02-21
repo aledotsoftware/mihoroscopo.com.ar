@@ -22,6 +22,7 @@ use App\Http\Controllers\PaymentController;
 // use App\Http\Controllers\LandingController;
 
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Middleware\EnsureAdminAuthenticated;
 
 
 
@@ -92,23 +93,26 @@ Route::put('/articles/{id}', [ArticleController::class, 'update'])->name('articl
 // Ruta para mostrar el formulario de login
 Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.login');
 // Ruta para procesa el login
-Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.login.process');
-// Ruta para el panel de administración
-Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-// Ruta para el logout
-Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
-// Ruta para mostrar el formulario de edición de un artículo existente
-Route::get('/admin/articles/{article}/edit', [ArticleController::class, 'edit'])->name('admin.articles.edit');
-// Ruta para mostrar la lista de artículos
-Route::get('/admin/articles', [ArticleController::class,  'adminIndex'])->name('admin.articles.index');
-// Ruta para mostrar el formulario de creación de un nuevo artículo
-Route::get('/admin/articles/create', [ArticleController::class, 'create'])->name('admin.articles.create');
-// Ruta para procesar la creación de un nuevo artículo
-Route::post('/admin/articles', [ArticleController::class, 'store'])->name('admin.articles.store');
-// Ruta para actualizar un artículo existente
-Route::put('/admin/articles/{article}', [ArticleController::class, 'update'])->name('admin.articles.update');
-// Ruta para eliminar un artículo
-Route::delete('/admin/articles/{article}', [ArticleController::class, 'destroy'])->name('admin.articles.destroy');
+Route::post('/admin/login', [AdminController::class, 'login'])->middleware('throttle:6,1')->name('admin.login.process');
+
+Route::middleware([EnsureAdminAuthenticated::class])->group(function () {
+    // Ruta para el panel de administración
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Ruta para el logout
+    Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
+    // Ruta para mostrar el formulario de edición de un artículo existente
+    Route::get('/admin/articles/{article}/edit', [ArticleController::class, 'edit'])->name('admin.articles.edit');
+    // Ruta para mostrar la lista de artículos
+    Route::get('/admin/articles', [ArticleController::class,  'adminIndex'])->name('admin.articles.index');
+    // Ruta para mostrar el formulario de creación de un nuevo artículo
+    Route::get('/admin/articles/create', [ArticleController::class, 'create'])->name('admin.articles.create');
+    // Ruta para procesar la creación de un nuevo artículo
+    Route::post('/admin/articles', [ArticleController::class, 'store'])->name('admin.articles.store');
+    // Ruta para actualizar un artículo existente
+    Route::put('/admin/articles/{article}', [ArticleController::class, 'update'])->name('admin.articles.update');
+    // Ruta para eliminar un artículo
+    Route::delete('/admin/articles/{article}', [ArticleController::class, 'destroy'])->name('admin.articles.destroy');
+});
 
 
 

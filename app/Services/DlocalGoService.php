@@ -26,7 +26,7 @@ class DlocalGoService
             CURLOPT_URL => 'https://api.mercadopago.com/preapproval/' . $subscriptionId,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer APP_USR-8219629790209665-062910-420b6ac831a33108c2677609f5d97655-212784792',
+                'Authorization: Bearer ' . config('mercado_pago.access_token'),
                 'Content-Type: application/json'
             ),
         ));
