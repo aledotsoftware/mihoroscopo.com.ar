@@ -19,7 +19,7 @@ class DiscordService
     public function __construct($botId)
     {
         $this->botId = $botId;
-        $this->webhookUrl = "https://discord.com/api/webhooks/1281123979431776327/5lGlZtlIF4r6MLsRH0TM3jRWtUwsNdNTlgZBtZ9dtfjj8pJUPKZSvafECx-VeqL-r90H";
+        $this->webhookUrl = config('discord.webhook_url');
     }
 
     /**

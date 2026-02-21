@@ -91,6 +91,10 @@ class NotificationController extends Controller
         // Determinar el tipo de notificación es, las de mercado pago tienen type, las de dLocalGo no
         //las de dLocalGo tienen 3 campos invoiceId, mid, y subscriptionId
         if (isset($data['type'])) {
+            if (!$this->verifyMercadoPagoSignature($request)) {
+                \Log::warning('Invalid MercadoPago signature');
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
             // Es una notificación de MercadoPago
             $topic = $data['type'];
 
@@ -115,6 +119,10 @@ class NotificationController extends Controller
         } else {
             // Es una notificación de dLocalGo
             if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
+                if (!$this->verifyDlocalGoSignature($request)) {
+                    \Log::warning('Invalid DlocalGo signature');
+                    return response()->json(['error' => 'Unauthorized'], 403);
+                }
                 // Es una notificación de dLocalGo
                 $this->handleDlocalGoNotification($data);
                 return;
@@ -136,7 +144,7 @@ class NotificationController extends Controller
             }
 
             // Configurar la llamada a la API de dLocalGo
-            $apiKey = env('DLOCALGO_API_KEY');
+            $apiKey = config('dlocalgo.api_key');
             $url = "https://api-sbx.dlocalgo.com/v1/subscription/{$subscriptionId}/execution/{$invoiceId}";
 
             $ch = curl_init();
@@ -513,5 +521,63 @@ class NotificationController extends Controller
             default:
                 return ''; // Bandera por defecto si no hay coincidencia
         }
+    }
+
+    private function verifyMercadoPagoSignature(Request $request)
+    {
+        $secret = config('mercado_pago.webhook_secret');
+        if (empty($secret)) {
+            return true;
+        }
+
+        $signatureHeader = $request->header('x-signature');
+        $requestId = $request->header('x-request-id');
+        $dataId = $request->input('data.id');
+
+        if (empty($signatureHeader) || empty($requestId) || empty($dataId)) {
+            return false;
+        }
+
+        $parts = explode(',', $signatureHeader);
+        $ts = null;
+        $v1 = null;
+
+        foreach ($parts as $part) {
+            $item = explode('=', trim($part), 2);
+            if (count($item) == 2) {
+                if ($item[0] == 'ts') $ts = $item[1];
+                if ($item[0] == 'v1') $v1 = $item[1];
+            }
+        }
+
+        if (empty($ts) || empty($v1)) {
+            return false;
+        }
+
+        $manifest = "id:$dataId;request-id:$requestId;ts:$ts;";
+        $sha = hash_hmac('sha256', $manifest, $secret);
+
+        return hash_equals($sha, $v1);
+    }
+
+    private function verifyDlocalGoSignature(Request $request)
+    {
+        $secret = config('dlocalgo.webhook_secret');
+        if (empty($secret)) {
+            return true;
+        }
+
+        $authHeader = $request->header('Authorization');
+        if (empty($authHeader)) {
+            return false;
+        }
+
+        // Usually "Bearer <token>"
+        if (strpos($authHeader, 'Bearer ') === 0) {
+            $token = substr($authHeader, 7);
+            return hash_equals($secret, $token);
+        }
+
+        return false;
     }
 }

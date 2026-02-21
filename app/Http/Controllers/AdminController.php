@@ -16,10 +16,11 @@ class AdminController extends Controller
     public function login(Request $request)
     {
         // Obtener la clave maestra del archivo .env
-        $adminPassword = env('ADMIN_PASSWORD');
+        $adminPassword = (string) config('admin.password');
+        $inputPassword = (string) $request->input('password');
 
         // Verificar si la clave ingresada es correcta
-        if ($request->input('password') === $adminPassword) {
+        if (hash_equals($adminPassword, $inputPassword)) {
             // Guardar en la sesión que el usuario es administrador
             $request->session()->put('is_admin', true);
             return redirect()->route('admin.dashboard');
