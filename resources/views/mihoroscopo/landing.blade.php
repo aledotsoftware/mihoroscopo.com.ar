@@ -82,6 +82,31 @@
         .woman-cook {
             display: none;
         }
+
+        /* Spinner and Loading State */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-loading {
+            opacity: 0.8;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -388,7 +413,15 @@
 
 //         $extradataHoroscope->save();
 
-            showModal('Por favor espere un momento.');
+            // UX Improvement: Show loading state on button instead of modal
+            // showModal('Por favor espere un momento.');
+
+            const originalBtnText = btnConfirmName.innerHTML;
+            btnConfirmName.disabled = true;
+            nameInput.disabled = true;
+            btnConfirmName.classList.add('btn-loading');
+            btnConfirmName.innerHTML = '<span class="spinner"></span> Cargando...';
+
             const apiUrl = "{{ url('api/v1/subscribe') }}"; // Genera la URL completa
             // Envío de datos al backend
 
@@ -441,6 +474,13 @@
                 })
                 .catch(error => {
                     console.error('Error al enviar los datos:', error);
+
+                    // Reset button state
+                    btnConfirmName.disabled = false;
+                    nameInput.disabled = false;
+                    btnConfirmName.classList.remove('btn-loading');
+                    btnConfirmName.innerHTML = originalBtnText;
+
                     // Recargar la página y volver al inicio
                     window.location.reload();
                 });
