@@ -10,6 +10,7 @@ class ArticleController extends Controller
 {
     private $viewDirectory;
     private $replacements; // Variable global para palabras clave
+    private $normalizedReplacements;
 
     public function __construct()
     {
@@ -103,6 +104,15 @@ class ArticleController extends Controller
             'Independencia',
             'Revolución',
         ];
+
+        // Optimización: Pre-calcular normalizaciones para búsqueda rápida O(1)
+        $this->normalizedReplacements = [];
+        foreach ($this->replacements as $r) {
+            $normalized = strtolower(preg_replace('/[^\w]+/', '', $r));
+            if ($normalized !== '') {
+                $this->normalizedReplacements[$normalized] = true;
+            }
+        }
     }
 
     private function applyReplacements($text)
@@ -119,12 +129,8 @@ class ArticleController extends Controller
             // Convertir la palabra a minúsculas y eliminar signos para la comparación
             $normalizedWord = strtolower(preg_replace('/[^\w]+/', '', $trimmedWord));
 
-            // Comprobar si la versión normalizada de la palabra está en los reemplazos
-            $replacementsNormalized = array_map(function ($r) {
-                return strtolower(preg_replace('/[^\w]+/', '', $r));
-            }, $this->replacements);
-
-            if (in_array($normalizedWord, $replacementsNormalized)) {
+            // Optimización: Búsqueda O(1) en el mapa pre-calculado
+            if ($normalizedWord !== '' && isset($this->normalizedReplacements[$normalizedWord])) {
                 // Si hay coincidencia, resalta la palabra original
                 if ($em) {
                     $output .= "<em>$trimmedWord</em>";
