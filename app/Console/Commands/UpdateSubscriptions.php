@@ -45,7 +45,6 @@ class UpdateSubscriptions extends Command
         foreach ($subscriptions as $subscription) {
             try {
                 $mercadoPagoSubscription = $this->mercadoPagoService->getSubscription($subscription->subscription_id);
-                var_dump($mercadoPagoSubscription);
                 $subscription->fill([
                     'status' => $mercadoPagoSubscription['status'] ?? 'gaia',
                     'next_payment_date' => $mercadoPagoSubscription['next_payment_date'] ?? null,

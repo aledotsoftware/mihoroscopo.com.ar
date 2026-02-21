@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\EmailLog;
+use App\Models\EmailClick;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -41,5 +42,34 @@ class EmailTrackingController extends Controller
             'Content-Type' => 'image/png',
             'Content-Length' => filesize($logoPath)
         ]);
+    }
+
+    public function trackClick(Request $request)
+    {
+        $emailLogId = $request->query('email');
+        $url = $request->query('url');
+
+        if ($emailLogId && $url) {
+            try {
+                // Registrar el click
+                EmailClick::create([
+                    'email_log_id' => $emailLogId,
+                    'url' => $url,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            } catch (\Exception $e) {
+                // Log error but continue redirect
+                \Log::error('Error tracking email click: ' . $e->getMessage());
+            }
+        }
+
+        // Redirigir a la URL original
+        if ($url) {
+            return redirect($url);
+        }
+
+        // Fallback si no hay URL
+        return redirect('/');
     }
 }

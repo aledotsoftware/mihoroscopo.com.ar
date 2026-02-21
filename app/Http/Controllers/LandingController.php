@@ -63,8 +63,6 @@ class LandingController extends Controller
 
         // Si aún no hay un país (por ejemplo, IP no reconocida), puedes establecer un valor por defecto
         $country = $country ?? 'unknown';
-// CONSOLE LOG COUNTRY
-        echo "<script>console.log('Country: $country');</script>";
         // Renderiza la vista pasando el país como parámetro
         return view($viewName, compact('country'));
     }

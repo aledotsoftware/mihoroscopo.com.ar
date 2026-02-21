@@ -13,6 +13,6 @@ Route::prefix('v1')->group(function () {
     });
 
 
-    Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+    Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->middleware('throttle:60,1');
 
 });
