@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Article; // Asumiendo que tienes un modelo Article
+use App\Models\Article;
+use Illuminate\Http\Request; // Asumiendo que tienes un modelo Article
 use Parsedown;
 
 class ArticleController extends Controller
 {
     private $viewDirectory;
+
     private $replacements; // Variable global para palabras clave
-    private $normalizedReplacements;
+
+    private $replacementPattern; // Patrón regex pre-calculado
 
     public function __construct()
     {
@@ -105,49 +107,44 @@ class ArticleController extends Controller
             'Revolución',
         ];
 
-        // Optimización: Pre-calcular normalizaciones para búsqueda rápida O(1)
-        $this->normalizedReplacements = [];
-        foreach ($this->replacements as $r) {
-            $normalized = strtolower(preg_replace('/[^\w]+/', '', $r));
-            if ($normalized !== '') {
-                $this->normalizedReplacements[$normalized] = true;
-            }
+        // Optimización: Pre-calcular patrón regex para búsqueda rápida y soporte de frases
+        // Ordenar por longitud descendente para que las frases más largas se encuentren primero
+        $replacements = $this->replacements;
+        usort($replacements, function ($a, $b) {
+            return strlen($b) - strlen($a);
+        });
+
+        $patterns = [];
+        foreach ($replacements as $r) {
+            $escaped = preg_quote($r, '/');
+            // Agregar límites de palabra solo si empieza/termina con un carácter de palabra (Unicode)
+            $start = preg_match('/^\w/u', $r) ? '\b' : '';
+            $end = preg_match('/\w$/u', $r) ? '\b' : '';
+            $patterns[] = $start.$escaped.$end;
         }
+
+        $this->replacementPattern = '/('.implode('|', $patterns).')/iu';
     }
 
     private function applyReplacements($text)
     {
-        // Dividir el texto en palabras y revisar cada una
-        $words = preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $output = '';
+        // Optimización: Usar preg_replace_callback con el patrón pre-calculado
+        // Esto evita iterar palabra por palabra y soporta frases de varias palabras
         $em = true;
 
-        foreach ($words as $word) {
-            // Remover espacios y normalizar para comparar
-            $trimmedWord = trim($word);
+        return preg_replace_callback($this->replacementPattern, function ($matches) use (&$em) {
+            $word = $matches[0];
+            if ($em) {
+                $em = false;
 
-            // Convertir la palabra a minúsculas y eliminar signos para la comparación
-            $normalizedWord = strtolower(preg_replace('/[^\w]+/', '', $trimmedWord));
-
-            // Optimización: Búsqueda O(1) en el mapa pre-calculado
-            if ($normalizedWord !== '' && isset($this->normalizedReplacements[$normalizedWord])) {
-                // Si hay coincidencia, resalta la palabra original
-                if ($em) {
-                    $output .= "<em>$trimmedWord</em>";
-                    $em = false;
-                } else {
-                    $output .= "<span>$trimmedWord</span>";
-                    $em = true;
-                }
+                return "<em>$word</em>";
             } else {
-                $output .= $word;
+                $em = true;
+
+                return "<span>$word</span>";
             }
-        }
-
-        return $output;
+        }, $text);
     }
-
-
 
     public function index()
     {
@@ -161,29 +158,24 @@ class ArticleController extends Controller
         return view('mihoroscopo/articles.index', compact('articles'));
     }
 
-
     public function show($slug)
     {
 
         $article = Article::where('slug', $slug)->firstOrFail();
-        $parsedown = new Parsedown();
+        $parsedown = new Parsedown;
         $article->content = $parsedown->text($article->content);
+
         return view('mihoroscopo/articles.show', compact('article'));
     }
-
 
     // Muestra la lista de artículos en el panel de administración
     public function adminIndex()
     {
 
         $articles = Article::orderBy('created_at', 'desc')->paginate(10);
+
         return view('admin.articles.index', compact('articles'));
     }
-
-
-
-
-
 
     // Mostrar el formulario para crear un nuevo artículo
     public function create()
@@ -201,13 +193,13 @@ class ArticleController extends Controller
         ]);
 
         Article::create($request->all());
+
         return redirect()->route('articles.index')->with('success', 'Artículo creado exitosamente.');
     }
 
     // Mostrar el formulario para editar un artículo
     public function edit(Article $article)
     {
-
 
         return view('admin.articles.edit', compact('article'));
     }
@@ -217,7 +209,7 @@ class ArticleController extends Controller
         // Validar los datos de entrada
         $request->validate([
             'id' => 'required|exists:articles,id', // Asegura que el ID es válido y el artículo existe
-            'slug' => 'required|unique:articles,slug,' . $request->input('id'),
+            'slug' => 'required|unique:articles,slug,'.$request->input('id'),
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
@@ -239,12 +231,11 @@ class ArticleController extends Controller
         return redirect()->route('admin.articles.edit', $article->id)->with('success', 'Artículo actualizado exitosamente.');
     }
 
-
-
     // Eliminar un artículo
     public function destroy(Article $article)
     {
         $article->delete();
+
         return redirect()->route('articles.index')->with('success', 'Artículo eliminado exitosamente.');
     }
 }
