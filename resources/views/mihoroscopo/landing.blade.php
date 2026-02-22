@@ -140,7 +140,7 @@
 
 
             <div class="wrapper-email">
-                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" type="email" />
+                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" type="email" autocomplete="email" inputmode="email" />
 
             </div>
 
@@ -189,7 +189,7 @@
 
             <h5 class="type-text" id="label-name">Ingresa tu Nombre</h5>
             <div class="wrapper-email">
-                <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" />
+                <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" type="text" autocomplete="name" autocapitalize="words" />
             </div>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-name">
@@ -321,6 +321,22 @@
         // Selectores de los botones
         const btnConfirmEmail = document.getElementById('btn-confirm-email');
         const btnConfirmZodiac = document.getElementById('btn-confirm-zodiac');
+
+        // UX Improvement: Enable "Enter" key to submit sections
+        function handleEnterKey(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        document.getElementById(buttonId).click();
+                    }
+                });
+            }
+        }
+
+        handleEnterKey('input-email', 'btn-confirm-email');
+        handleEnterKey('input-name', 'btn-confirm-name');
         const btnConfirmName = document.getElementById('btn-confirm-name');
         const btnConfirmSubscription = document.getElementById('btn-confirm-subscription');
 
