@@ -10,16 +10,21 @@ class ArticleController extends Controller
 {
     private $viewDirectory;
 
-    private $replacements; // Variable global para palabras clave
-
     private $replacementPattern; // Patrón regex pre-calculado
 
     public function __construct()
     {
         // Obtén la variable de entorno
         $this->viewDirectory = env('VIEW_DIRECTORY');
+    }
 
-        $this->replacements = [
+    private function getReplacementPattern()
+    {
+        if ($this->replacementPattern !== null) {
+            return $this->replacementPattern;
+        }
+
+        $replacements = [
             'Carta Astral',
             'horóscopo',
             'Zodiacales',
@@ -109,7 +114,6 @@ class ArticleController extends Controller
 
         // Optimización: Pre-calcular patrón regex para búsqueda rápida y soporte de frases
         // Ordenar por longitud descendente para que las frases más largas se encuentren primero
-        $replacements = $this->replacements;
         usort($replacements, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
@@ -124,6 +128,8 @@ class ArticleController extends Controller
         }
 
         $this->replacementPattern = '/('.implode('|', $patterns).')/iu';
+
+        return $this->replacementPattern;
     }
 
     private function applyReplacements($text)
@@ -132,7 +138,7 @@ class ArticleController extends Controller
         // Esto evita iterar palabra por palabra y soporta frases de varias palabras
         $em = true;
 
-        return preg_replace_callback($this->replacementPattern, function ($matches) use (&$em) {
+        return preg_replace_callback($this->getReplacementPattern(), function ($matches) use (&$em) {
             $word = $matches[0];
             if ($em) {
                 $em = false;
