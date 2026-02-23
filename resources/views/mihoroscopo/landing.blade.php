@@ -107,6 +107,14 @@
             pointer-events: none;
             cursor: not-allowed;
         }
+
+        /* Focus styles for accessibility */
+        input:focus-visible,
+        select:focus-visible,
+        button:focus-visible {
+            outline: 3px solid #facc15;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 
@@ -326,7 +334,7 @@
         function handleEnterKey(inputId, buttonId) {
             const input = document.getElementById(inputId);
             if (input) {
-                input.addEventListener('keyup', function(event) {
+                input.addEventListener('keydown', function(event) {
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         document.getElementById(buttonId).click();
@@ -337,13 +345,21 @@
 
         handleEnterKey('input-email', 'btn-confirm-email');
         handleEnterKey('input-name', 'btn-confirm-name');
+        handleEnterKey('select-zodiac-sign', 'btn-confirm-zodiac');
+
         const btnConfirmName = document.getElementById('btn-confirm-name');
         const btnConfirmSubscription = document.getElementById('btn-confirm-subscription');
 
         // Función para mostrar la siguiente sección y ocultar la actual usando CSS desde JavaScript
-        function showNextSection(currentSection, nextSection) {
+        function showNextSection(currentSection, nextSection, nextInputId) {
             currentSection.style.display = 'none'; // Ocultar la sección actual
             nextSection.style.display = 'flex'; // Mostrar la siguiente sección
+            if (nextInputId) {
+                const nextInput = document.getElementById(nextInputId);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
         }
 
         // Eventos de los botones con validaciones correspondientes
@@ -355,32 +371,39 @@
 
             if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1]) {
                 showModal('Por favor, ingresa un correo válido.');
+                emailInput.setAttribute('aria-invalid', 'true');
                 return;
             }
 
             const domain = emailParts[1];
             if (!validDomains.includes(domain)) {
                 showModal('Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.');
+                emailInput.setAttribute('aria-invalid', 'true');
                 return;
             }
 
-            showNextSection(emailSection, zodiacSection); // Mostrar la siguiente sección si todo es correcto
+            emailInput.setAttribute('aria-invalid', 'false');
+            showNextSection(emailSection, zodiacSection, 'select-zodiac-sign'); // Mostrar la siguiente sección si todo es correcto
         });
 
         btnConfirmZodiac.addEventListener('click', () => {
             if (zodiacSelect.value === '') {
                 showModal('Por favor, selecciona tu signo.');
+                zodiacSelect.setAttribute('aria-invalid', 'true');
                 return;
             }
 
-            showNextSection(zodiacSection, nameSection);
+            zodiacSelect.setAttribute('aria-invalid', 'false');
+            showNextSection(zodiacSection, nameSection, 'input-name');
         });
 
         btnConfirmName.addEventListener('click', () => {
             if (nameInput.value.trim() === '') {
                 showModal('Por favor, ingresa tu nombre.');
+                nameInput.setAttribute('aria-invalid', 'true');
                 return;
             }
+            nameInput.setAttribute('aria-invalid', 'false');
 
             // showNextSection(nameSection, subscriptionSection);
 
