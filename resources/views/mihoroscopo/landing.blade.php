@@ -299,19 +299,6 @@
         }
 
 
-        // Función para mostrar el modal con un mensaje
-        function showModal(message) {
-            const modal = document.getElementById('modal');
-            const modalMessage = document.getElementById('modal-message');
-            modalMessage.textContent = message;
-            modal.style.display = 'block';
-        }
-
-        // Función para cerrar el modal al hacer clic en la "X"
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.style.display = 'none';
-        }
 
 
         // Selectores de las secciones
@@ -553,18 +540,59 @@
 
         });
 
+        let lastFocusedElement;
+
         // Función para mostrar el modal con un mensaje
         function showModal(message) {
+            lastFocusedElement = document.activeElement;
             const modal = document.getElementById('modal');
             const modalMessage = document.getElementById('modal-message');
+            const closeBtn = modal.querySelector('.close');
+
             modalMessage.textContent = message;
             modal.style.display = 'flex';
+
+            if (closeBtn) {
+                closeBtn.focus();
+            }
+
+            modal.addEventListener('keydown', trapFocus);
         }
 
         // Función para cerrar el modal al hacer clic en la "X"
         function closeModal() {
             const modal = document.getElementById('modal');
             modal.style.display = 'none';
+            modal.removeEventListener('keydown', trapFocus);
+
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+            }
+        }
+
+        function trapFocus(e) {
+            const modal = document.getElementById('modal');
+            const focusableContent = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusableContent.length === 0) return;
+
+            const firstFocusableElement = focusableContent[0];
+            const lastFocusableElement = focusableContent[focusableContent.length - 1];
+
+            if (e.key === 'Tab') {
+                if (e.shiftKey) { // Shift + Tab
+                    if (document.activeElement === firstFocusableElement) {
+                        lastFocusableElement.focus();
+                        e.preventDefault();
+                    }
+                } else { // Tab
+                    if (document.activeElement === lastFocusableElement) {
+                        firstFocusableElement.focus();
+                        e.preventDefault();
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                closeModal();
+            }
         }
 
         document.addEventListener('click', (event) => {
