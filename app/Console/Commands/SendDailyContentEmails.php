@@ -18,6 +18,7 @@ use App\Models\ContentLunarRitual;
 use App\Models\ContentProsperityRitual;
 use App\Models\ContentZodiacCompatibility;
 use App\Models\EmailLog;
+use App\Models\Subscription;
 
 class SendDailyContentEmails extends Command
 {
@@ -50,13 +51,30 @@ class SendDailyContentEmails extends Command
         // Inicializar el archivo de log
         file_put_contents($this->logPath, "Inicio del proceso: " . Carbon::now() . "\n", FILE_APPEND);
 
+        // Fetch daily content once to avoid queries inside loop
+        $date = Carbon::now()->format('d/m/Y');
+        $dateForDatabase = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+
+        $dailyContent = [
+            'date' => $date,
+            'contentAstralGuide' => ContentAstralGuide::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentDailyAstroAdvice' => ContentDailyAstroAdvice::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentHoroscope' => ContentHoroscope::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentLovePrediction' => ContentLovePrediction::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentLoveRitual' => ContentLoveRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentLunarRitual' => ContentLunarRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentProsperityRitual' => ContentProsperityRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+            'contentZodiacCompatibility' => ContentZodiacCompatibility::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray(),
+        ];
+
         if ($email) {
-            $subscription = DB::table('subscriptions')
+            // Eager load extradata_horoscopes
+            $subscription = Subscription::with('extradata_horoscopes')
                 ->where('email', $email)
                 ->first();
         
             if ($subscription) {
-                $this->sendEmail($subscription);
+                $this->sendEmail($subscription, $dailyContent);
                 $this->discordService->sendDiscordMessage(
                     "CONTENIDO ENVIADO A :" . $email
                 );
@@ -64,17 +82,18 @@ class SendDailyContentEmails extends Command
                 file_put_contents($this->logPath, "No se encontró una suscripción autorizada para el correo: " . $email . "\n", FILE_APPEND);
             }
         } else {
-            $subscriptions = DB::table('subscriptions')
-                ->where('status', 'authorized')
-                ->orWhere('status', 'pending')
-                ->get();
+            // Use Eloquent with chunking to handle large datasets and eager load relationships
+            $subscriptionQuery = Subscription::with('extradata_horoscopes')
+                ->whereIn('status', ['authorized', 'pending']);
 
-            $subscriptionCount = $subscriptions->count();
+            $subscriptionCount = $subscriptionQuery->count();
             file_put_contents($this->logPath, "Total de suscripciones encontradas: " . $subscriptionCount . "\n", FILE_APPEND);
 
-            foreach ($subscriptions as $subscription) {
-                $this->sendEmail($subscription);
-            }
+            $subscriptionQuery->chunk(100, function ($subscriptions) use ($dailyContent) {
+                foreach ($subscriptions as $subscription) {
+                    $this->sendEmail($subscription, $dailyContent);
+                }
+            });
 
             // Enviar log a Discord al final del proceso
             $this->sendLogToDiscord($subscriptionCount);
@@ -82,44 +101,33 @@ class SendDailyContentEmails extends Command
     }
 
 
-    public function sendEmail($subscription)
+    public function sendEmail($subscription, $dailyContent = null)
     {
         // Proceso de enviar email
-
-            $date = Carbon::now()->format('d/m/Y');
-            $dateForDatabase = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
-
-            $contentAstralGuide = ContentAstralGuide::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentDailyAstroAdvice = ContentDailyAstroAdvice::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentHoroscope = ContentHoroscope::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentLovePrediction = ContentLovePrediction::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentLoveRitual = ContentLoveRitual::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentLunarRitual = ContentLunarRitual::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentProsperityRitual = ContentProsperityRitual::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
-
-            $contentZodiacCompatibility = ContentZodiacCompatibility::where('date', $dateForDatabase)
-                ->pluck('content', 'zodiac_sign')
-                ->toArray();
+            // Use passed content or fallback
+            if ($dailyContent) {
+                $date = $dailyContent['date'];
+                $contentAstralGuide = $dailyContent['contentAstralGuide'];
+                $contentDailyAstroAdvice = $dailyContent['contentDailyAstroAdvice'];
+                $contentHoroscope = $dailyContent['contentHoroscope'];
+                $contentLovePrediction = $dailyContent['contentLovePrediction'];
+                $contentLoveRitual = $dailyContent['contentLoveRitual'];
+                $contentLunarRitual = $dailyContent['contentLunarRitual'];
+                $contentProsperityRitual = $dailyContent['contentProsperityRitual'];
+                $contentZodiacCompatibility = $dailyContent['contentZodiacCompatibility'];
+            } else {
+                 // Optimization: This block is kept for backward compatibility if called without content
+                $date = Carbon::now()->format('d/m/Y');
+                $dateForDatabase = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
+                $contentAstralGuide = ContentAstralGuide::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentDailyAstroAdvice = ContentDailyAstroAdvice::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentHoroscope = ContentHoroscope::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentLovePrediction = ContentLovePrediction::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentLoveRitual = ContentLoveRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentLunarRitual = ContentLunarRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentProsperityRitual = ContentProsperityRitual::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+                $contentZodiacCompatibility = ContentZodiacCompatibility::where('date', $dateForDatabase)->pluck('content', 'zodiac_sign')->toArray();
+            }
 
             $timestamp = Carbon::now()->timestamp;
 
@@ -128,7 +136,12 @@ class SendDailyContentEmails extends Command
             $preferencesLink = url('https://mihoroscopo.com.ar/subscription/preferences/' . $subscription->external_reference);
 
             try {
-                $extradataHoroscope = ExtradataHoroscope::where('subscription_id', $subscription->id)->first();
+                // Use eager loaded relation if available to avoid N+1, with fallback for stdClass
+                if ($subscription instanceof Subscription && $subscription->relationLoaded('extradata_horoscopes')) {
+                    $extradataHoroscope = $subscription->extradata_horoscopes->first();
+                } else {
+                    $extradataHoroscope = ExtradataHoroscope::where('subscription_id', $subscription->id)->first();
+                }
 
                 if ($extradataHoroscope) {
                     $zodiacSign = $extradataHoroscope->signo;
