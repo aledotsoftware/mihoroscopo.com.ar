@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Http\Request; // Asumiendo que tienes un modelo Article
+use Illuminate\Support\Facades\Cache;
 use Parsedown;
 
 class ArticleController extends Controller
@@ -11,6 +12,8 @@ class ArticleController extends Controller
     private $viewDirectory;
 
     private $replacementPattern; // Patrón regex pre-calculado
+
+    const CACHE_VERSION = 'v1';
 
     public function __construct()
     {
@@ -24,110 +27,112 @@ class ArticleController extends Controller
             return $this->replacementPattern;
         }
 
-        $replacements = [
-            'Carta Astral',
-            'horóscopo',
-            'Zodiacales',
-            'decisiones?',
-            'Carta Astral Gratis',
-            'Horoscopo Chino',
-            'Capricórnio',
-            'Horóscopo de Hoy',
-            'emociones',
-            'Mercurio Retrogrado',
-            'Soñar con Ratas',
-            'Piscis Hoy',
-            'Suerte',
-            'Escorpio',
-            'Signo Leo',
-            'Virgo Hoy',
-            'Tauro Hoy',
-            'Libra Hoy',
-            'Capricornio Hoy',
-            'Sagitário Hoy',
-            'Acuario Hoy',
-            'Signos',
-            'Piscis',
-            'Astrología',
-            'Compatibilidad de Signos',
-            'Cáncer Hoy',
-            'Fechas de los Signos',
-            'Horoscopo Leo',
-            'Personalidad',
-            'Sueños',
-            'Influencia de los Signos Zodiacales',
-            'Personalidad',
-            'Política de Privacidad',
-            'Términos y Condiciones',
-            'Preguntas Frecuentes',
-            'Influencia de los Sueños',
-            'Suerte',
-            'Horóscopo',
-            'Tomar Mejores Decisiones',
-            'Luna',
-            'Emociones',
-            'Vida',
-            'Aries',
-            'Primer Signo del Zodiaco',
-            'Energía de Aries',
-            'Tauro',
-            'Estabilidad',
-            'Paciencia',
-            'Fortaleza',
-            'Géminis',
-            'Dualidad',
-            'Comunicación',
-            'Adaptabilidad',
-            'Cáncer',
-            'Signo del Hogar',
-            'Emoción',
-            'Protección',
-            'Leo',
-            'Signo del Coraje',
-            'Confianza',
-            'Creatividad',
-            'Virgo',
-            'Signo de la Organización',
-            'Práctica',
-            'Perfección',
-            'Libra',
-            'Signo de la Armonía',
-            'Diplomacia',
-            'Encanto',
-            'Escorpio',
-            'Signo de la Intensidad',
-            'Transformación',
-            'Misterio',
-            'Sagitario',
-            'Signo de la Aventura',
-            'Libertad',
-            'Filosofía',
-            'Capricornio',
-            'Signo de la Disciplina',
-            'Ambición',
-            'Perseverancia',
-            'Acuario',
-            'Signo de la Innovación',
-            'Independencia',
-            'Revolución',
-        ];
+        $this->replacementPattern = Cache::rememberForever('article_replacements_' . self::CACHE_VERSION, function () {
+            $replacements = [
+                'Carta Astral',
+                'horóscopo',
+                'Zodiacales',
+                'decisiones?',
+                'Carta Astral Gratis',
+                'Horoscopo Chino',
+                'Capricórnio',
+                'Horóscopo de Hoy',
+                'emociones',
+                'Mercurio Retrogrado',
+                'Soñar con Ratas',
+                'Piscis Hoy',
+                'Suerte',
+                'Escorpio',
+                'Signo Leo',
+                'Virgo Hoy',
+                'Tauro Hoy',
+                'Libra Hoy',
+                'Capricornio Hoy',
+                'Sagitário Hoy',
+                'Acuario Hoy',
+                'Signos',
+                'Piscis',
+                'Astrología',
+                'Compatibilidad de Signos',
+                'Cáncer Hoy',
+                'Fechas de los Signos',
+                'Horoscopo Leo',
+                'Personalidad',
+                'Sueños',
+                'Influencia de los Signos Zodiacales',
+                'Personalidad',
+                'Política de Privacidad',
+                'Términos y Condiciones',
+                'Preguntas Frecuentes',
+                'Influencia de los Sueños',
+                'Suerte',
+                'Horóscopo',
+                'Tomar Mejores Decisiones',
+                'Luna',
+                'Emociones',
+                'Vida',
+                'Aries',
+                'Primer Signo del Zodiaco',
+                'Energía de Aries',
+                'Tauro',
+                'Estabilidad',
+                'Paciencia',
+                'Fortaleza',
+                'Géminis',
+                'Dualidad',
+                'Comunicación',
+                'Adaptabilidad',
+                'Cáncer',
+                'Signo del Hogar',
+                'Emoción',
+                'Protección',
+                'Leo',
+                'Signo del Coraje',
+                'Confianza',
+                'Creatividad',
+                'Virgo',
+                'Signo de la Organización',
+                'Práctica',
+                'Perfección',
+                'Libra',
+                'Signo de la Armonía',
+                'Diplomacia',
+                'Encanto',
+                'Escorpio',
+                'Signo de la Intensidad',
+                'Transformación',
+                'Misterio',
+                'Sagitario',
+                'Signo de la Aventura',
+                'Libertad',
+                'Filosofía',
+                'Capricornio',
+                'Signo de la Disciplina',
+                'Ambición',
+                'Perseverancia',
+                'Acuario',
+                'Signo de la Innovación',
+                'Independencia',
+                'Revolución',
+            ];
 
-        // Optimización: Pre-calcular patrón regex para búsqueda rápida y soporte de frases
-        // Ordenar por longitud descendente para que las frases más largas se encuentren primero
-        usort($replacements, function ($a, $b) {
-            return strlen($b) - strlen($a);
+            // Optimización: Pre-calcular patrón regex para búsqueda rápida y soporte de frases
+            // Ordenar por longitud descendente para que las frases más largas se encuentren primero
+            usort($replacements, function ($a, $b) {
+                return strlen($b) - strlen($a);
+            });
+
+            $patterns = [];
+            foreach ($replacements as $r) {
+                $escaped = preg_quote($r, '/');
+                // Agregar límites de palabra solo si empieza/termina con un carácter de palabra (Unicode)
+                $start = preg_match('/^\w/u', $r) ? '\b' : '';
+                $end = preg_match('/\w$/u', $r) ? '\b' : '';
+                $patterns[] = $start.$escaped.$end;
+            }
+
+            return '/('.implode('|', $patterns).')/iu';
         });
-
-        $patterns = [];
-        foreach ($replacements as $r) {
-            $escaped = preg_quote($r, '/');
-            // Agregar límites de palabra solo si empieza/termina con un carácter de palabra (Unicode)
-            $start = preg_match('/^\w/u', $r) ? '\b' : '';
-            $end = preg_match('/\w$/u', $r) ? '\b' : '';
-            $patterns[] = $start.$escaped.$end;
-        }
-
-        $this->replacementPattern = '/('.implode('|', $patterns).')/iu';
 
         return $this->replacementPattern;
     }
