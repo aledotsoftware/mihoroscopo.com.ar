@@ -83,6 +83,23 @@
             display: none;
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* Error state styling */
+        #input-email[aria-invalid="true"],
+        #select-zodiac-sign[aria-invalid="true"],
+        #input-name[aria-invalid="true"] {
+            border-color: #ef4444;
+        }
+
         /* Spinner and Loading State */
         .spinner {
             display: inline-block;
@@ -349,6 +366,14 @@
             }
         }
 
+        // Función para animar el elemento en caso de error
+        function shakeElement(element) {
+            element.classList.add('shake');
+            setTimeout(() => {
+                element.classList.remove('shake');
+            }, 500);
+        }
+
         // Eventos de los botones con validaciones correspondientes
         btnConfirmEmail.addEventListener('click', () => {
             const emailValue = emailInput.value.trim().toLowerCase();
@@ -359,6 +384,8 @@
             if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1]) {
                 showModal('Por favor, ingresa un correo válido.');
                 emailInput.setAttribute('aria-invalid', 'true');
+                shakeElement(emailInput);
+                emailInput.focus();
                 return;
             }
 
@@ -366,6 +393,8 @@
             if (!validDomains.includes(domain)) {
                 showModal('Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.');
                 emailInput.setAttribute('aria-invalid', 'true');
+                shakeElement(emailInput);
+                emailInput.focus();
                 return;
             }
 
@@ -377,6 +406,8 @@
             if (zodiacSelect.value === '') {
                 showModal('Por favor, selecciona tu signo.');
                 zodiacSelect.setAttribute('aria-invalid', 'true');
+                shakeElement(zodiacSelect);
+                zodiacSelect.focus();
                 return;
             }
 
@@ -388,6 +419,8 @@
             if (nameInput.value.trim() === '') {
                 showModal('Por favor, ingresa tu nombre.');
                 nameInput.setAttribute('aria-invalid', 'true');
+                shakeElement(nameInput);
+                nameInput.focus();
                 return;
             }
             nameInput.setAttribute('aria-invalid', 'false');
