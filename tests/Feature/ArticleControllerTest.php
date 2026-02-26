@@ -28,8 +28,17 @@ class ArticleControllerTest extends TestCase
                 $table->integer('author_id')->nullable();
                 $table->integer('video_status')->default(0);
                 $table->timestamps();
+
+                // Add index for performance optimization
+                $table->index('created_at');
             });
         }
+    }
+
+    public function test_articles_table_has_indexes()
+    {
+        // Verify index exists on created_at
+        $this->assertTrue(Schema::hasIndex('articles', 'articles_created_at_index'), 'Index on created_at is missing');
     }
 
     public function test_articles_index_page_loads()
