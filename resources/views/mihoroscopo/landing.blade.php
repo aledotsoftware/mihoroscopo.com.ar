@@ -96,7 +96,8 @@
         /* Error state styling */
         #input-email[aria-invalid="true"],
         #select-zodiac-sign[aria-invalid="true"],
-        #input-name[aria-invalid="true"] {
+        #input-name[aria-invalid="true"],
+        #select-subscription[aria-invalid="true"] {
             border-color: #ef4444;
         }
 
@@ -382,19 +383,17 @@
             const emailParts = emailValue.split('@');
 
             if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1]) {
-                showModal('Por favor, ingresa un correo válido.');
+                showModal('Por favor, ingresa un correo válido.', emailInput);
                 emailInput.setAttribute('aria-invalid', 'true');
                 shakeElement(emailInput);
-                emailInput.focus();
                 return;
             }
 
             const domain = emailParts[1];
             if (!validDomains.includes(domain)) {
-                showModal('Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.');
+                showModal('Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.', emailInput);
                 emailInput.setAttribute('aria-invalid', 'true');
                 shakeElement(emailInput);
-                emailInput.focus();
                 return;
             }
 
@@ -404,10 +403,9 @@
 
         btnConfirmZodiac.addEventListener('click', () => {
             if (zodiacSelect.value === '') {
-                showModal('Por favor, selecciona tu signo.');
+                showModal('Por favor, selecciona tu signo.', zodiacSelect);
                 zodiacSelect.setAttribute('aria-invalid', 'true');
                 shakeElement(zodiacSelect);
-                zodiacSelect.focus();
                 return;
             }
 
@@ -417,10 +415,9 @@
 
         btnConfirmName.addEventListener('click', () => {
             if (nameInput.value.trim() === '') {
-                showModal('Por favor, ingresa tu nombre.');
+                showModal('Por favor, ingresa tu nombre.', nameInput);
                 nameInput.setAttribute('aria-invalid', 'true');
                 shakeElement(nameInput);
-                nameInput.focus();
                 return;
             }
             nameInput.setAttribute('aria-invalid', 'false');
@@ -562,9 +559,12 @@
 
         btnConfirmSubscription.addEventListener('click', () => {
             if (subscriptionSelect.value === '') {
-                showModal('Por favor, selecciona una suscripción.');
+                showModal('Por favor, selecciona una suscripción.', subscriptionSelect);
+                subscriptionSelect.setAttribute('aria-invalid', 'true');
+                shakeElement(subscriptionSelect);
                 return;
             }
+            subscriptionSelect.setAttribute('aria-invalid', 'false');
 
             // Aquí puedes continuar con la lógica de confirmación final o envío de datos
             console.log('Suscripción confirmada.');
@@ -574,10 +574,12 @@
         });
 
         let lastFocusedElement;
+        let focusAfterCloseElement;
 
         // Función para mostrar el modal con un mensaje
-        function showModal(message) {
+        function showModal(message, focusTarget = null) {
             lastFocusedElement = document.activeElement;
+            focusAfterCloseElement = focusTarget;
             const modal = document.getElementById('modal');
             const modalMessage = document.getElementById('modal-message');
             const closeBtn = modal.querySelector('.close');
@@ -598,7 +600,10 @@
             modal.style.display = 'none';
             modal.removeEventListener('keydown', trapFocus);
 
-            if (lastFocusedElement) {
+            if (focusAfterCloseElement) {
+                focusAfterCloseElement.focus();
+                focusAfterCloseElement = null;
+            } else if (lastFocusedElement) {
                 lastFocusedElement.focus();
             }
         }
