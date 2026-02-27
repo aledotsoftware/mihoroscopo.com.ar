@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use GeoIp2\Database\Reader;
 
@@ -71,16 +72,19 @@ class LandingController extends Controller
 
     private function getCountryByIp(string $ip): string
     {
-        try {
-            // Ruta al archivo GeoLite2-Country.mmdb
-            $reader = new Reader(storage_path('geoip/GeoLite2-Country.mmdb'));
+        // Optimization: Cache the country lookup for 24 hours to avoid repetitive file I/O on GeoLite2 DB
+        return Cache::remember('geoip_country_' . $ip, 60 * 60 * 24, function () use ($ip) {
+            try {
+                // Ruta al archivo GeoLite2-Country.mmdb
+                $reader = new Reader(storage_path('geoip/GeoLite2-Country.mmdb'));
 
-            // Busca la información del país usando la IP
-            $record = $reader->country($ip);
+                // Busca la información del país usando la IP
+                $record = $reader->country($ip);
 
-            return $record->country->isoCode; // Devuelve el código ISO del país (ej: "AR", "US")
-        } catch (\Exception $e) {
-            return 'global'; // Código predeterminado si falla la detección
-        }
+                return $record->country->isoCode; // Devuelve el código ISO del país (ej: "AR", "US")
+            } catch (\Exception $e) {
+                return 'global'; // Código predeterminado si falla la detección
+            }
+        });
     }
 }
