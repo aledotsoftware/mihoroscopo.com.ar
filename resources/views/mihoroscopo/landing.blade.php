@@ -133,6 +133,18 @@
             outline: 3px solid #facc15;
             outline-offset: 2px;
         }
+
+        /* Custom SVG Arrow for Selects */
+        .select-custom {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5rem;
+            padding-right: 2.5rem;
+        }
     </style>
 </head>
 
@@ -166,7 +178,7 @@
 
 
             <div class="wrapper-email">
-                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" type="email" autocomplete="email" inputmode="email" />
+                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" aria-required="true" type="email" autocomplete="email" inputmode="email" />
 
             </div>
 
@@ -215,7 +227,7 @@
 
             <h5 class="type-text" id="label-name">Ingresa tu Nombre</h5>
             <div class="wrapper-email">
-                <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" type="text" autocomplete="name" autocapitalize="words" />
+                <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" aria-required="true" type="text" autocomplete="name" autocapitalize="words" />
             </div>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-name">
@@ -235,7 +247,7 @@
 
 
             <h5 class="type-text hid" id="label-subscription">Selecciona tu Suscripción</h5>
-            <select class="select-custom" id="select-subscription" aria-labelledby="label-subscription">
+            <select class="select-custom" id="select-subscription" aria-labelledby="label-subscription" aria-required="true">
                 <option value="" disabled selected>Selecciona tu suscripción</option>
 
                 <option value="{{ env('SUBSCRIPTION_DAILY_FREQUENCY_TYPE') }}">
