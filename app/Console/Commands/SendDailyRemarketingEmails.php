@@ -40,24 +40,32 @@ class SendDailyRemarketingEmails extends Command
         $date = Carbon::now()->format('d/m/Y');
         $dateForDatabase = Carbon::createFromFormat('d/m/Y', $date)->format('Y-m-d');
 
-        // Recuperar suscripciones activas
-        $subscriptions = DB::table('subscriptions')
+        // ⚡ Bolt: Memory optimization.
+        // What: Replaced ->get() with ->chunkById() to process pending subscriptions in batches of 100.
+        // Why: Loading all pending subscriptions into memory at once with get() causes massive memory overhead
+        //      when the table is large, often leading to OOM (Out Of Memory) exceptions on the server.
+        //      chunkById() is used instead of chunk() to prevent skipping records if the processed records
+        //      are mutated (which would change their position in the result set when using LIMIT/OFFSET).
+        // Impact: Reduces memory usage exponentially from O(N) to O(1) where N is the number of records.
+        $query = DB::table('subscriptions')
             ->where('status', 'pending')
             ->whereBetween('created_at', [
                 Carbon::now()->subDays(3)->startOfDay(),  // Inicio de hace 3 días
                 Carbon::now()->endOfDay()  // Final del día de hoy
-            ])
-            ->get();
+            ]);
 
-        $subscriptionCount = $subscriptions->count();
+        $subscriptionCount = $query->count();
         $this->logMessage("Total de suscripciones encontradas: $subscriptionCount");
 
-        // Procesar cada suscripción
-        foreach ($subscriptions as $subscription) {
-            // if ($subscription->email === 'ayackbrea@gmail.com') {
-            $this->processSubscription($subscription, $date);
-            // }
-        }
+        // Procesar cada suscripción en fragmentos para ahorrar memoria
+        // Se usa chunkById en lugar de chunk para evitar saltarse registros si el estado cambia durante el procesamiento.
+        $query->chunkById(100, function ($subscriptions) use ($date) {
+            foreach ($subscriptions as $subscription) {
+                // if ($subscription->email === 'ayackbrea@gmail.com') {
+                $this->processSubscription($subscription, $date);
+                // }
+            }
+        });
 
         // Enviar log a Discord
         $this->sendLogToDiscord($subscriptionCount);
