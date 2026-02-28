@@ -124,9 +124,19 @@
             transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #9c30cc;
             transform: scale(1.03);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        button:focus-visible {
+            outline: 2px solid #c63dff;
+            outline-offset: 2px;
         }
 
         .error-message {
@@ -185,7 +195,7 @@
             <button type="submit">Suscribirse</button>
         </form>
 
-        <div id="error-message" class="error-message">
+        <div id="error-message" class="error-message" role="alert" aria-live="assertive">
             Ocurrió un error. Por favor, inténtalo de nuevo.
         </div>
     </main>
@@ -211,10 +221,19 @@
 
         document.getElementById('subscription-form').addEventListener('submit', function(event) {
             event.preventDefault();
+
+            const form = event.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Procesando...';
+            document.getElementById('error-message').style.display = 'none';
+
             const capturedGclid = localStorage.getItem('gclid');
 
             country = "{{ $country }}";
-            const form = event.target;
             const formData = {
                 email: form.email.value,
                 zodiacSign: form.zodiac_sign.value,
@@ -238,6 +257,10 @@
                         window.location.href = data.init_point;
                     } else {
                         // Mostrar un mensaje de error si no hay `init_point`
+                        // Reset button state
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalBtnText;
+
                         const errorMessage = document.getElementById('error-message');
                         errorMessage.style.display = 'block';
                         errorMessage.textContent = 'No se recibió una URL de redirección válida.';
@@ -245,6 +268,11 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
+
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+
                     const errorMessage = document.getElementById('error-message');
                     errorMessage.style.display = 'block';
                     errorMessage.textContent = 'Ocurrió un error al procesar tu solicitud.';
