@@ -488,7 +488,9 @@
             btnConfirmName.disabled = true;
             nameInput.disabled = true;
             btnConfirmName.classList.add('btn-loading');
-            btnConfirmName.innerHTML = '<span class="spinner"></span> Cargando...';
+            btnConfirmName.setAttribute('aria-busy', 'true');
+            btnConfirmName.setAttribute('aria-live', 'polite');
+            btnConfirmName.innerHTML = '<span class="spinner" aria-hidden="true"></span> Cargando...';
 
             const apiUrl = "{{ url('api/v1/subscribe') }}"; // Genera la URL completa
             // Envío de datos al backend
@@ -547,6 +549,8 @@
                     btnConfirmName.disabled = false;
                     nameInput.disabled = false;
                     btnConfirmName.classList.remove('btn-loading');
+                    btnConfirmName.removeAttribute('aria-busy');
+                    btnConfirmName.removeAttribute('aria-live');
                     btnConfirmName.innerHTML = originalBtnText;
 
                     // Recargar la página y volver al inicio
