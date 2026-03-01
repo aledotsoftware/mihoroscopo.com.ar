@@ -228,6 +228,8 @@
 
             // Show loading state
             submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.setAttribute('aria-live', 'polite');
             submitBtn.textContent = 'Procesando...';
             document.getElementById('error-message').style.display = 'none';
 
@@ -259,6 +261,8 @@
                         // Mostrar un mensaje de error si no hay `init_point`
                         // Reset button state
                         submitBtn.disabled = false;
+                        submitBtn.removeAttribute('aria-busy');
+                        submitBtn.removeAttribute('aria-live');
                         submitBtn.textContent = originalBtnText;
 
                         const errorMessage = document.getElementById('error-message');
@@ -271,6 +275,8 @@
 
                     // Reset button state
                     submitBtn.disabled = false;
+                    submitBtn.removeAttribute('aria-busy');
+                    submitBtn.removeAttribute('aria-live');
                     submitBtn.textContent = originalBtnText;
 
                     const errorMessage = document.getElementById('error-message');
