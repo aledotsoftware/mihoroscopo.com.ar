@@ -5,3 +5,7 @@
 ## 2026-02-21 - [Controller Constructor Optimization]
 **Learning:** `ArticleController` was building a complex regex in `__construct` on every request, even for methods that didn't use it (e.g., `show`, `admin`).
 **Action:** Use lazy initialization for expensive operations in controllers, especially if they are only needed for specific actions.
+
+## 2026-03-01 - [Memory Exhaustion on Large Datasets]
+**Learning:** Commands fetching entire database tables via `->get()` (like in `UpdateSubscriptions.php`) cause OOM exceptions as the system scales and table size grows.
+**Action:** Always use chunking mechanisms like `->chunk()` or `->chunkById()` when iterating over large datasets in batch processes or CLI commands.
