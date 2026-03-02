@@ -9,3 +9,7 @@
 ## 2026-03-01 - [Memory Exhaustion on Large Datasets]
 **Learning:** Commands fetching entire database tables via `->get()` (like in `UpdateSubscriptions.php`) cause OOM exceptions as the system scales and table size grows.
 **Action:** Always use chunking mechanisms like `->chunk()` or `->chunkById()` when iterating over large datasets in batch processes or CLI commands.
+
+## 2026-03-02 - [Missing Indexes on Heavily Queried Columns]
+**Learning:** The `subscriptions` table is frequently queried by `email`, `external_reference`, and `subscription_id` in various critical paths (like `SubscriptionController` and `NotificationController`), but these columns lacked database indexes, leading to full table scans.
+**Action:** Always verify that columns used in `where()` clauses or join conditions for large or frequently accessed tables have appropriate database indexes created via migrations.
