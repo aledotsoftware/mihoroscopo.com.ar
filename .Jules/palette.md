@@ -13,3 +13,6 @@
 ## 2024-11-20 - Managing accessibility state in custom step-based JS flows
 **Learning:** This app uses custom step-based navigation relying on standard JS event listeners (not inside actual `<form>` components for `landing.blade.php`), which inherently skips native form validation/loading announcements. When a submit triggers a loading state that alters the button to a spinner and disables inputs, screen readers can fall silent without context.
 **Action:** Always explicitly implement `aria-busy="true"` and `aria-live="polite"` on the active submit button when initiating an asynchronous transition, ensuring to remove the attributes when the loading state resolves or throws an error, even if the user interface manages focus/disabled properties adequately.
+## 2026-03-02 - Mobile Menu Accessibility
+**Learning:** Custom interactive elements like '.menu-trigger' mimicking buttons must explicitly include keyboard events, tabindex, and ARIA roles (e.g., 'role="button"', 'aria-expanded') to avoid locking keyboard users out of core navigation.
+**Action:** Always ensure that custom toggle buttons are accessible via keyboard ('Enter' / 'Space') and dynamically update ARIA attributes reflecting their state.

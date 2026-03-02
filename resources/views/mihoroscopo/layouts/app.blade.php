@@ -137,7 +137,7 @@
                             {{-- <li class="scroll-to-section"><a href="{{ route('landing') }}">Landing</a></li> --}}
 
                         </ul>
-                        <a class='menu-trigger'>
+                        <a class='menu-trigger' role="button" tabindex="0" aria-label="Abrir menú" aria-expanded="false">
                             <span>Menú</span>
                         </a>
                     </nav>
