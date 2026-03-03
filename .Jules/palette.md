@@ -16,3 +16,7 @@
 ## 2026-03-02 - Mobile Menu Accessibility
 **Learning:** Custom interactive elements like '.menu-trigger' mimicking buttons must explicitly include keyboard events, tabindex, and ARIA roles (e.g., 'role="button"', 'aria-expanded') to avoid locking keyboard users out of core navigation.
 **Action:** Always ensure that custom toggle buttons are accessible via keyboard ('Enter' / 'Space') and dynamically update ARIA attributes reflecting their state.
+
+## 2024-11-21 - Replace Validation Modals with Inline Feedback
+**Learning:** Using full-screen modals to display validation errors (e.g., "Please enter a valid email") disrupts the user's workflow, traps focus unhelpfully, and makes correcting the form difficult. Screen reader users may lose context of which input was invalid.
+**Action:** Implement inline error messages (`<span role="alert">`) directly below the corresponding inputs instead of modals. Connect the error to the input using `aria-describedby` and `aria-invalid="true"` to ensure screen readers announce the specific error when the field is focused.
