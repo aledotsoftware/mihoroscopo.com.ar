@@ -134,6 +134,16 @@
             outline-offset: 2px;
         }
 
+        /* Inline Error Message */
+        .inline-error {
+            display: none;
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            width: 100%;
+        }
+
         /* Custom SVG Arrow for Selects */
         .select-custom {
             appearance: none;
@@ -179,7 +189,7 @@
 
             <div class="wrapper-email">
                 <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" aria-required="true" type="email" autocomplete="email" inputmode="email" />
-
+                <span class="inline-error" id="error-input-email" role="alert"></span>
             </div>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-email">
@@ -210,6 +220,7 @@
                 <option value="acuario">Acuario</option>
                 <option value="piscis">Piscis</option>
             </select>
+            <span class="inline-error" id="error-select-zodiac-sign" role="alert"></span>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-zodiac">
                 <div class="wrapper-btn-shadow">
@@ -228,6 +239,7 @@
             <h5 class="type-text" id="label-name">Ingresa tu Nombre</h5>
             <div class="wrapper-email">
                 <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" aria-required="true" type="text" autocomplete="name" autocapitalize="words" />
+                <span class="inline-error" id="error-input-name" role="alert"></span>
             </div>
 
             <div class="wrapper-btns confirm" id="btn-wrapper-name">
@@ -265,6 +277,7 @@
                 <option value="gaia">Mi Horóscopo Gratis - Gratis</option>
 
             </select>
+            <span class="inline-error" id="error-select-subscription" role="alert"></span>
 
 
 
@@ -387,52 +400,69 @@
             }, 500);
         }
 
+        // Funciones para mostrar y limpiar errores inline
+        function showInlineError(inputId, message) {
+            const errorEl = document.getElementById('error-' + inputId);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.setAttribute('aria-invalid', 'true');
+                inputEl.setAttribute('aria-describedby', 'error-' + inputId);
+                shakeElement(inputEl);
+            }
+        }
+
+        function clearInlineError(inputId) {
+            const errorEl = document.getElementById('error-' + inputId);
+            if (errorEl) errorEl.style.display = 'none';
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.setAttribute('aria-invalid', 'false');
+                inputEl.removeAttribute('aria-describedby');
+            }
+        }
+
         // Eventos de los botones con validaciones correspondientes
         btnConfirmEmail.addEventListener('click', () => {
+            clearInlineError('input-email');
             const emailValue = emailInput.value.trim().toLowerCase();
             const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'live.com', 'hotmail.com.ar', 'yahoo.com.ar', 'live.com.ar', 'fibertel.com.ar', 'speedy.com.ar', 'arnet.com.ar', 'ciudad.com.ar', 'uol.com.ar', 'mi.com.ar', 'outlook.com.ar', 'ymail.com', 'protonmail.com', 'tutanota.com', 'mailfence.com', 'startmail.com', 'runbox.com', 'posteo.net', 'mailbox.org', 'ctemplar.com', 'safe-mail.net', 'riseup.net', 'hushmail.com', 'disroot.org'];
 
             const emailParts = emailValue.split('@');
 
             if (emailParts.length !== 2 || !emailParts[0] || !emailParts[1]) {
-                showModal('Por favor, ingresa un correo válido.', emailInput);
-                emailInput.setAttribute('aria-invalid', 'true');
-                shakeElement(emailInput);
+                showInlineError('input-email', 'Por favor, ingresa un correo válido.');
                 return;
             }
 
             const domain = emailParts[1];
             if (!validDomains.includes(domain)) {
-                showModal('Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.', emailInput);
-                emailInput.setAttribute('aria-invalid', 'true');
-                shakeElement(emailInput);
+                showInlineError('input-email', 'Por favor, asegúrate de que el correo esté bien escrito, sin errores de tipeo.');
                 return;
             }
 
-            emailInput.setAttribute('aria-invalid', 'false');
             showNextSection(emailSection, zodiacSection, 'select-zodiac-sign'); // Mostrar la siguiente sección si todo es correcto
         });
 
         btnConfirmZodiac.addEventListener('click', () => {
+            clearInlineError('select-zodiac-sign');
             if (zodiacSelect.value === '') {
-                showModal('Por favor, selecciona tu signo.', zodiacSelect);
-                zodiacSelect.setAttribute('aria-invalid', 'true');
-                shakeElement(zodiacSelect);
+                showInlineError('select-zodiac-sign', 'Por favor, selecciona tu signo.');
                 return;
             }
 
-            zodiacSelect.setAttribute('aria-invalid', 'false');
             showNextSection(zodiacSection, nameSection, 'input-name');
         });
 
         btnConfirmName.addEventListener('click', () => {
+            clearInlineError('input-name');
             if (nameInput.value.trim() === '') {
-                showModal('Por favor, ingresa tu nombre.', nameInput);
-                nameInput.setAttribute('aria-invalid', 'true');
-                shakeElement(nameInput);
+                showInlineError('input-name', 'Por favor, ingresa tu nombre.');
                 return;
             }
-            nameInput.setAttribute('aria-invalid', 'false');
 
             // showNextSection(nameSection, subscriptionSection);
 
@@ -574,13 +604,11 @@
         });
 
         btnConfirmSubscription.addEventListener('click', () => {
+            clearInlineError('select-subscription');
             if (subscriptionSelect.value === '') {
-                showModal('Por favor, selecciona una suscripción.', subscriptionSelect);
-                subscriptionSelect.setAttribute('aria-invalid', 'true');
-                shakeElement(subscriptionSelect);
+                showInlineError('select-subscription', 'Por favor, selecciona una suscripción.');
                 return;
             }
-            subscriptionSelect.setAttribute('aria-invalid', 'false');
 
             // Aquí puedes continuar con la lógica de confirmación final o envío de datos
             console.log('Suscripción confirmada.');
