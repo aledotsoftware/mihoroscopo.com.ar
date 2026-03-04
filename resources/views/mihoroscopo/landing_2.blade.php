@@ -145,6 +145,31 @@
             color: #dc3545;
             display: none;
         }
+
+        /* Spinner and Loading State */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-loading {
+            opacity: 0.8;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -228,9 +253,10 @@
 
             // Show loading state
             submitBtn.disabled = true;
+            submitBtn.classList.add('btn-loading');
             submitBtn.setAttribute('aria-busy', 'true');
             submitBtn.setAttribute('aria-live', 'polite');
-            submitBtn.textContent = 'Procesando...';
+            submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Procesando...';
             document.getElementById('error-message').style.display = 'none';
 
             const capturedGclid = localStorage.getItem('gclid');
@@ -261,9 +287,10 @@
                         // Mostrar un mensaje de error si no hay `init_point`
                         // Reset button state
                         submitBtn.disabled = false;
+                        submitBtn.classList.remove('btn-loading');
                         submitBtn.removeAttribute('aria-busy');
                         submitBtn.removeAttribute('aria-live');
-                        submitBtn.textContent = originalBtnText;
+                        submitBtn.innerHTML = originalBtnText;
 
                         const errorMessage = document.getElementById('error-message');
                         errorMessage.style.display = 'block';
@@ -275,9 +302,10 @@
 
                     // Reset button state
                     submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-loading');
                     submitBtn.removeAttribute('aria-busy');
                     submitBtn.removeAttribute('aria-live');
-                    submitBtn.textContent = originalBtnText;
+                    submitBtn.innerHTML = originalBtnText;
 
                     const errorMessage = document.getElementById('error-message');
                     errorMessage.style.display = 'block';
