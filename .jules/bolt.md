@@ -13,3 +13,7 @@
 ## 2026-03-02 - [Missing Indexes on Heavily Queried Columns]
 **Learning:** The `subscriptions` table is frequently queried by `email`, `external_reference`, and `subscription_id` in various critical paths (like `SubscriptionController` and `NotificationController`), but these columns lacked database indexes, leading to full table scans.
 **Action:** Always verify that columns used in `where()` clauses or join conditions for large or frequently accessed tables have appropriate database indexes created via migrations.
+
+## 2026-03-04 - [Missing Indexes on Payment Table]
+**Learning:** The `payment` table is queried by `payment_id` and `external_reference` in critical paths (like `NotificationController` and `SubscriptionController`), but these columns lacked database indexes, leading to full table scans and performance degradation.
+**Action:** Always ensure that columns frequently used in `where()` clauses or join conditions have appropriate database indexes created via migrations, especially for tables that grow rapidly like payments.
