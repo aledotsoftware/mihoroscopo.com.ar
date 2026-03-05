@@ -31,6 +31,7 @@ class SubscriptionTest extends TestCase
         \Illuminate\Support\Facades\Schema::create('extradata_horoscopes', function ($table) {
             $table->id();
             $table->foreignId('subscription_id');
+            $table->index('subscription_id');
             $table->string('signo')->nullable();
             $table->string('name')->nullable();
             $table->string('gclid')->nullable();

@@ -17,3 +17,7 @@
 ## 2026-03-04 - [Missing Indexes on Payment Table]
 **Learning:** The `payment` table is queried by `payment_id` and `external_reference` in critical paths (like `NotificationController` and `SubscriptionController`), but these columns lacked database indexes, leading to full table scans and performance degradation.
 **Action:** Always ensure that columns frequently used in `where()` clauses or join conditions have appropriate database indexes created via migrations, especially for tables that grow rapidly like payments.
+
+## 2026-03-05 - [Missing Index on extradata_horoscopes]
+**Learning:** The `extradata_horoscopes` table is heavily queried using `subscription_id` via relationships (like `hasMany`) and joins in performance-critical areas (e.g., `SubscriptionController` and `SendDailyContentEmails`), but lacked an index, causing full table scans.
+**Action:** Always index foreign keys and columns that are frequently used in relationship resolution and joins. This is especially critical for batch processes and controllers handling significant traffic.
