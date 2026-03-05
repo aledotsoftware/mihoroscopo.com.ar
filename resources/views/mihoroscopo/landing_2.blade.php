@@ -146,6 +146,11 @@
             display: none;
         }
 
+        .required-indicator {
+            color: #dc3545;
+            margin-left: 2px;
+        }
+
         /* Spinner and Loading State */
         .spinner {
             display: inline-block;
@@ -192,11 +197,11 @@
                 <li class="type-text hid">Ritual de Prosperidad</li>
                 <li class="type-text hid">Compatibilidad Zodiacal</li>
             </ul>
-            <label for="email">Correo Electrónico</label>
-            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+            <label for="email">Correo Electrónico<span class="required-indicator" aria-hidden="true">*</span></label>
+            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true">
 
-            <label for="zodiac_sign">Selecciona tu Signo Astrológico</label>
-            <select name="zodiac_sign" id="zodiac_sign" required>
+            <label for="zodiac_sign">Selecciona tu Signo Astrológico<span class="required-indicator" aria-hidden="true">*</span></label>
+            <select name="zodiac_sign" id="zodiac_sign" required aria-required="true">
                 <option value="" disabled selected>Selecciona tu signo</option>
                 <option value="aries">Aries</option>
                 <option value="tauro">Tauro</option>
@@ -212,8 +217,8 @@
                 <option value="piscis">Piscis</option>
             </select>
 
-            <label for="name">Nombre</label>
-            <input type="text" id="name" name="name" placeholder="Tu Nombre" required>
+            <label for="name">Nombre<span class="required-indicator" aria-hidden="true">*</span></label>
+            <input type="text" id="name" name="name" placeholder="Tu Nombre" required aria-required="true">
 
             <input type="hidden" name="subscription" value="days">
 
