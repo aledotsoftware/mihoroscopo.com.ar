@@ -47,6 +47,7 @@ class SendDailyContentEmailsTest extends TestCase
         Schema::create('extradata_horoscopes', function ($table) {
             $table->id();
             $table->integer('subscription_id');
+            $table->index('subscription_id');
             $table->string('signo')->nullable();
             $table->string('name')->nullable();
         });
@@ -54,6 +55,7 @@ class SendDailyContentEmailsTest extends TestCase
         Schema::create('email_logs', function ($table) {
             $table->id();
             $table->integer('subscription_id');
+            $table->index('subscription_id');
             $table->string('service_type')->nullable();
             $table->string('content_id')->nullable();
             $table->timestamp('sent_at')->nullable();
