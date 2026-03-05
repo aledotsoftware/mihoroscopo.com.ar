@@ -20,3 +20,11 @@
 ## 2024-11-21 - Replace Validation Modals with Inline Feedback
 **Learning:** Using full-screen modals to display validation errors (e.g., "Please enter a valid email") disrupts the user's workflow, traps focus unhelpfully, and makes correcting the form difficult. Screen reader users may lose context of which input was invalid.
 **Action:** Implement inline error messages (`<span role="alert">`) directly below the corresponding inputs instead of modals. Connect the error to the input using `aria-describedby` and `aria-invalid="true"` to ensure screen readers announce the specific error when the field is focused.
+
+## 2024-10-27 - Consistency with explicit aria-required attributes
+**Learning:** Even when native `required` attributes are present, relying on them alone can cause varying screen reader behavior, especially in complex or custom forms that mimic step-by-step progressions. `landing.blade.php` explicitly included `aria-required="true"`, but the variation `landing_2.blade.php` omitted it. Ensuring `aria-required="true"` consistently accompanies native `required` bolsters the accessibility of these fields across different screen readers.
+**Action:** Always verify that custom form elements and variations explicitly mirror critical ARIA attributes like `aria-required="true"` present in primary templates to guarantee a consistent user experience.
+
+## 2024-10-27 - Visual Required Indicators
+**Learning:** Native `required` and `aria-required` attributes assist screen readers but offer zero help to sighted users trying to scan a form. In custom forms mimicking step-by-step progressions, omitting visual required indicators (like asterisks) increases cognitive load and form abandonment. Sighted users must easily see which fields are mandatory.
+**Action:** Always include a visual required indicator (e.g., `<span class="required-indicator" aria-hidden="true">*</span>`) explicitly tied to the field's `<label>` when the field is marked as required. This provides an immediately recognizable cue and improves form completion rates.
