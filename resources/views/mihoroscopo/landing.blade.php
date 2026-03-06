@@ -79,6 +79,11 @@
         })(window, document, "clarity", "script", "o5xaqvsgs8");
     </script>
     <style>
+        .required-indicator {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
         .woman-cook {
             display: none;
         }
@@ -187,8 +192,9 @@
             </ul>
 
 
+            <h5 class="type-text" id="label-email">Ingresa tu correo<span class="required-indicator" aria-hidden="true">*</span></h5>
             <div class="wrapper-email">
-                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-label="Ingresa tu correo electrónico" aria-required="true" type="email" autocomplete="email" inputmode="email" />
+                <input class="email-input" id="input-email" placeholder="Ingresa tu correo" aria-labelledby="label-email" aria-required="true" type="email" autocomplete="email" inputmode="email" />
                 <span class="inline-error" id="error-input-email" role="alert"></span>
             </div>
 
@@ -204,7 +210,7 @@
         <div class="wrapper-info" id="section-zodiac">
             <br>
             <h3 class="type-text hid">Guía Astrológica Gratis</h3>
-            <h5 class="type-text" id="label-zodiac-sign">Selecciona tu Signo Astrológico</h5>
+            <h5 class="type-text" id="label-zodiac-sign">Selecciona tu Signo Astrológico<span class="required-indicator" aria-hidden="true">*</span></h5>
             <select name="zodiac_sign" id="select-zodiac-sign" class="select-custom" required aria-labelledby="label-zodiac-sign">
                 <option value="" disabled selected>Selecciona tu signo</option>
                 <option value="aries">Aries</option>
@@ -236,7 +242,7 @@
             <h3 class="type-text hid">Guía Astrológica Gratis</h3>
 
 
-            <h5 class="type-text" id="label-name">Ingresa tu Nombre</h5>
+            <h5 class="type-text" id="label-name">Ingresa tu Nombre<span class="required-indicator" aria-hidden="true">*</span></h5>
             <div class="wrapper-email">
                 <input class="email-input" id="input-name" placeholder="Tu Nombre" aria-labelledby="label-name" aria-required="true" type="text" autocomplete="name" autocapitalize="words" />
                 <span class="inline-error" id="error-input-name" role="alert"></span>
@@ -258,7 +264,7 @@
 
 
 
-            <h5 class="type-text hid" id="label-subscription">Selecciona tu Suscripción</h5>
+            <h5 class="type-text hid" id="label-subscription">Selecciona tu Suscripción<span class="required-indicator" aria-hidden="true">*</span></h5>
             <select class="select-custom" id="select-subscription" aria-labelledby="label-subscription" aria-required="true">
                 <option value="" disabled selected>Selecciona tu suscripción</option>
 
