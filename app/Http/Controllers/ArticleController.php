@@ -173,8 +173,17 @@ class ArticleController extends Controller
     {
 
         $article = Article::where('slug', $slug)->firstOrFail();
-        $parsedown = new Parsedown;
-        $article->content = $parsedown->text($article->content);
+
+        // ⚡ Bolt: CPU/Memory optimization.
+        // What: Added caching to the Parsedown markdown compilation process.
+        // Why: Parsing raw markdown to HTML on every page load for static content is an expensive, synchronous CPU operation.
+        //      The cache key uses the `updated_at` timestamp to automatically invalidate when the article is updated, avoiding expensive string hashing.
+        // Impact: Eliminates redundant parsing cycles per request, significantly speeding up article rendering.
+        $cacheKey = 'article_parsed_' . $article->id . '_' . ($article->updated_at?->timestamp ?? 0);
+        $article->content = Cache::remember($cacheKey, 86400, function () use ($article) {
+            $parsedown = new Parsedown;
+            return $parsedown->text($article->content);
+        });
 
         return view('mihoroscopo/articles.show', compact('article'));
     }

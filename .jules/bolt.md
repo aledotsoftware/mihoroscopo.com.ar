@@ -21,3 +21,7 @@
 ## 2026-03-05 - [Missing Index on extradata_horoscopes]
 **Learning:** The `extradata_horoscopes` table is heavily queried using `subscription_id` via relationships (like `hasMany`) and joins in performance-critical areas (e.g., `SubscriptionController` and `SendDailyContentEmails`), but lacked an index, causing full table scans.
 **Action:** Always index foreign keys and columns that are frequently used in relationship resolution and joins. This is especially critical for batch processes and controllers handling significant traffic.
+
+## 2026-03-05 - [Eloquent Model Hydration Overhead]
+**Learning:** Replacing a raw `DB::table()->join()` with Eloquent ORM `Subscription::with(...)` for retrieving a single record creates a significant performance degradation. Model hydration uses much more CPU and memory, and eager loading executes multiple separate queries instead of a fast, single SQL `JOIN`.
+**Action:** When optimizing performance-critical paths, especially for fetching single records or read-only structured data, prefer raw `DB::table()` with `JOIN` over Eloquent relationship eager-loading (`with`).
