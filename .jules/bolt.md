@@ -21,3 +21,7 @@
 ## 2026-03-05 - [Missing Index on extradata_horoscopes]
 **Learning:** The `extradata_horoscopes` table is heavily queried using `subscription_id` via relationships (like `hasMany`) and joins in performance-critical areas (e.g., `SubscriptionController` and `SendDailyContentEmails`), but lacked an index, causing full table scans.
 **Action:** Always index foreign keys and columns that are frequently used in relationship resolution and joins. This is especially critical for batch processes and controllers handling significant traffic.
+
+## 2026-03-06 - [Redundant Database Count Queries Before Chunking]
+**Learning:** Commands like `SendDailyContentEmails` and `SendDailyRemarketingEmails` were executing an expensive, unbounded `->count()` database query simply to log the total number of records to be processed before initiating `chunkById`. This causes a completely unnecessary full index/table scan on large tables.
+**Action:** When iterating over a database using `chunk()` or `chunkById()`, avoid running a separate `->count()` query if the total count is only needed for logging. Instead, initialize a local counter variable and increment it during the chunk loop (`$count += $chunk->count();`) to eliminate the extra database query.
