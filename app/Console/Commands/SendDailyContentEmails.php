@@ -86,14 +86,21 @@ class SendDailyContentEmails extends Command
             $subscriptionQuery = Subscription::with('extradata_horoscopes')
                 ->whereIn('status', ['authorized', 'pending']);
 
-            $subscriptionCount = $subscriptionQuery->count();
-            file_put_contents($this->logPath, "Total de suscripciones encontradas: " . $subscriptionCount . "\n", FILE_APPEND);
+            // ⚡ Bolt: Query optimization.
+            // What: Removed unbounded ->count() query and replaced it with a running counter.
+            // Why: Calling count() before chunking executes a redundant full table scan
+            //      just to get the total number of records, consuming memory and CPU.
+            // Impact: Eliminates a costly database query, speeding up command execution on large tables.
+            $subscriptionCount = 0;
 
-            $subscriptionQuery->chunk(100, function ($subscriptions) use ($dailyContent) {
+            $subscriptionQuery->chunk(100, function ($subscriptions) use ($dailyContent, &$subscriptionCount) {
+                $subscriptionCount += count($subscriptions);
                 foreach ($subscriptions as $subscription) {
                     $this->sendEmail($subscription, $dailyContent);
                 }
             });
+
+            file_put_contents($this->logPath, "Total de suscripciones encontradas: " . $subscriptionCount . "\n", FILE_APPEND);
 
             // Enviar log a Discord al final del proceso
             $this->sendLogToDiscord($subscriptionCount);

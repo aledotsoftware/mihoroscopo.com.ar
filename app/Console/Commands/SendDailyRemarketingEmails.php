@@ -54,18 +54,25 @@ class SendDailyRemarketingEmails extends Command
                 Carbon::now()->endOfDay()  // Final del día de hoy
             ]);
 
-        $subscriptionCount = $query->count();
-        $this->logMessage("Total de suscripciones encontradas: $subscriptionCount");
+        // ⚡ Bolt: Query optimization.
+        // What: Removed unbounded ->count() query and replaced it with a running counter.
+        // Why: Calling count() before chunking executes a redundant full table/index scan
+        //      just to get the total number of records, which consumes memory and CPU.
+        // Impact: Eliminates a costly O(N) database query, speeding up command execution on large tables.
+        $subscriptionCount = 0;
 
         // Procesar cada suscripción en fragmentos para ahorrar memoria
         // Se usa chunkById en lugar de chunk para evitar saltarse registros si el estado cambia durante el procesamiento.
-        $query->chunkById(100, function ($subscriptions) use ($date) {
+        $query->chunkById(100, function ($subscriptions) use ($date, &$subscriptionCount) {
+            $subscriptionCount += count($subscriptions);
             foreach ($subscriptions as $subscription) {
                 // if ($subscription->email === 'ayackbrea@gmail.com') {
                 $this->processSubscription($subscription, $date);
                 // }
             }
         });
+
+        $this->logMessage("Total de suscripciones procesadas: $subscriptionCount");
 
         // Enviar log a Discord
         $this->sendLogToDiscord($subscriptionCount);
