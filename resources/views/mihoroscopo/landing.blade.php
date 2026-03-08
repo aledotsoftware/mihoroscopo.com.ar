@@ -306,17 +306,17 @@
     </div>
 
     <footer class="terms-conditions-price">
-        <h5 class="subscription-price hid">
+        <p class="subscription-price hid">
             Mi Horóscopo es una suscripción OPCIONAL. Para más información, revisa los términos y condiciones.
-        </h5>
+        </p>
 
         <div class="terms-privacy-links">
-            <a href="/blog/terminos-y-condiciones-de-servicio" target="_blank">
-                <h5 class="terms">Términos y Condiciones</h5>
+            <a href="/blog/terminos-y-condiciones-de-servicio" target="_blank" rel="noopener noreferrer" aria-label="Términos y Condiciones (Abre en una nueva pestaña)">
+                <span class="terms">Términos y Condiciones</span>
             </a>
-            <span> - </span>
-            <a href="/blog/politica-de-privacidad" target="_blank">
-                <h5 class="terms">Política de Privacidad</h5>
+            <span aria-hidden="true"> - </span>
+            <a href="/blog/politica-de-privacidad" target="_blank" rel="noopener noreferrer" aria-label="Política de Privacidad (Abre en una nueva pestaña)">
+                <span class="terms">Política de Privacidad</span>
             </a>
         </div>
     </footer>
