@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suscripción</title>
     <script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
+    <style>
+        .required-indicator { color: #dc3545; margin-left: 2px; }
+    </style>
 </head>
 <body>
     <h1>Suscripción al Servicio</h1>
     <form id="subscriptionForm">
-        <label for="email">Correo electrónico:</label>
-        <input type="email" id="email" name="email" required>
+        <label for="email">Correo electrónico:<span class="required-indicator" aria-hidden="true">*</span></label>
+        <input type="email" id="email" name="email" required aria-required="true">
 
         <label for="cardToken">Token de tarjeta:</label>
         <input type="hidden" id="cardToken" name="card_token_id">
