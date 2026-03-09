@@ -159,7 +159,14 @@ class ArticleController extends Controller
 
     public function index()
     {
-        $articles = Article::orderBy('created_at', 'desc')->paginate(10);
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select(['id', 'slug', 'title', 'created_at']) to the query.
+        // Why: The 'content' column contains large markdown text. Fetching it for the index view
+        //      (which only displays the title and slug) wastes significant memory and CPU during model hydration.
+        // Impact: Reduces memory footprint per request and speeds up database retrieval for the article list.
+        $articles = Article::select(['id', 'slug', 'title', 'created_at'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         // Aplicar reemplazos en los títulos de todos los artículos
         foreach ($articles as $article) {
@@ -191,8 +198,13 @@ class ArticleController extends Controller
     // Muestra la lista de artículos en el panel de administración
     public function adminIndex()
     {
-
-        $articles = Article::orderBy('created_at', 'desc')->paginate(10);
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select to fetch only necessary columns for the admin index view.
+        // Why: The 'content' column is heavy and unnecessary for listing articles.
+        // Impact: Reduces memory footprint per request and speeds up database retrieval.
+        $articles = Article::select(['id', 'slug', 'title', 'created_at'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('admin.articles.index', compact('articles'));
     }
