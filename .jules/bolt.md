@@ -25,3 +25,7 @@
 ## 2026-03-05 - [Eloquent Model Hydration Overhead]
 **Learning:** Replacing a raw `DB::table()->join()` with Eloquent ORM `Subscription::with(...)` for retrieving a single record creates a significant performance degradation. Model hydration uses much more CPU and memory, and eager loading executes multiple separate queries instead of a fast, single SQL `JOIN`.
 **Action:** When optimizing performance-critical paths, especially for fetching single records or read-only structured data, prefer raw `DB::table()` with `JOIN` over Eloquent relationship eager-loading (`with`).
+
+## 2026-03-06 - [Model Hydration Overhead in Index Views]
+**Learning:** Eloquent `Model::paginate()` retrieves all columns by default. When the table contains heavy columns (like large Markdown/HTML text in the `articles.content` column), hydrating these fields into memory for index views that only display titles/slugs causes significant memory and CPU waste per request.
+**Action:** Always explicitly use `select()` in queries intended for index/list views to restrict the returned columns to only what is necessary (e.g., `id`, `slug`, `title`, `created_at`), preventing the expensive loading of large text or BLOB columns.
