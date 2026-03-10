@@ -1987,3 +1987,18 @@ body {
     border-radius: 23px;
   }
 }
+
+/*
+---------------------------------------------
+Focus Visible Accessibility Styles
+---------------------------------------------
+*/
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
+}
