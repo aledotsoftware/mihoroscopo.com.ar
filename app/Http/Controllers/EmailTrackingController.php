@@ -18,15 +18,15 @@ class EmailTrackingController extends Controller
 
         // Verificar si el email_id existe
         if ($emailId) {
-            // Buscar el log del correo en la base de datos
-            $emailLog = EmailLog::find($emailId);
-
-            if ($emailLog) {
-                // Actualizar el campo 'opened_at' en la base de datos para registrar la apertura
-                $emailLog->update([
-                    'opened_at' => Carbon::now(),
-                ]);
-            }
+            // ⚡ Bolt: Database update optimization.
+            // What: Replaced EmailLog::find()->update() with a direct where()->update() query.
+            // Why: Avoids executing an unnecessary SELECT query and prevents loading the
+            //      entire Eloquent model into memory just to update a single timestamp column.
+            // Impact: Eliminates O(1) memory overhead and 1 database query per tracking request,
+            //         significantly improving throughput for this highly concurrent endpoint.
+            EmailLog::where('id', $emailId)->update([
+                'opened_at' => Carbon::now(),
+            ]);
         }
 
         // Ruta a la imagen del logo
@@ -37,11 +37,14 @@ class EmailTrackingController extends Controller
             abort(404, 'Logo not found');
         }
 
-        // Devolver la imagen del logo
-        return Response::make(file_get_contents($logoPath), 200, [
-            'Content-Type' => 'image/png',
-            'Content-Length' => filesize($logoPath)
-        ]);
+        // ⚡ Bolt: File serving optimization.
+        // What: Replaced Response::make(file_get_contents($path)) with response()->file($path).
+        // Why: file_get_contents() loads the entire binary image into PHP's allocated memory
+        //      before constructing the response string, causing OOMs under high concurrency.
+        //      response()->file() streams the file directly from disk and automatically generates
+        //      client-side caching headers (Last-Modified, ETag) to prevent re-downloads.
+        // Impact: Reduces peak memory usage drastically per request and enables browser caching.
+        return response()->file($logoPath);
     }
 
     public function trackClick(Request $request)
