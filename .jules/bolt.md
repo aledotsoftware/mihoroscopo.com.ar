@@ -29,3 +29,11 @@
 ## 2026-03-06 - [Model Hydration Overhead in Index Views]
 **Learning:** Eloquent `Model::paginate()` retrieves all columns by default. When the table contains heavy columns (like large Markdown/HTML text in the `articles.content` column), hydrating these fields into memory for index views that only display titles/slugs causes significant memory and CPU waste per request.
 **Action:** Always explicitly use `select()` in queries intended for index/list views to restrict the returned columns to only what is necessary (e.g., `id`, `slug`, `title`, `created_at`), preventing the expensive loading of large text or BLOB columns.
+
+## 2026-03-10 - [Eloquent Model Hydration Overhead on Simple Updates]
+**Learning:** In highly concurrent endpoints (like an email tracking pixel handler `trackOpen`), using `Model::find($id)` followed by `$model->update()` incurs the cost of executing a `SELECT` query and hydrating a full Eloquent model into memory, just to update a single timestamp.
+**Action:** When updating a single database column without needing model lifecycle events, prefer direct mass update queries (e.g., `Model::where('id', $id)->update(...)`) to eliminate unnecessary SELECT queries and the memory/CPU overhead of Eloquent model hydration.
+
+## 2026-03-10 - [Memory Overhead of file_get_contents]
+**Learning:** Serving a static file by reading it entirely into memory with `file_get_contents()` and then wrapping it in a `Response::make()` causes significant memory spikes and potential Out-Of-Memory (OOM) errors under high concurrency (e.g., serving a tracking pixel).
+**Action:** When serving static files or binaries from controllers, always use Laravel's streaming helpers like `response()->file($path)` or `response()->download($path)` to stream the file directly from disk. This drastically reduces peak memory usage and automatically leverages HTTP caching headers like `Last-Modified` and `ETag`.
