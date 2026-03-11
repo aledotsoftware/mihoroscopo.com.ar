@@ -28,3 +28,7 @@
 ## 2024-10-27 - Visual Required Indicators
 **Learning:** Native `required` and `aria-required` attributes assist screen readers but offer zero help to sighted users trying to scan a form. In custom forms mimicking step-by-step progressions, omitting visual required indicators (like asterisks) increases cognitive load and form abandonment. Sighted users must easily see which fields are mandatory.
 **Action:** Always include a visual required indicator (e.g., `<span class="required-indicator" aria-hidden="true">*</span>`) explicitly tied to the field's `<label>` when the field is marked as required. This provides an immediately recognizable cue and improves form completion rates.
+
+## 2024-11-21 - Focus Management for Inline Validation
+**Learning:** When using custom JS validation instead of native browser form submission, displaying inline errors with `role="alert"` is good, but focus remains on the submit button. This forces keyboard/screen reader users to manually navigate backwards to locate and fix the invalid input.
+**Action:** Always programmatically move focus (`inputEl.focus()`) back to the invalid input when custom validation fails. This ensures immediate context for correction and pairs perfectly with `aria-invalid` announcements.
