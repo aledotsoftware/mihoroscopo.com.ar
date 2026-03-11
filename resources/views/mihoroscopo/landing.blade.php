@@ -418,6 +418,7 @@
                 inputEl.setAttribute('aria-invalid', 'true');
                 inputEl.setAttribute('aria-describedby', 'error-' + inputId);
                 shakeElement(inputEl);
+                inputEl.focus();
             }
         }
 
