@@ -37,3 +37,7 @@
 ## 2026-03-10 - [Memory Overhead of file_get_contents]
 **Learning:** Serving a static file by reading it entirely into memory with `file_get_contents()` and then wrapping it in a `Response::make()` causes significant memory spikes and potential Out-Of-Memory (OOM) errors under high concurrency (e.g., serving a tracking pixel).
 **Action:** When serving static files or binaries from controllers, always use Laravel's streaming helpers like `response()->file($path)` or `response()->download($path)` to stream the file directly from disk. This drastically reduces peak memory usage and automatically leverages HTTP caching headers like `Last-Modified` and `ETag`.
+
+## 2026-03-11 - [Eloquent Model Hydration Overhead in Batch Jobs]
+**Learning:** In batch commands like `UpdateSubscriptions`, loading full Eloquent models using `Subscription::chunkById` is inefficient when only needing specific IDs to call an external API and perform updates. Hydrating the models and fetching heavy JSON columns (`response`, `payload`) from the database causes massive CPU spikes and slows down the command throughput.
+**Action:** When updating millions of rows in a background job where you only need a few columns (e.g., `id`, `subscription_id`), use `DB::table()->select()->chunkById()` to fetch only necessary fields as arrays/objects, and use `DB::table()->where()->update()` for mass updates to bypass Eloquent memory and CPU overhead.
