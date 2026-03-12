@@ -39,31 +39,35 @@ class UpdateSubscriptions extends Command
      */
     public function handle()
     {
-        // ⚡ Bolt: Memory optimization.
-        // What: Replaced ->get() with ->chunkById() to process subscriptions in batches of 100.
-        // Why: Loading all subscriptions into memory at once with get() causes massive memory overhead
-        //      when the table is large, often leading to OOM (Out Of Memory) exceptions on the server.
-        // Impact: Reduces memory usage exponentially from O(N) to O(1) where N is the number of records.
-        Subscription::where('payment_type', '!=', 'gaia')
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Replaced Eloquent chunkById with DB::table()->select()->chunkById() and mass update.
+        // Why: Loading full Eloquent models for background updates wastes significant CPU on hydration
+        //      and memory on large unneeded columns (like full JSON responses in the table).
+        //      Using raw DB queries fetches only the IDs needed and performs direct SQL updates,
+        //      drastically improving throughput and reducing memory overhead per chunk.
+        // Impact: Eliminates O(100) Eloquent hydrations per chunk.
+        \Illuminate\Support\Facades\DB::table('subscriptions')
+            ->select('id', 'subscription_id')
+            ->where('payment_type', '!=', 'gaia')
             ->chunkById(100, function ($subscriptions) {
                 foreach ($subscriptions as $subscription) {
                     try {
                         $mercadoPagoSubscription = $this->mercadoPagoService->getSubscription($subscription->subscription_id);
-                        $subscription->fill([
-                            'status' => $mercadoPagoSubscription['status'] ?? 'gaia',
-                            'next_payment_date' => $mercadoPagoSubscription['next_payment_date'] ?? null,
-                            'payment_method_id' => $mercadoPagoSubscription['payment_method_id'] ?? null,
-                            'charged_quantity' => $mercadoPagoSubscription['summarized']['charged_quantity'] ?? null,
-                            'charged_amount' => $mercadoPagoSubscription['summarized']['charged_amount'] ?? null,
 
-                            'pending_charge_amount' => $mercadoPagoSubscription['summarized']['pending_charge_amount'] ?? null,
-                            'semaphore' => $mercadoPagoSubscription['summarized']['semaphore'] ?? null,
-                            'last_charged_date' => $mercadoPagoSubscription['summarized']['last_charged_date'] ?? null,
-                            'last_charged_amount' => $mercadoPagoSubscription['summarized']['last_charged_amount'] ?? null,
-                            'updated_at' => now(),
-                        ]);
-
-                        $subscription->save();
+                        \Illuminate\Support\Facades\DB::table('subscriptions')
+                            ->where('id', $subscription->id)
+                            ->update([
+                                'status' => $mercadoPagoSubscription['status'] ?? 'gaia',
+                                'next_payment_date' => $mercadoPagoSubscription['next_payment_date'] ?? null,
+                                'payment_method_id' => $mercadoPagoSubscription['payment_method_id'] ?? null,
+                                'charged_quantity' => $mercadoPagoSubscription['summarized']['charged_quantity'] ?? null,
+                                'charged_amount' => $mercadoPagoSubscription['summarized']['charged_amount'] ?? null,
+                                'pending_charge_amount' => $mercadoPagoSubscription['summarized']['pending_charge_amount'] ?? null,
+                                'semaphore' => $mercadoPagoSubscription['summarized']['semaphore'] ?? null,
+                                'last_charged_date' => $mercadoPagoSubscription['summarized']['last_charged_date'] ?? null,
+                                'last_charged_amount' => $mercadoPagoSubscription['summarized']['last_charged_amount'] ?? null,
+                                'updated_at' => now(),
+                            ]);
                     } catch (\Exception $e) {
                         $this->discordService->sendDiscordMessage("Error updating subscription {$subscription->subscription_id}: {$e->getMessage()}");
                     }
