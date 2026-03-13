@@ -406,6 +406,15 @@
             }, 500);
         }
 
+        // UX Improvement: Clear inline errors when user starts typing/changing
+        function clearErrorOnInput(inputId) {
+            const inputEl = document.getElementById(inputId);
+            if (inputEl) {
+                inputEl.addEventListener('input', () => clearInlineError(inputId));
+                inputEl.addEventListener('change', () => clearInlineError(inputId));
+            }
+        }
+
         // Funciones para mostrar y limpiar errores inline
         function showInlineError(inputId, message) {
             const errorEl = document.getElementById('error-' + inputId);
@@ -431,6 +440,11 @@
                 inputEl.removeAttribute('aria-describedby');
             }
         }
+
+        clearErrorOnInput('input-email');
+        clearErrorOnInput('select-zodiac-sign');
+        clearErrorOnInput('input-name');
+        clearErrorOnInput('select-subscription');
 
         // Eventos de los botones con validaciones correspondientes
         btnConfirmEmail.addEventListener('click', () => {

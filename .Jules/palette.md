@@ -32,3 +32,7 @@
 ## 2024-11-21 - Focus Management for Inline Validation
 **Learning:** When using custom JS validation instead of native browser form submission, displaying inline errors with `role="alert"` is good, but focus remains on the submit button. This forces keyboard/screen reader users to manually navigate backwards to locate and fix the invalid input.
 **Action:** Always programmatically move focus (`inputEl.focus()`) back to the invalid input when custom validation fails. This ensures immediate context for correction and pairs perfectly with `aria-invalid` announcements.
+
+## 2024-11-23 - Clear Form Errors on Input
+**Learning:** When users receive a form validation error (e.g., "invalid email" displayed as an inline error), they often start correcting the input immediately. If the error message and the `aria-invalid` state persist while they are typing, it can be confusing and frustrating, as the system still claims the input is "invalid" even while they are actively fixing it.
+**Action:** Always add event listeners for `input` and `change` on form fields that clear any inline errors or `aria-invalid` attributes as soon as the user starts modifying the value. This provides immediate positive feedback and reduces cognitive friction.
