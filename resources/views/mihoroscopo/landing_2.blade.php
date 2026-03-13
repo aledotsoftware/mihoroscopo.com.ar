@@ -249,6 +249,15 @@
 
         // Captura el gclid y guárdalo en localStorage
 
+        // UX Improvement: Clear inline errors when user starts typing/changing
+        ['email', 'zodiac_sign', 'name'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => document.getElementById('error-message').style.display = 'none');
+                el.addEventListener('change', () => document.getElementById('error-message').style.display = 'none');
+            }
+        });
+
         document.getElementById('subscription-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
