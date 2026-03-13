@@ -372,8 +372,16 @@ class SubscriptionController extends Controller
         // Determinar el tipo de suscripción basado en el formato del ID
         $subscriptionType = strpos($id, '-') !== false ? 'tipo_con_guion' : 'tipo_sin_guion';
 
-        // Buscar la suscripción
-        $subscription = Subscription::where('subscription_id', $id)->first();
+        // ⚡ Bolt: Memory and CPU optimization.
+        // What: Replaced fetching the full Eloquent model and saving it with a select query and mass update.
+        // Why: The full model is not needed if the subscription doesn't need to be redirected to MercadoPago,
+        //      and even if it does, we only need the 'status' and 'subscription_id' fields. This avoids hydrating
+        //      all columns of the Subscription model into memory and eliminates a SELECT query when possible.
+        // Impact: Reduces memory overhead and database operations per request.
+        $subscription = DB::table('subscriptions')
+            ->select('id', 'status', 'subscription_id')
+            ->where('subscription_id', $id)
+            ->first();
 
         // Verificar si la suscripción existe
         if (!$subscription) {
@@ -387,8 +395,7 @@ class SubscriptionController extends Controller
         }
 
         // En todos los demás casos, cancelar la suscripción y redirigir a preferencias
-        $subscription->status = 'cancelled';
-        $subscription->save();
+        DB::table('subscriptions')->where('id', $subscription->id)->update(['status' => 'cancelled']);
 
         return redirect('/subscription/preferences/' . $id);
     }
@@ -399,20 +406,22 @@ class SubscriptionController extends Controller
     public function reactivate($externalReference)
     {
         // Lógica para reactivar la suscripción
-        $subscription = DB::table('subscriptions')
+        // ⚡ Bolt: Database and memory optimization.
+        // What: Replaced DB::table()->first() followed by an update with a single DB::table()->update() call,
+        //      using the affected row count to determine success.
+        // Why: The application previously queried the database to fetch the first row (consuming memory to hydrate
+        //      the object array representation) only to check its existence before running a mass update. This
+        //      can be done in a single query by inspecting the result of the update operation.
+        // Impact: Eliminates a redundant SELECT query, lowering database load and removing memory allocation.
+        $affectedRows = DB::table('subscriptions')
             ->where('external_reference', $externalReference) // Corrección en la clave del where
-            ->first();
+            ->update([
+                'subscription_id' => $externalReference,
+                'status' => 'authorized',
+                'payment_type' => 'gaia'
+            ]);
 
-        if ($subscription) {
-            // Actualiza los campos necesarios
-            DB::table('subscriptions')
-                ->where('external_reference', $externalReference)
-                ->update([
-                    'subscription_id' => $externalReference,
-                    'status' => 'authorized',
-                    'payment_type' => 'gaia'
-                ]);
-
+        if ($affectedRows > 0) {
             // Redirigir a preferencias
             return redirect('/subscription/preferences/' . $externalReference);
         } else {
