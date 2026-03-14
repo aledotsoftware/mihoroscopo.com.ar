@@ -13,7 +13,7 @@
     <h1>Suscripción al Servicio</h1>
     <form id="subscriptionForm">
         <label for="email">Correo electrónico:<span class="required-indicator" aria-hidden="true">*</span></label>
-        <input type="email" id="email" name="email" required aria-required="true">
+        <input type="email" id="email" name="email" required aria-required="true" autocomplete="email" inputmode="email">
 
         <label for="cardToken">Token de tarjeta:</label>
         <input type="hidden" id="cardToken" name="card_token_id">

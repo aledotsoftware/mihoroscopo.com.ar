@@ -10,7 +10,7 @@
 <form action="{{ route('payment.create') }}" method="POST">
     @csrf
     <label for="email">Tu correo electrónico<span class="required-indicator" aria-hidden="true">*</span></label>
-    <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required aria-required="true">
+    <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required aria-required="true" autocomplete="email" inputmode="email">
 
     <label for="description">Descripción del pago<span class="required-indicator" aria-hidden="true">*</span></label>
     <input type="text" id="description" name="description" placeholder="Ej: Suscripción mensual" required aria-required="true">

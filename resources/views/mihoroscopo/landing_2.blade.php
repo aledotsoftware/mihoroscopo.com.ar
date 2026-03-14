@@ -198,7 +198,7 @@
                 <li class="type-text hid">Compatibilidad Zodiacal</li>
             </ul>
             <label for="email">Correo Electrónico<span class="required-indicator" aria-hidden="true">*</span></label>
-            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true">
+            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true" autocomplete="email" inputmode="email">
 
             <label for="zodiac_sign">Selecciona tu Signo Astrológico<span class="required-indicator" aria-hidden="true">*</span></label>
             <select name="zodiac_sign" id="zodiac_sign" required aria-required="true">
