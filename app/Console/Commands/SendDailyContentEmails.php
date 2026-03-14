@@ -153,7 +153,14 @@ class SendDailyContentEmails extends Command
                 if ($extradataHoroscope) {
                     $zodiacSign = $extradataHoroscope->signo;
                     //  if (in_array($subscription->email, ['aleavellaneda1@gmail.com'])) {
-                    $emailLog = EmailLog::create([
+
+                    // ⚡ Bolt: Database and memory optimization.
+                    // What: Replaced EmailLog::create() with DB::table('email_logs')->insertGetId().
+                    // Why: The application generates thousands of email logs per run in a loop. Calling create()
+                    //      forces Eloquent to instantiate a full Model object for every iteration, wasting memory
+                    //      and CPU on hydration that isn't needed. Using a direct database insert avoids this overhead.
+                    // Impact: Significantly reduces memory footprint and CPU time when processing large subscriber chunks.
+                    $emailLogId = \Illuminate\Support\Facades\DB::table('email_logs')->insertGetId([
                         'subscription_id' => $subscription->id,
                         'service_type' => 'horoscope',
                         'content_id' => array_search($zodiacSign, array_keys($contentHoroscope)),
@@ -161,12 +168,12 @@ class SendDailyContentEmails extends Command
                         'status' => 'sent'
                     ]);
 
-                    $trackedUnsubscribeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $unsubscribeLink]);
-                    $trackedUpgradeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $upgradeLink]);
-                    $trackedPreferencesLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $preferencesLink]);
+                    $trackedUnsubscribeLink = URL::signedRoute('email.track.click', ['email' => $emailLogId, 'url' => $unsubscribeLink]);
+                    $trackedUpgradeLink = URL::signedRoute('email.track.click', ['email' => $emailLogId, 'url' => $upgradeLink]);
+                    $trackedPreferencesLink = URL::signedRoute('email.track.click', ['email' => $emailLogId, 'url' => $preferencesLink]);
 
                     $content = [
-                        'email_id' => $emailLog->id,
+                        'email_id' => $emailLogId,
                         'name' => $extradataHoroscope->name ?? 'Todo bien?',
                         'zodiac_sign' => ucfirst($zodiacSign),
                         'date' => $date,
@@ -192,7 +199,7 @@ class SendDailyContentEmails extends Command
             } catch (\Exception $e) {
                 file_put_contents($this->logPath, "Error en el envío para suscripción ID: " . $subscription->subscription_id . ". Error: " . $e->getMessage() . "\n", FILE_APPEND);
 
-                EmailLog::create([
+                \Illuminate\Support\Facades\DB::table('email_logs')->insert([
                     'subscription_id' => $subscription->id,
                     'service_type' => 'horoscope',
                     'content_id' => array_search($zodiacSign ?? null, array_keys($contentHoroscope)),

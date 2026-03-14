@@ -84,7 +84,11 @@ class SendDailyRemarketingEmails extends Command
 
         try {
             // // Crear registro de EmailLog
-            $emailLog = EmailLog::create([
+            // ⚡ Bolt: Database and memory optimization.
+            // What: Replaced EmailLog::create() with DB::table('email_logs')->insertGetId().
+            // Why: Avoids executing a redundant Model hydration cycle inside a large processing chunk.
+            // Impact: Reduces CPU/Memory load per subscription processed.
+            $emailLogId = DB::table('email_logs')->insertGetId([
                 'subscription_id' => $subscription->id,
                 'service_type' => 'horoscope',
                 'content_id' => 0,
@@ -94,7 +98,7 @@ class SendDailyRemarketingEmails extends Command
 
             // Contenido del correo
             $content = [
-                'email_id' => $emailLog->id,
+                'email_id' => $emailLogId,
                 'name' => 'Todo bien',
                 'payment_link' => "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_id={$subscription->subscription_id}"
             ];
