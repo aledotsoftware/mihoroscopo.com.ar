@@ -55,11 +55,19 @@ class EmailTrackingController extends Controller
         if ($emailLogId && $url) {
             try {
                 // Registrar el click
-                EmailClick::create([
+                // ⚡ Bolt: Database write optimization.
+                // What: Replaced EmailClick::create() with DB::table('email_clicks')->insert().
+                // Why: Avoids executing an unnecessary Eloquent Model hydration cycle on a high-concurrency
+                //      tracking endpoint where we don't need the resulting object.
+                // Impact: Eliminates memory allocation overhead per tracked click.
+                \Illuminate\Support\Facades\DB::table('email_clicks')->insert([
                     'email_log_id' => $emailLogId,
                     'url' => $url,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
+                    'clicked_at' => Carbon::now(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]);
             } catch (\Exception $e) {
                 // Log error but continue redirect
