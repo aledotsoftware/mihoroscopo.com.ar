@@ -198,10 +198,10 @@
                 <li class="type-text hid">Compatibilidad Zodiacal</li>
             </ul>
             <label for="email">Correo Electrónico<span class="required-indicator" aria-hidden="true">*</span></label>
-            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true">
+            <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required autocomplete="email" inputmode="email">
 
             <label for="zodiac_sign">Selecciona tu Signo Astrológico<span class="required-indicator" aria-hidden="true">*</span></label>
-            <select name="zodiac_sign" id="zodiac_sign" required aria-required="true">
+            <select name="zodiac_sign" id="zodiac_sign" required>
                 <option value="" disabled selected>Selecciona tu signo</option>
                 <option value="aries">Aries</option>
                 <option value="tauro">Tauro</option>
@@ -218,7 +218,7 @@
             </select>
 
             <label for="name">Nombre<span class="required-indicator" aria-hidden="true">*</span></label>
-            <input type="text" id="name" name="name" placeholder="Tu Nombre" required aria-required="true">
+            <input type="text" id="name" name="name" placeholder="Tu Nombre" required autocomplete="name" autocapitalize="words">
 
             <input type="hidden" name="subscription" value="days">
 
