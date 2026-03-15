@@ -8,6 +8,7 @@ use App\Models\EmailClick;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
 
 class EmailTrackingController extends Controller
 {
@@ -55,11 +56,18 @@ class EmailTrackingController extends Controller
         if ($emailLogId && $url) {
             try {
                 // Registrar el click
-                EmailClick::create([
+                // ⚡ Bolt: Memory & CPU optimization.
+                // What: Replaced Model::create() with DB::table()->insert().
+                // Why: In a high-throughput tracking endpoint, avoiding Eloquent model hydration for every record drastically reduces memory footprint and CPU overhead. Eloquent's automatic timestamps are explicitly set.
+                // Impact: Eliminates model instantiation overhead, improving max requests per second.
+                $now = Carbon::now();
+                DB::table('email_clicks')->insert([
                     'email_log_id' => $emailLogId,
                     'url' => $url,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->userAgent(),
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
             } catch (\Exception $e) {
                 // Log error but continue redirect

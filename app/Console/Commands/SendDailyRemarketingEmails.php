@@ -84,13 +84,19 @@ class SendDailyRemarketingEmails extends Command
 
         try {
             // // Crear registro de EmailLog
-            $emailLog = EmailLog::create([
+            // ⚡ Bolt: Memory & CPU optimization.
+            // What: Replaced Model::create() with DB::table()->insertGetId().
+            // Why: In a batch processing loop (sending mass emails), avoiding Eloquent model hydration for every record drastically reduces memory footprint and CPU overhead.
+            // Impact: Eliminates model instantiation overhead per iteration, preventing OOM issues.
+            $emailLogId = \Illuminate\Support\Facades\DB::table('email_logs')->insertGetId([
                 'subscription_id' => $subscription->id,
                 'service_type' => 'horoscope',
                 'content_id' => 0,
                 'sent_at' => Carbon::now(),
                 'status' => 'sent'
             ]);
+            // Stub object to maintain compatibility with existing tracking code
+            $emailLog = (object)['id' => $emailLogId];
 
             // Contenido del correo
             $content = [

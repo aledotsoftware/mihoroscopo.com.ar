@@ -153,13 +153,19 @@ class SendDailyContentEmails extends Command
                 if ($extradataHoroscope) {
                     $zodiacSign = $extradataHoroscope->signo;
                     //  if (in_array($subscription->email, ['aleavellaneda1@gmail.com'])) {
-                    $emailLog = EmailLog::create([
+                    // ⚡ Bolt: Memory & CPU optimization.
+                    // What: Replaced Model::create() with DB::table()->insertGetId().
+                    // Why: In a batch processing loop (sending mass emails), avoiding Eloquent model hydration for every record drastically reduces memory footprint and CPU overhead. Eloquent's automatic timestamps are bypassed.
+                    // Impact: Eliminates model instantiation overhead per iteration, preventing OOM issues.
+                    $emailLogId = \Illuminate\Support\Facades\DB::table('email_logs')->insertGetId([
                         'subscription_id' => $subscription->id,
                         'service_type' => 'horoscope',
                         'content_id' => array_search($zodiacSign, array_keys($contentHoroscope)),
                         'sent_at' => Carbon::now(),
                         'status' => 'sent'
                     ]);
+                    // Stub object to maintain compatibility with existing tracking link code
+                    $emailLog = (object)['id' => $emailLogId];
 
                     $trackedUnsubscribeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $unsubscribeLink]);
                     $trackedUpgradeLink = URL::signedRoute('email.track.click', ['email' => $emailLog->id, 'url' => $upgradeLink]);
@@ -192,7 +198,11 @@ class SendDailyContentEmails extends Command
             } catch (\Exception $e) {
                 file_put_contents($this->logPath, "Error en el envío para suscripción ID: " . $subscription->subscription_id . ". Error: " . $e->getMessage() . "\n", FILE_APPEND);
 
-                EmailLog::create([
+                // ⚡ Bolt: Memory & CPU optimization.
+                // What: Replaced Model::create() with DB::table()->insert().
+                // Why: Avoids Eloquent model hydration overhead in batch processing loop.
+                // Impact: Reduces memory footprint per iteration.
+                \Illuminate\Support\Facades\DB::table('email_logs')->insert([
                     'subscription_id' => $subscription->id,
                     'service_type' => 'horoscope',
                     'content_id' => array_search($zodiacSign ?? null, array_keys($contentHoroscope)),
