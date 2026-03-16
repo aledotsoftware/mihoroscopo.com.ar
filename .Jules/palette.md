@@ -36,3 +36,7 @@
 ## 2024-11-23 - Clear Form Errors on Input
 **Learning:** When users receive a form validation error (e.g., "invalid email" displayed as an inline error), they often start correcting the input immediately. If the error message and the `aria-invalid` state persist while they are typing, it can be confusing and frustrating, as the system still claims the input is "invalid" even while they are actively fixing it.
 **Action:** Always add event listeners for `input` and `change` on form fields that clear any inline errors or `aria-invalid` attributes as soon as the user starts modifying the value. This provides immediate positive feedback and reduces cognitive friction.
+
+## 2026-03-16 - Consistent Visual Required Indicators on Sub-pages
+**Learning:** The main form ('landing.blade.php') includes visual required indicators ('*'), but secondary sub-pages like 'payment.blade.php' sometimes omit them even when fields have native 'required' attributes. This inconsistency degrades UX for sighted users scanning forms.
+**Action:** Always ensure any form view or partial explicitly implements the required indicator ('<span class="required-indicator" aria-hidden="true">*</span>') to match the design system's accessibility standard for mandatory fields.
