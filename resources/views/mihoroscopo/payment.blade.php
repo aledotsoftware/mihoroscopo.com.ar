@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generar Token de Tarjeta</title>
     <script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
+    <style>
+        .required-indicator { color: #dc3545; margin-left: 2px; }
+    </style>
 </head>
 <body>
     <h1>Pago con Tarjeta</h1>
     <form id="paymentForm">
-        <label for="cardNumber">Número de tarjeta:</label>
+        <label for="cardNumber">Número de tarjeta:<span class="required-indicator" aria-hidden="true">*</span></label>
         <input type="text" id="cardNumber" name="cardNumber" required>
         
-        <label for="expirationDate">Fecha de expiración:</label>
+        <label for="expirationDate">Fecha de expiración:<span class="required-indicator" aria-hidden="true">*</span></label>
         <input type="text" id="expirationDate" name="expirationDate" required>
 
-        <label for="cardholderName">Nombre del titular:</label>
+        <label for="cardholderName">Nombre del titular:<span class="required-indicator" aria-hidden="true">*</span></label>
         <input type="text" id="cardholderName" name="cardholderName" required>
 
         <label for="cardToken">Token de tarjeta:</label>
