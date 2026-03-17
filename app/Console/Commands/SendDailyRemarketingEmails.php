@@ -47,7 +47,15 @@ class SendDailyRemarketingEmails extends Command
         //      chunkById() is used instead of chunk() to prevent skipping records if the processed records
         //      are mutated (which would change their position in the result set when using LIMIT/OFFSET).
         // Impact: Reduces memory usage exponentially from O(N) to O(1) where N is the number of records.
+
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Added select(['id', 'subscription_id', 'email']) to the query builder.
+        // Why: The subscriptions table contains heavy TEXT columns like 'response' and 'payload' (for JSON).
+        //      Processing thousands of pending subscriptions without explicitly restricting the SELECT clause
+        //      pulls all these large strings into PHP memory for every chunk, which wastes RAM and bandwidth.
+        // Impact: Significantly decreases memory consumption and network I/O per processed chunk.
         $query = DB::table('subscriptions')
+            ->select(['id', 'subscription_id', 'email'])
             ->where('status', 'pending')
             ->whereBetween('created_at', [
                 Carbon::now()->subDays(3)->startOfDay(),  // Inicio de hace 3 días
