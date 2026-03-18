@@ -13,13 +13,13 @@
     <h1>Pago con Tarjeta</h1>
     <form id="paymentForm">
         <label for="cardNumber">Número de tarjeta:<span class="required-indicator" aria-hidden="true">*</span></label>
-        <input type="text" id="cardNumber" name="cardNumber" required>
+        <input type="text" id="cardNumber" name="cardNumber" required aria-required="true" autocomplete="cc-number" inputmode="numeric">
         
         <label for="expirationDate">Fecha de expiración:<span class="required-indicator" aria-hidden="true">*</span></label>
-        <input type="text" id="expirationDate" name="expirationDate" required>
+        <input type="text" id="expirationDate" name="expirationDate" required aria-required="true" autocomplete="cc-exp" inputmode="text">
 
         <label for="cardholderName">Nombre del titular:<span class="required-indicator" aria-hidden="true">*</span></label>
-        <input type="text" id="cardholderName" name="cardholderName" required>
+        <input type="text" id="cardholderName" name="cardholderName" required aria-required="true" autocomplete="cc-name" autocapitalize="words">
 
         <label for="cardToken">Token de tarjeta:</label>
         <input type="hidden" id="cardToken" name="cardToken">
