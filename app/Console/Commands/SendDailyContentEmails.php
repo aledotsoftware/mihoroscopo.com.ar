@@ -83,7 +83,14 @@ class SendDailyContentEmails extends Command
             }
         } else {
             // Use Eloquent with chunking to handle large datasets and eager load relationships
+            // ⚡ Bolt: Memory optimization.
+            // What: Added select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status']) to the Eloquent query.
+            // Why: The subscriptions table contains heavy TEXT columns like 'response' and 'payload'. By explicitly
+            //      selecting only the columns required by the sendEmail function, we prevent Eloquent from
+            //      hydrating these large strings into PHP memory for every model in the chunk, avoiding OOM issues.
+            // Impact: Significantly decreases memory consumption and network I/O per processed chunk.
             $subscriptionQuery = Subscription::with('extradata_horoscopes')
+                ->select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status'])
                 ->whereIn('status', ['authorized', 'pending']);
 
             // ⚡ Bolt: Query optimization.
