@@ -40,3 +40,7 @@
 ## 2026-03-16 - Consistent Visual Required Indicators on Sub-pages
 **Learning:** The main form ('landing.blade.php') includes visual required indicators ('*'), but secondary sub-pages like 'payment.blade.php' sometimes omit them even when fields have native 'required' attributes. This inconsistency degrades UX for sighted users scanning forms.
 **Action:** Always ensure any form view or partial explicitly implements the required indicator ('<span class="required-indicator" aria-hidden="true">*</span>') to match the design system's accessibility standard for mandatory fields.
+
+## 2024-11-23 - Consistent Layout on Payment Status Pages
+**Learning:** Payment status pages (success, pending, failure) were basic HTML dead ends, jarring the user experience after a transaction.
+**Action:** Always wrap post-transaction pages in the main application layout (`@extends('layouts.app')`) and include clear navigation options to prevent users from getting stuck.
