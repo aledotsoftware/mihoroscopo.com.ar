@@ -18,5 +18,16 @@
     <label for="amount">Monto<span class="required-indicator" aria-hidden="true">*</span></label>
     <input type="number" id="amount" name="amount" placeholder="Ej: 1500" required aria-required="true" inputmode="numeric">
 
-    <button type="submit">Pagar con Mercado Pago</button>
+    <button type="submit" id="submitBtn">Pagar con Mercado Pago</button>
 </form>
+
+<script>
+    document.getElementById('submitBtn').closest('form').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.innerHTML = 'Procesando pago...';
+        btn.style.opacity = '0.8';
+        btn.style.cursor = 'not-allowed';
+    });
+</script>
