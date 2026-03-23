@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Pago Exitoso</title>
-</head>
-<body>
+@extends('mihoroscopo.layouts.app')
+
+@section('title', 'Pago Exitoso')
+
+@section('content')
+<div class="container text-center" style="padding: 150px 0 100px;">
     <h1>¡Gracias por tu pago!</h1>
-    <p>Tu suscripción ha sido activada.</p>
-</body>
-</html>
+    <p class="mt-4 mb-4">Tu suscripción ha sido activada.</p>
+    <a href="{{ url('/') }}" class="btn btn-primary">Volver al inicio</a>
+</div>
+@endsection
