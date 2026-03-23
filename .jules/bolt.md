@@ -49,3 +49,7 @@
 ## 2026-03-18 - [Eloquent Model Hydration Overhead in Chunking Queries]
 **Learning:** When using `Model::chunk()` or `Model::chunkById()` for batch processes (e.g., `SendDailyContentEmails`), Eloquent fetches all columns by default. If the table contains heavy TEXT/JSON columns (like `response` or `payload`), hydrating these into memory for thousands of records per chunk causes significant RAM usage and network I/O overhead.
 **Action:** Always use `select()` in Eloquent chunking queries to explicitly restrict the fetched columns to only those required by the loop logic, preventing unnecessary memory allocation.
+
+## 2026-03-23 - [Blocking Webhooks]
+**Learning:** Webhook handlers (like `NotificationController::toQueue`) often receive high traffic and need to respond to the provider (like MercadoPago or dLocalGo) immediately to prevent timeouts and retries. Processing synchronous HTTP requests (`curl`), database transactions, or sending Discord logs inside the main web request cycle creates a severe bottleneck.
+**Action:** In Laravel 11.x applications, optimize synchronous webhook handlers by wrapping blocking operations inside the `defer()` helper (e.g., `defer(fn () => $this->handle($data));`). This acknowledges the webhook instantly with a 200 OK and executes the heavy logic in the background, significantly reducing response time and preventing external provider timeouts.
