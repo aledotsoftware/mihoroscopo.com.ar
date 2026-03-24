@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Pago Fallido</title>
-</head>
-<body>
+@extends('mihoroscopo.layouts.app')
+
+@section('title', 'Pago Fallido')
+
+@section('content')
+<div class="container text-center" style="padding: 150px 0 100px;">
     <h1>El pago ha fallado</h1>
-    <p>Por favor, intenta nuevamente.</p>
-</body>
-</html>
+    <p class="mt-4 mb-4">Por favor, intenta nuevamente.</p>
+    <a href="{{ url('/') }}" class="btn btn-primary">Volver al inicio</a>
+</div>
+@endsection

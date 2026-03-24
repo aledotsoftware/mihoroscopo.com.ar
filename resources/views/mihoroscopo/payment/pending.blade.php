@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Pago Pendiente</title>
-</head>
-<body>
+@extends('mihoroscopo.layouts.app')
+
+@section('title', 'Pago Pendiente')
+
+@section('content')
+<div class="container text-center" style="padding: 150px 0 100px;">
     <h1>Tu pago está en espera</h1>
-    <p>Estamos esperando la confirmación del pago.</p>
-</body>
-</html>
+    <p class="mt-4 mb-4">Estamos esperando la confirmación del pago.</p>
+    <a href="{{ url('/') }}" class="btn btn-primary">Volver al inicio</a>
+</div>
+@endsection
