@@ -41,6 +41,6 @@
 **Learning:** The main form ('landing.blade.php') includes visual required indicators ('*'), but secondary sub-pages like 'payment.blade.php' sometimes omit them even when fields have native 'required' attributes. This inconsistency degrades UX for sighted users scanning forms.
 **Action:** Always ensure any form view or partial explicitly implements the required indicator ('<span class="required-indicator" aria-hidden="true">*</span>') to match the design system's accessibility standard for mandatory fields.
 
-## 2026-03-23 - Payment Feedback Pages Missing Layout Context
-**Learning:** Payment outcome pages (`success.blade.php`, `pending.blade.php`, `failure.blade.php`) were historically raw HTML fragments, leaving users stranded without main navigation or a way back if a process halted.
-**Action:** Always wrap status/outcome pages in the main application layout (`@extends('mihoroscopo.layouts.app')`) and include a clear, accessible return action (like 'Volver al inicio') to prevent dead-end user flows.
+## 2026-03-22 - Prevent Dead-End Pages
+**Learning:** Payment status pages (success, pending, failure) originally implemented as plain HTML templates without extending the main app layout caused a jarring, dead-end UX for users trying to return to the site.
+**Action:** Always ensure auxiliary pages like status or error screens extend the primary layout (e.g., `mihoroscopo.layouts.app`) and explicitly include clear navigation controls (like 'Volver al inicio') back to the main content.
