@@ -100,7 +100,14 @@ class SendDailyContentEmails extends Command
             // Impact: Eliminates a costly database query, speeding up command execution on large tables.
             $subscriptionCount = 0;
 
-            $subscriptionQuery->chunk(100, function ($subscriptions) use ($dailyContent, &$subscriptionCount) {
+            // ⚡ Bolt: Query pagination optimization.
+            // What: Replaced ->chunk() with ->chunkById() for processing the large subscriptions table.
+            // Why: The standard chunk() method relies on SQL `OFFSET` and `LIMIT`. As the offset grows (e.g., OFFSET 100000),
+            //      the database must scan and discard all preceding rows before returning the batch, causing query execution time
+            //      to degrade linearly (O(N)), resulting in an overall O(N^2) operation. chunkById() uses an indexed `WHERE id > ?`
+            //      condition instead, maintaining constant O(1) query time for every batch, regardless of depth.
+            // Impact: Prevents severe database CPU spikes and drastically speeds up execution time when processing millions of records.
+            $subscriptionQuery->chunkById(100, function ($subscriptions) use ($dailyContent, &$subscriptionCount) {
                 $subscriptionCount += count($subscriptions);
                 foreach ($subscriptions as $subscription) {
                     $this->sendEmail($subscription, $dailyContent);
