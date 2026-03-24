@@ -26,6 +26,11 @@ class SubscriptionTest extends TestCase
             $table->integer('service_id')->default(1);
             $table->integer('payment_provider_id')->default(1);
             $table->timestamps();
+
+            // ⚡ Bolt: Indexes to match migration
+            $table->index('email');
+            $table->index('external_reference');
+            $table->index('subscription_id');
         });
 
         \Illuminate\Support\Facades\Schema::create('extradata_horoscopes', function ($table) {
