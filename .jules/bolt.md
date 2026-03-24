@@ -49,3 +49,11 @@
 ## 2026-03-18 - [Eloquent Model Hydration Overhead in Chunking Queries]
 **Learning:** When using `Model::chunk()` or `Model::chunkById()` for batch processes (e.g., `SendDailyContentEmails`), Eloquent fetches all columns by default. If the table contains heavy TEXT/JSON columns (like `response` or `payload`), hydrating these into memory for thousands of records per chunk causes significant RAM usage and network I/O overhead.
 **Action:** Always use `select()` in Eloquent chunking queries to explicitly restrict the fetched columns to only those required by the loop logic, preventing unnecessary memory allocation.
+
+## 2026-03-24 - [Avoid Micro-Optimizing Single Record Writes]
+**Learning:** Attempting to optimize `new Model()->save()` into `DB::table()->insert()` on regular, low-throughput endpoints or when returning the Model object is required is an anti-pattern. This micro-optimization breaks Model return types, silently bypasses Eloquent Events/Mutators, and violates conventions for negligible performance gain.
+**Action:** Restrict raw Query Builder (`DB::table`) write optimizations to bulk processing loops (commands/jobs) or extremely high-concurrency logging endpoints where the Model object is immediately discarded and lifecycle events are explicitly unnecessary.
+
+## 2026-03-24 - [Synchronous Webhook Bottlenecks]
+**Learning:** The `NotificationController::toQueue` method was performing synchronous database writes, making external HTTP calls to Discord, calling payment provider APIs, and conducting file I/O operations directly within the webhook request lifecycle. This blocks the HTTP response thread, increasing response latency and causing webhook providers (like Mercado Pago and dLocalGo) to timeout and retry the webhook multiple times, degrading overall system performance.
+**Action:** In Laravel 11.x applications, optimize synchronous webhook handlers that don't require returning data in the response body by validating the request signatures synchronously, and then wrapping the heavy processing logic inside the `defer()` helper. This guarantees an immediate `200 OK` response to the provider while the blocking operations safely run in the background.
