@@ -328,11 +328,26 @@ class SubscriptionController extends Controller
     public function preferences($externalReference)
     {
         // Realizar la consulta con INNER JOIN
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Replaced 'subscriptions.*' with explicit column names in the select() clause.
+        // Why: The 'subscriptions' table contains large TEXT/JSON columns ('response', 'payload')
+        //      that consume significant memory when hydrated. Since the view only needs a few status fields,
+        //      fetching all columns is extremely wasteful.
+        // Impact: Drastically reduces memory footprint and network transfer time for rendering the preferences page.
         $subscription = DB::table('subscriptions')
             ->join('extradata_horoscopes', 'subscriptions.id', '=', 'extradata_horoscopes.subscription_id')
             ->where('subscriptions.external_reference', $externalReference)
             ->orderBy('extradata_horoscopes.subscription_id', 'ASC')
-            ->select('subscriptions.*', 'extradata_horoscopes.signo', 'extradata_horoscopes.gclid', 'extradata_horoscopes.name')
+            ->select(
+                'subscriptions.id',
+                'subscriptions.external_reference',
+                'subscriptions.payment_type',
+                'subscriptions.status',
+                'subscriptions.subscription_id',
+                'extradata_horoscopes.signo',
+                'extradata_horoscopes.gclid',
+                'extradata_horoscopes.name'
+            )
             ->first();
 
         // Depurar el resultado de la consulta
