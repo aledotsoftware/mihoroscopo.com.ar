@@ -125,3 +125,7 @@ Route::get('/email/track/click', [EmailTrackingController::class, 'trackClick'])
 Route::get('/logo', [EmailTrackingController::class, 'trackOpen'])->name('logo');
 
 
+
+Route::get('/payment-form-test', function () {
+    return view('mihoroscopo.payment_form');
+});

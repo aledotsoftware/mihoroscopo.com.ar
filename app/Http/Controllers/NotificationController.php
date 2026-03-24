@@ -102,15 +102,23 @@ class NotificationController extends Controller
 
             switch ($topic) {
                 case 'subscription_preapproval':
-                    $this->handleSubscriptionPreapproval($data);
+                    // ⚡ Bolt: Async/Deferred processing optimization.
+                    // What: Wrapped the heavy method call in Laravel's defer() helper.
+                    // Why: The method contains synchronous, blocking HTTP requests to MercadoPago
+                    //      that force the webhook provider to wait for a response, risking timeouts.
+                    //      By deferring execution until after the HTTP response is sent, we instantly acknowledge the webhook.
+                    // Impact: Drastically reduces the endpoint's response time and prevents webhook retries under load.
+                    defer(fn () => $this->handleSubscriptionPreapproval($data));
                     break;
 
                 case 'subscription_authorized_payment':
-                    $this->handleSubscriptionAuthorizedPayment($data);
+                    // ⚡ Bolt: Async/Deferred processing optimization.
+                    defer(fn () => $this->handleSubscriptionAuthorizedPayment($data));
                     break;
 
                 case 'payment':
-                    $this->handlePayment($data);
+                    // ⚡ Bolt: Async/Deferred processing optimization.
+                    defer(fn () => $this->handlePayment($data));
                     break;
 
                 default:
@@ -118,6 +126,7 @@ class NotificationController extends Controller
                     $this->handleDefault($data);
                     break;
             }
+            return response()->json(['status' => 'received'], 200);
         } else {
             // Es una notificación de dLocalGo
             if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
@@ -126,8 +135,14 @@ class NotificationController extends Controller
                     return response()->json(['error' => 'Unauthorized'], 403);
                 }
                 // Es una notificación de dLocalGo
-                $this->handleDlocalGoNotification($data);
-                return;
+                // ⚡ Bolt: Async/Deferred processing optimization.
+                // What: Wrapped the heavy handleDlocalGoNotification call in Laravel's defer() helper.
+                // Why: The handleDlocalGoNotification method contains a synchronous, blocking curl request
+                //      that forces the webhook provider to wait for a response, risking timeouts. By deferring
+                //      execution until after the HTTP response is sent, we instantly acknowledge the webhook.
+                // Impact: Drastically reduces the endpoint's response time and prevents webhook retries under load.
+                defer(fn () => $this->handleDlocalGoNotification($data));
+                return response()->json(['status' => 'received'], 200);
             }
             $this->handleDefault($data);
         }
