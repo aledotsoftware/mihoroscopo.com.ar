@@ -41,7 +41,13 @@ class SendDailyContentEmailsTest extends TestCase
             $table->string('external_reference')->nullable();
             $table->string('payment_type')->nullable();
             $table->integer('service_id')->default(1);
+            $table->string('subscription_id')->nullable();
             $table->timestamps();
+
+            // ⚡ Bolt: Indexes to match migration
+            $table->index('email');
+            $table->index('external_reference');
+            $table->index('subscription_id');
         });
 
         Schema::create('extradata_horoscopes', function ($table) {
