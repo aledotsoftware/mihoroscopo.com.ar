@@ -48,89 +48,98 @@ class NotificationController extends Controller
      */
     public function toQueue(Request $request)
     {
-        // Reenviar la solicitud al endpoint externo
+        // ⚡ Bolt: Controller response time optimization.
+        // What: Wrapped the heavy, synchronous webhook processing logic inside Laravel's `defer()` helper.
+        // Why: Webhooks endpoints process external APIs, DB writes, Discord API calls, and file I/O operations synchronously.
+        //      This blocked the HTTP response thread, risking timeouts from providers.
+        //      `defer()` allows us to send an immediate 200 OK to Mercado Pago / dLocalGo, while executing
+        //      these long-running operations in the background after the response is sent.
+        // Impact: Reduces HTTP response times drastically and avoids provider timeout retries.
 
-        // Obtener todos los headers de la solicitud
-        $headers = $request->headers->all();
-
-        // Obtener el cuerpo (body) de la solicitud
-        $body = $request->getContent();
-
-        // Obtener todos los parámetros (si los hay)
+        // Authenticate signatures synchronously before deferring, and return 403 if invalid
         $data = $request->all();
-
-        // Crear un array con toda la información a guardar
-        $log_data = [
-            'headers' => $headers,
-            'body' => $body,
-            'data' => $data
-
-        ];
-
-        // Convertir los datos a JSON para guardar en un archivo
-        $log_json = json_encode($log_data, JSON_PRETTY_PRINT);
-
-        // Definir el nombre del archivo
-        $file_name = 'logs/mercadopago_notification_' . now()->format('Y-m-d_H-i-s') . '.json';
-
-        // Guardar el archivo directamente en la carpeta public/logs
-        file_put_contents(public_path($file_name), $log_json);
-
-        // Crear un link público al archivo
-        $public_link = url('logs/' . basename($file_name));
-
-        $this->discordService->sendDiscordMessage('Nueva notificación recibida: ' . $public_link);
-
-        // Guardar la notificación en la base de datos
-        $this->saveNotification($data);
-
-
-
-        // Obtener los atributos GET de la ruta y los headers de la solicitud
-        $queryParams = $request->query();
-        $headers = $request->headers->all();
-
-        // Determinar el tipo de notificación es, las de mercado pago tienen type, las de dLocalGo no
-        //las de dLocalGo tienen 3 campos invoiceId, mid, y subscriptionId
         if (isset($data['type'])) {
             if (!$this->verifyMercadoPagoSignature($request)) {
                 \Log::warning('Invalid MercadoPago signature');
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
-            // Es una notificación de MercadoPago
-            $topic = $data['type'];
-
-            switch ($topic) {
-                case 'subscription_preapproval':
-                    $this->handleSubscriptionPreapproval($data);
-                    break;
-
-                case 'subscription_authorized_payment':
-                    $this->handleSubscriptionAuthorizedPayment($data);
-                    break;
-
-                case 'payment':
-                    $this->handlePayment($data);
-                    break;
-
-                default:
-                    echo "notificacion de mercadopago desconocida";
-                    $this->handleDefault($data);
-                    break;
-            }
         } else {
-            // Es una notificación de dLocalGo
             if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
                 if (!$this->verifyDlocalGoSignature($request)) {
                     \Log::warning('Invalid DlocalGo signature');
                     return response()->json(['error' => 'Unauthorized'], 403);
                 }
-                // Es una notificación de dLocalGo
-                $this->handleDlocalGoNotification($data);
-                return;
             }
-            $this->handleDefault($data);
         }
+
+        // Obtener el cuerpo (body) de la solicitud (must fetch syncly)
+        $body = $request->getContent();
+        $headers = $request->headers->all();
+        $queryParams = $request->query();
+
+        defer(function () use ($data, $body, $headers, $queryParams) {
+            // Reenviar la solicitud al endpoint externo
+
+            // Crear un array con toda la información a guardar
+            $log_data = [
+                'headers' => $headers,
+                'body' => $body,
+                'data' => $data
+            ];
+
+            // Convertir los datos a JSON para guardar en un archivo
+            $log_json = json_encode($log_data, JSON_PRETTY_PRINT);
+
+            // Definir el nombre del archivo
+            $file_name = 'logs/mercadopago_notification_' . now()->format('Y-m-d_H-i-s') . '.json';
+
+            // Guardar el archivo directamente en la carpeta public/logs
+            file_put_contents(public_path($file_name), $log_json);
+
+            // Crear un link público al archivo
+            $public_link = url('logs/' . basename($file_name));
+
+            $this->discordService->sendDiscordMessage('Nueva notificación recibida: ' . $public_link);
+
+            // Guardar la notificación en la base de datos
+            $this->saveNotification($data);
+
+            // Determinar el tipo de notificación es, las de mercado pago tienen type, las de dLocalGo no
+            //las de dLocalGo tienen 3 campos invoiceId, mid, y subscriptionId
+            if (isset($data['type'])) {
+                // Es una notificación de MercadoPago
+                $topic = $data['type'];
+
+                switch ($topic) {
+                    case 'subscription_preapproval':
+                        $this->handleSubscriptionPreapproval($data);
+                        break;
+
+                    case 'subscription_authorized_payment':
+                        $this->handleSubscriptionAuthorizedPayment($data);
+                        break;
+
+                    case 'payment':
+                        $this->handlePayment($data);
+                        break;
+
+                    default:
+                        $this->handleDefault($data);
+                        break;
+                }
+            } else {
+                // Es una notificación de dLocalGo
+                if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
+                    // Es una notificación de dLocalGo
+                    $this->handleDlocalGoNotification($data);
+                    return;
+                }
+                $this->handleDefault($data);
+            }
+        });
+
+        // Retornar una respuesta OK inmediatamente
+        return response()->json(['status' => 'success'], 200);
     }
 
     private function handleDlocalGoNotification($data)
