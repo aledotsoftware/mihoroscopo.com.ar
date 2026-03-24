@@ -40,3 +40,7 @@
 ## 2026-03-16 - Consistent Visual Required Indicators on Sub-pages
 **Learning:** The main form ('landing.blade.php') includes visual required indicators ('*'), but secondary sub-pages like 'payment.blade.php' sometimes omit them even when fields have native 'required' attributes. This inconsistency degrades UX for sighted users scanning forms.
 **Action:** Always ensure any form view or partial explicitly implements the required indicator ('<span class="required-indicator" aria-hidden="true">*</span>') to match the design system's accessibility standard for mandatory fields.
+
+## 2024-11-25 - ARIA Labels for Icon-Only Buttons
+**Learning:** Icon-only buttons or links (like the toggle sidebar, search, or action buttons in tables) rely entirely on visual cues. Without explicit text, screen reader users cannot determine their purpose, severely hindering navigation and administration.
+**Action:** Always add descriptive `aria-label` attributes to `<a>` or `<button>` elements that contain only icons (e.g., SVG or font-icons) and lack visible text content, ensuring all interactive elements are understandable via assistive technologies.
