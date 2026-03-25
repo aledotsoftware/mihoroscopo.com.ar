@@ -448,17 +448,16 @@ class SubscriptionController extends Controller
 
     public function update($externalReference)
     {
-
-
-
-
-
-
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Removed 'extradata_horoscopes' join and restricted select to only 'id' and 'external_reference'.
+        // Why: The 'subscriptions' table contains large TEXT/JSON columns ('response', 'payload') that consume
+        //      significant memory when hydrated. The 'update.blade.php' view only actually consumes
+        //      '$subscription->external_reference' to generate reactivation links. The join and full select
+        //      are completely unnecessary and slow down the endpoint.
+        // Impact: Drastically reduces memory footprint and database overhead for rendering the subscription update page.
         $subscription = DB::table('subscriptions')
-            ->join('extradata_horoscopes', 'subscriptions.id', '=', 'extradata_horoscopes.subscription_id')
-            ->where('subscriptions.external_reference', $externalReference)
-            ->orderBy('extradata_horoscopes.subscription_id', 'ASC')
-            ->select('subscriptions.*', 'extradata_horoscopes.*')
+            ->where('external_reference', $externalReference)
+            ->select('id', 'external_reference')
             ->first();
 
         // Pasar el registro completo a la vista
