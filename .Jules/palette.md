@@ -44,3 +44,7 @@
 ## 2024-11-23 - Consistent Layout on Payment Status Pages
 **Learning:** Payment status pages (success, pending, failure) were basic HTML dead ends, jarring the user experience after a transaction.
 **Action:** Always wrap post-transaction pages in the main application layout (`@extends('layouts.app')`) and include clear navigation options to prevent users from getting stuck.
+
+## 2026-03-26 - Missing Async Loading States in Secondary Forms
+**Learning:** While the primary landing forms (`landing.blade.php`, `landing_2.blade.php`, `payment_form.blade.php`) properly handled asynchronous state transitions (disabling submit buttons and setting `aria-busy`), secondary forms like `payment.blade.php` and `subscribe.blade.php` that rely on pure Javascript `fetch` or `mp.createToken` lacked visual feedback. This inconsistency allowed users to spam the submit button during network requests and offered poor accessibility.
+**Action:** Always verify that every asynchronous form submission endpoint (including token generation or raw API calls) implements a loading state on the submit button, updating both visual properties (disabled state, opacity, cursor) and accessibility markers (`aria-busy="true"`). Wrap async tasks in `try/finally` blocks to guarantee state restoration on failure.
