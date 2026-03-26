@@ -454,11 +454,15 @@ class SubscriptionController extends Controller
 
 
 
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Replaced 'subscriptions.*' with explicit column names in the select() clause and removed unnecessary JOIN.
+        // Why: The 'subscriptions' table contains large TEXT/JSON columns ('response', 'payload')
+        //      that consume significant memory when fetched. Since the update view only needs the external_reference,
+        //      fetching all columns and performing a JOIN with extradata_horoscopes is extremely wasteful.
+        // Impact: Drastically reduces memory footprint, database CPU time, and network transfer time for rendering the update page.
         $subscription = DB::table('subscriptions')
-            ->join('extradata_horoscopes', 'subscriptions.id', '=', 'extradata_horoscopes.subscription_id')
-            ->where('subscriptions.external_reference', $externalReference)
-            ->orderBy('extradata_horoscopes.subscription_id', 'ASC')
-            ->select('subscriptions.*', 'extradata_horoscopes.*')
+            ->where('external_reference', $externalReference)
+            ->select('id', 'external_reference')
             ->first();
 
         // Pasar el registro completo a la vista
