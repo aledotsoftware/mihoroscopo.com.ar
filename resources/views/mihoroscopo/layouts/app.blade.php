@@ -69,6 +69,7 @@
 </head>
 
 <body>
+    <a href="#main-content" class="visually-hidden-focusable p-3 position-absolute top-0 start-0 bg-white text-dark" style="z-index: 9999;">Saltar al contenido principal</a>
 
     <!-- ***** Preloader Start ***** -->
     <div id="js-preloader" class="js-preloader">
@@ -150,9 +151,9 @@
 
 
     <!-- Contenido principal -->
-
-    @yield('content') <!-- Aquí se inyectará el contenido de las vistas -->
-
+    <main id="main-content" tabindex="-1">
+        @yield('content') <!-- Aquí se inyectará el contenido de las vistas -->
+    </main>
 
 
 
