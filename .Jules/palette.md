@@ -45,10 +45,6 @@
 **Learning:** Payment status pages (success, pending, failure) were basic HTML dead ends, jarring the user experience after a transaction.
 **Action:** Always wrap post-transaction pages in the main application layout (`@extends('layouts.app')`) and include clear navigation options to prevent users from getting stuck.
 
-## 2026-03-26 - Missing Async Loading States in Secondary Forms
-**Learning:** While the primary landing forms (`landing.blade.php`, `landing_2.blade.php`, `payment_form.blade.php`) properly handled asynchronous state transitions (disabling submit buttons and setting `aria-busy`), secondary forms like `payment.blade.php` and `subscribe.blade.php` that rely on pure Javascript `fetch` or `mp.createToken` lacked visual feedback. This inconsistency allowed users to spam the submit button during network requests and offered poor accessibility.
-**Action:** Always verify that every asynchronous form submission endpoint (including token generation or raw API calls) implements a loading state on the submit button, updating both visual properties (disabled state, opacity, cursor) and accessibility markers (`aria-busy="true"`). Wrap async tasks in `try/finally` blocks to guarantee state restoration on failure.
-
-## 2024-11-24 - Missing skip-to-content links
-**Learning:** Screen reader and keyboard users need a way to bypass repetitive navigation links at the top of the page. Without a "skip-to-content" link, navigating to the core content is tedious. Also, adding `tabindex="-1"` is strictly required on the main target container to ensure proper focus behavior across all browsers.
-**Action:** Implemented a skip-to-content link using `.visually-hidden-focusable` (Bootstrap) at the top of `app.blade.php` and wrapped the main content with `<main id="main-content" tabindex="-1">`.
+## 2026-03-25 - Implement Skip-to-Content Link
+**Learning:** The primary layout `app.blade.php` lacked a semantic `<main>` tag, causing the primary content area to not have a clear, addressable endpoint for screen readers. Furthermore, when adding skip-to-content links that target a container using an anchor hash (`#main-content`), the target element must explicitly include `tabindex="-1"`. Without it, browsers may not properly shift the keyboard focus to the target container, breaking the linear tab order for users navigating via keyboard.
+**Action:** Always wrap the primary view content (`@yield('content')`) inside a semantic `<main id="main-content" tabindex="-1">` block and implement a skip link using `.visually-hidden-focusable` as the first interactive element in the `<body>` to ensure consistent focus routing across browsers.

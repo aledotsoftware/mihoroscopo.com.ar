@@ -1,0 +1,18 @@
+--- resources/views/mihoroscopo/layouts/app.blade.php
++++ resources/views/mihoroscopo/layouts/app.blade.php
+@@ -75,6 +75,7 @@
+ </head>
+
+ <body>
++    <a href="#main-content" class="visually-hidden-focusable p-3 bg-primary text-white z-3 position-absolute" style="top: 0; left: 0; z-index: 9999;">Saltar al contenido principal</a>
+
+     <!-- ***** Preloader Start ***** -->
+     <div id="js-preloader" class="js-preloader">
+@@ -151,7 +152,9 @@
+
+     <!-- Contenido principal -->
+
+-    @yield('content') <!-- Aquí se inyectará el contenido de las vistas -->
++    <main id="main-content" tabindex="-1">
++        @yield('content') <!-- Aquí se inyectará el contenido de las vistas -->
++    </main>
