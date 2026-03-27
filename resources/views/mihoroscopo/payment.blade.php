@@ -35,6 +35,16 @@
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // UX Improvement: Show loading state on button
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.innerHTML = 'Procesando...';
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.cursor = 'not-allowed';
+
             const cardData = {
                 cardNumber: document.getElementById('cardNumber').value,
                 expirationDate: document.getElementById('expirationDate').value,
@@ -49,6 +59,13 @@
                 form.submit(); // Ahora puedes enviar el formulario para la suscripción
             }).catch(error => {
                 console.error('Error al generar el token', error);
+
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.removeAttribute('aria-busy');
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.style.opacity = '';
+                submitBtn.style.cursor = '';
             });
         });
     </script>
