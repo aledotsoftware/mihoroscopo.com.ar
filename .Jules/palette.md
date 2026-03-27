@@ -44,3 +44,7 @@
 ## 2024-11-23 - Consistent Layout on Payment Status Pages
 **Learning:** Payment status pages (success, pending, failure) were basic HTML dead ends, jarring the user experience after a transaction.
 **Action:** Always wrap post-transaction pages in the main application layout (`@extends('layouts.app')`) and include clear navigation options to prevent users from getting stuck.
+
+## 2026-03-25 - Implement Skip-to-Content Link
+**Learning:** The primary layout `app.blade.php` lacked a semantic `<main>` tag, causing the primary content area to not have a clear, addressable endpoint for screen readers. Furthermore, when adding skip-to-content links that target a container using an anchor hash (`#main-content`), the target element must explicitly include `tabindex="-1"`. Without it, browsers may not properly shift the keyboard focus to the target container, breaking the linear tab order for users navigating via keyboard.
+**Action:** Always wrap the primary view content (`@yield('content')`) inside a semantic `<main id="main-content" tabindex="-1">` block and implement a skip link using `.visually-hidden-focusable` as the first interactive element in the `<body>` to ensure consistent focus routing across browsers.

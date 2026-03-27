@@ -42,29 +42,35 @@ class SubscriptionController extends Controller
      */
     private function saveExtraData($subscriptionId, $name, $zodiacSign, $gclid, $gbraid, $wbraid, $li_fat_id, $li_ed, $sub_days, $cost, $click_id, $web_push_creative_id, $mobile_brand, $city_name, $browser_family, $os_type, $price, $region_name, $spot_id, $domain)
     {
-        $extradataHoroscope = new ExtradataHoroscope();
-        $extradataHoroscope->subscription_id = $subscriptionId;
-        $extradataHoroscope->signo = $zodiacSign;
-        $extradataHoroscope->gclid = $gclid;
-        $extradataHoroscope->name = $name;
-        $extradataHoroscope->li_fat_id = $li_fat_id;
-        $extradataHoroscope->li_ed = $li_ed;
-        $extradataHoroscope->sub_days = $sub_days;
-        $extradataHoroscope->cost = $cost;
-        $extradataHoroscope->click_id = $click_id;
-        $extradataHoroscope->web_push_creative_id = $web_push_creative_id;
-        $extradataHoroscope->mobile_brand = $mobile_brand;
-        $extradataHoroscope->city_name = $city_name;
-        $extradataHoroscope->browser_family = $browser_family;
-        $extradataHoroscope->os_type = $os_type;
-        $extradataHoroscope->price = $price;
-        $extradataHoroscope->region_name = $region_name;
-        $extradataHoroscope->spot_id = $spot_id;
-        $extradataHoroscope->domain = $domain;
-        $extradataHoroscope->gbraid = $gbraid;
-        $extradataHoroscope->wbraid = $wbraid;
-
-        $extradataHoroscope->save();
+        // ⚡ Bolt: Database write optimization.
+        // What: Replaced new ExtradataHoroscope()->save() with DB::table('extradata_horoscopes')->insert().
+        // Why: Avoids hydrating a full Eloquent model and dispatching lifecycle events just to insert
+        //      a single related record during the highly concurrent subscription creation flow.
+        // Impact: Eliminates memory allocation overhead and reduces CPU cycles during checkout.
+        ExtradataHoroscope::insert([
+            'subscription_id' => $subscriptionId,
+            'signo' => $zodiacSign,
+            'gclid' => $gclid,
+            'name' => $name,
+            'li_fat_id' => $li_fat_id,
+            'li_ed' => $li_ed,
+            'sub_days' => $sub_days,
+            'cost' => $cost,
+            'click_id' => $click_id,
+            'web_push_creative_id' => $web_push_creative_id,
+            'mobile_brand' => $mobile_brand,
+            'city_name' => $city_name,
+            'browser_family' => $browser_family,
+            'os_type' => $os_type,
+            'price' => $price,
+            'region_name' => $region_name,
+            'spot_id' => $spot_id,
+            'domain' => $domain,
+            'gbraid' => $gbraid,
+            'wbraid' => $wbraid,
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
     }
 
     /**

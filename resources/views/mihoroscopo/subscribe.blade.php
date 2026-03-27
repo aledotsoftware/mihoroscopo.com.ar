@@ -28,6 +28,9 @@
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
             const email = document.getElementById('email').value;
             const cardToken = document.getElementById('cardToken').value;
 
@@ -36,25 +39,44 @@
                 return;
             }
 
-            const response = await fetch('/create-subscription', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    payer_email: email,
-                    card_token_id: cardToken,
-                    preapproval_plan_id: 'YOUR_PREAPPROVAL_PLAN_ID' // Reemplaza con tu plan
-                })
-            });
+            // UX Improvement: Show loading state on button
+            submitBtn.disabled = true;
+            submitBtn.setAttribute('aria-busy', 'true');
+            submitBtn.innerHTML = 'Procesando...';
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.cursor = 'not-allowed';
 
-            const result = await response.json();
+            try {
+                const response = await fetch('/create-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        payer_email: email,
+                        card_token_id: cardToken,
+                        preapproval_plan_id: 'YOUR_PREAPPROVAL_PLAN_ID' // Reemplaza con tu plan
+                    })
+                });
 
-            if (result.status === 'authorized') {
-                alert('Suscripción creada exitosamente');
-            } else {
-                alert('Error al crear la suscripción');
+                const result = await response.json();
+
+                if (result.status === 'authorized') {
+                    alert('Suscripción creada exitosamente');
+                } else {
+                    alert('Error al crear la suscripción');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al procesar la solicitud');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.removeAttribute('aria-busy');
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.style.opacity = '';
+                submitBtn.style.cursor = '';
             }
         });
 
