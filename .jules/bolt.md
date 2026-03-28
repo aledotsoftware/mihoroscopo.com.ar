@@ -61,3 +61,7 @@
 ## 2026-03-24 - [Avoid select('*') with Joins When Only Specific Columns are Needed]
 **Learning:** Using `select('subscriptions.*', 'extradata_horoscopes.*')` with a `join` when loading a single subscription for an update view hydrates massive TEXT/JSON columns (like `response` and `payload`) into memory unnecessarily. If the blade view only uses a single field (like `$subscription->external_reference`), this wastes significant memory and database I/O, scaling poorly under concurrent traffic.
 **Action:** Always explicitly specify which columns are needed using `select()` when querying tables with large payload columns. Eliminate unnecessary `join` clauses if data from the related table is not actually consumed by the view or downstream logic.
+
+## 2026-03-24 - [Eloquent Model Hydration Overhead on Webhook Audit Logs]
+**Learning:** Instantiating new Eloquent models (e.g., `new Notification()`) and saving them inside a high-throughput webhook handler (like Mercado Pago / dLocalGo callbacks) wastes significant CPU and memory per request. Webhooks can experience burst traffic, and using the full ORM lifecycle just to insert a single audit log row scales poorly.
+**Action:** In high-throughput webhook endpoints or logging routes, replace Eloquent model creation with raw `DB::table()->insert()` (or `insertGetId()`) to eliminate memory allocation overhead and reduce database connection latency. Always ensure to add manual `created_at` and `updated_at` timestamps since Eloquent bypasses them in raw queries.

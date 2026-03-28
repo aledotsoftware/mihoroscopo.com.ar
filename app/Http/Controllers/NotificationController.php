@@ -281,13 +281,22 @@ class NotificationController extends Controller
      */
     private function saveNotification($data)
     {
-        $notification = new Notification();
-        $notification->type = $data['type'] ?? 'unknown';
-        $notification->data_id = $data['data']['id'] ?? 'N/A';
-        $notification->status = 'pending'; // Puedes ajustar esto según tu lógica
-        $notification->details = json_encode($data, JSON_PRETTY_PRINT);
-        $notification->save();
-        return $notification;
+        // ⚡ Bolt: Database write optimization.
+        // What: Replaced new Notification()->save() with DB::table('notifications')->insert().
+        // Why: The saveNotification method is called for every incoming webhook from Mercado Pago / dLocalGo.
+        //      Under burst traffic, hydrating a full Eloquent model and dispatching lifecycle events just to
+        //      insert a single audit log wastes memory and CPU. Using a raw query avoids this overhead.
+        // Impact: Eliminates memory allocation overhead and reduces CPU cycles during high-throughput webhook processing.
+        $notificationId = \Illuminate\Support\Facades\DB::table('notifications')->insertGetId([
+            'type' => $data['type'] ?? 'unknown',
+            'data_id' => $data['data']['id'] ?? 'N/A',
+            'status' => 'pending',
+            'details' => json_encode($data, JSON_PRETTY_PRINT),
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
+
+        return $notificationId;
     }
 
 
