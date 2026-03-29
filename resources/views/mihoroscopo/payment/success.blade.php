@@ -16,8 +16,8 @@
                                                 <div class="col-lg-7">
                                                     <h1>¡Gracias por tu pago!</h1>
                                                     <div class="line-dec"></div>
-                                                    <p>Tu suscripción ha sido activada.</p>
-                                                    <a href="/">Volver al inicio</a>
+                                                    <p class="mb-4">Tu suscripción ha sido activada.</p>
+                                                    <a href="/" class="btn btn-primary">Volver al inicio</a>
                                                 </div>
                                             </div>
                                         </div>

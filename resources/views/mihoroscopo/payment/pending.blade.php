@@ -16,8 +16,8 @@
                                                 <div class="col-lg-7">
                                                     <h1>Tu pago está en espera</h1>
                                                     <div class="line-dec"></div>
-                                                    <p>Estamos esperando la confirmación del pago.</p>
-                                                    <a href="/">Volver al inicio</a>
+                                                    <p class="mb-4">Estamos esperando la confirmación del pago.</p>
+                                                    <a href="/" class="btn btn-primary">Volver al inicio</a>
                                                 </div>
                                             </div>
                                         </div>

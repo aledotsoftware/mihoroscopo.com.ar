@@ -129,3 +129,12 @@ Route::get('/logo', [EmailTrackingController::class, 'trackOpen'])->name('logo')
 Route::get('/payment-form-test', function () {
     return view('mihoroscopo.payment_form');
 });
+Route::get('/test-success', function () {
+    return view('mihoroscopo.payment.success');
+});
+Route::get('/test-pending', function () {
+    return view('mihoroscopo.payment.pending');
+});
+Route::get('/test-failure', function () {
+    return view('mihoroscopo.payment.failure');
+});

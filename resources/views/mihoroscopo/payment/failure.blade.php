@@ -16,8 +16,8 @@
                                                 <div class="col-lg-7">
                                                     <h1>El pago ha fallado</h1>
                                                     <div class="line-dec"></div>
-                                                    <p>Por favor, intenta nuevamente.</p>
-                                                    <a href="/landing">Volver a intentar</a>
+                                                    <p class="mb-4">Por favor, intenta nuevamente.</p>
+                                                    <a href="/landing" class="btn btn-primary">Volver a intentar</a>
                                                 </div>
                                             </div>
                                         </div>
