@@ -36,24 +36,24 @@
 
 
                                     <!-- Login form-->
-                                    <form action="{{ route('admin.login.process') }}" method="POST">
+                                    <form action="{{ route('admin.login.process') }}" method="POST" id="loginForm">
                                         @csrf
                                         <!-- Form Group (email address)-->
                                         <div class="mb-3">
-                                            <label class="small mb-1" for="password">Clave Maestra</label>
-                                            <input class="form-control" type="password" name="password"
-                                                placeholder="Ingrese Clave Maestra" />
+                                            <label class="small mb-1" for="password">Clave Maestra <span class="text-danger" aria-hidden="true">*</span></label>
+                                            <input class="form-control" type="password" name="password" id="password"
+                                                placeholder="Ingrese Clave Maestra" required aria-required="true" />
                                         </div>
                                         <!-- Form Group (password)-->
 
 
                                         @if (session('error'))
-                                            <p style="color:red;">{{ session('error') }}</p>
+                                            <p style="color:red;" role="alert">{{ session('error') }}</p>
                                         @endif
 
                                         <!-- Form Group (login box)-->
                                         <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                            <button class="btn btn-primary" type="submit">Ingresar</button>
+                                            <button class="btn btn-primary" type="submit" id="submitBtn">Ingresar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -82,6 +82,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
     </script>
     <script src="{{ asset('assets/panel/js/scripts.js') }}"></script>
+    <script>
+        document.getElementById('loginForm')?.addEventListener('submit', function() {
+            const btn = document.getElementById('submitBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                btn.innerHTML = 'Ingresando...';
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'not-allowed';
+            }
+        });
+    </script>
 </body>
 
 </html>
