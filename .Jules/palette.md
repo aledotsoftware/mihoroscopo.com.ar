@@ -48,3 +48,7 @@
 ## 2026-03-25 - Implement Skip-to-Content Link
 **Learning:** The primary layout `app.blade.php` lacked a semantic `<main>` tag, causing the primary content area to not have a clear, addressable endpoint for screen readers. Furthermore, when adding skip-to-content links that target a container using an anchor hash (`#main-content`), the target element must explicitly include `tabindex="-1"`. Without it, browsers may not properly shift the keyboard focus to the target container, breaking the linear tab order for users navigating via keyboard.
 **Action:** Always wrap the primary view content (`@yield('content')`) inside a semantic `<main id="main-content" tabindex="-1">` block and implement a skip link using `.visually-hidden-focusable` as the first interactive element in the `<body>` to ensure consistent focus routing across browsers.
+
+## 2026-03-26 - Focus Management for General Error Containers
+**Learning:** When a form submission fails and a general error message container (e.g., `#error-message`) is dynamically shown, the focus is left stranded on the form button. Screen reader users miss the error context, and keyboard users must manually navigate to find it.
+**Action:** Always add `tabindex="-1"` to general error containers and explicitly call `.focus()` on them in the error-handling block. This guarantees the error is announced and correctly routes keyboard focus.

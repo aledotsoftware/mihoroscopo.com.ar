@@ -225,7 +225,7 @@
             <button type="submit">Suscribirse</button>
         </form>
 
-        <div id="error-message" class="error-message" role="alert" aria-live="assertive">
+        <div id="error-message" class="error-message" role="alert" aria-live="assertive" tabindex="-1">
             Ocurrió un error. Por favor, inténtalo de nuevo.
         </div>
     </main>
@@ -309,6 +309,7 @@
                         const errorMessage = document.getElementById('error-message');
                         errorMessage.style.display = 'block';
                         errorMessage.textContent = 'No se recibió una URL de redirección válida.';
+                        errorMessage.focus();
                     }
                 })
                 .catch(error => {
@@ -324,6 +325,7 @@
                     const errorMessage = document.getElementById('error-message');
                     errorMessage.style.display = 'block';
                     errorMessage.textContent = 'Ocurrió un error al procesar tu solicitud.';
+                    errorMessage.focus();
                 });
         });
     </script>
