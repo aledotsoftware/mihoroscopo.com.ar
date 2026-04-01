@@ -53,9 +53,24 @@
 
                                         <!-- Form Group (login box)-->
                                         <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                            <button class="btn btn-primary" type="submit">Ingresar</button>
+                                            <button id="loginBtn" class="btn btn-primary" type="submit">Ingresar</button>
                                         </div>
                                     </form>
+
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            const loginBtn = document.getElementById('loginBtn');
+                                            if (loginBtn) {
+                                                loginBtn.closest('form').addEventListener('submit', function() {
+                                                    loginBtn.disabled = true;
+                                                    loginBtn.setAttribute('aria-busy', 'true');
+                                                    loginBtn.innerHTML = 'Ingresando...';
+                                                    loginBtn.style.opacity = '0.7';
+                                                    loginBtn.style.cursor = 'not-allowed';
+                                                });
+                                            }
+                                        });
+                                    </script>
                                 </div>
 
                             </div>
