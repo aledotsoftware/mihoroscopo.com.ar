@@ -1,37 +1,16 @@
 <?php
-$content = file_get_contents('tests/Feature/SendDailyContentEmailsTest.php');
+require 'vendor/autoload.php';
+$app = require_once __DIR__.'/bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
 
-$search = <<<'SEARCH'
-        Schema::create('subscriptions', function ($table) {
-            $table->id();
-            $table->string('email')->nullable();
-            $table->string('status')->nullable();
-            $table->string('external_reference')->nullable();
-            $table->string('payment_type')->nullable();
-            $table->integer('service_id')->default(1);
-            $table->timestamps();
-        });
-SEARCH;
+DB::enableQueryLog();
 
-$replace = <<<'REPLACE'
-        Schema::create('subscriptions', function ($table) {
-            $table->id();
-            $table->string('email')->nullable();
-            $table->string('status')->nullable();
-            $table->string('external_reference')->nullable();
-            $table->string('payment_type')->nullable();
-            $table->integer('service_id')->default(1);
-            $table->string('subscription_id')->nullable();
-            $table->timestamps();
+$query = \App\Models\Subscription::with(['extradata_horoscopes' => function($q) {
+    $q->select('subscription_id', 'signo', 'name');
+}])->select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status'])
+->whereIn('status', ['authorized', 'pending']);
 
-            // ⚡ Bolt: Indexes to match migration
-            $table->index('email');
-            $table->index('external_reference');
-            $table->index('subscription_id');
-        });
-REPLACE;
+echo $query->toSql() . "\n";
+print_r($query->getBindings());
 
-$content = str_replace($search, $replace, $content);
-
-file_put_contents('tests/Feature/SendDailyContentEmailsTest.php', $content);
-echo "Patched SendDailyContentEmailsTest\n";
