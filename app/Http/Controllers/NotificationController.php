@@ -229,19 +229,27 @@ class NotificationController extends Controller
             $subscription->save();
 
             // Crear un nuevo pago
-            $payment = new Payment();
-            $payment->external_reference = $subscription->external_reference;
-            $payment->payment_id = $executionData['external_transaction_id'];
-            $payment->preapproval_id = $executionData['subscription']['id'];
-            $payment->net_received_amount = $executionData['amount_received'];
-            $payment->total_paid_amount = $executionData['amount_paid'];
-            $payment->status = $executionData['status'];
-            $payment->payer_email = $executionData['subscription']['client_email'];
-            $payment->payer_identification_number = $executionData['subscription']['client_document'] ?? '';
-            $payment->payer_identification_type = $executionData['subscription']['client_document_type'] ?? '';
-            $payment->payment_method_id = $executionData['subscription']['payment_method_code'];
-            $payment->payload = json_encode($executionData);
-            $payment->save();
+            // ⚡ Bolt: Database write optimization.
+            // What: Replaced new Payment()->save() with DB::table('payment')->insert().
+            // Why: Avoids hydrating a full Eloquent model and dispatching lifecycle events just to insert
+            //      a single logging record during the highly concurrent webhook processing flow.
+            // Impact: Eliminates memory allocation overhead and reduces CPU cycles per webhook.
+            \Illuminate\Support\Facades\DB::table('payment')->insert([
+                'external_reference' => $subscription->external_reference,
+                'payment_id' => $executionData['external_transaction_id'],
+                'preapproval_id' => $executionData['subscription']['id'],
+                'net_received_amount' => $executionData['amount_received'],
+                'total_paid_amount' => $executionData['amount_paid'],
+                'status' => $executionData['status'],
+                'payer_email' => $executionData['subscription']['client_email'],
+                'payer_identification_number' => $executionData['subscription']['client_document'] ?? '',
+                'payer_identification_type' => $executionData['subscription']['client_document_type'] ?? '',
+                'payment_method_id' => $executionData['subscription']['payment_method_code'],
+                'payload' => json_encode($executionData),
+                'created_at' => now(),
+                'updated_at' => now(),
+                'currency_id' => $executionData['currency'] ?? '',
+            ]);
 
             // // Notificar a Discord
             // $this->discordService->sendDiscordMessage(
@@ -281,13 +289,20 @@ class NotificationController extends Controller
      */
     private function saveNotification($data)
     {
-        $notification = new Notification();
-        $notification->type = $data['type'] ?? 'unknown';
-        $notification->data_id = $data['data']['id'] ?? 'N/A';
-        $notification->status = 'pending'; // Puedes ajustar esto según tu lógica
-        $notification->details = json_encode($data, JSON_PRETTY_PRINT);
-        $notification->save();
-        return $notification;
+        // ⚡ Bolt: Database write optimization.
+        // What: Replaced new Notification()->save() with DB::table('notifications')->insertGetId().
+        // Why: Avoids hydrating a full Eloquent model and dispatching lifecycle events just to insert
+        //      a single logging record during the highly concurrent webhook processing flow.
+        // Impact: Eliminates memory allocation overhead and reduces CPU cycles per webhook.
+        $notificationId = \Illuminate\Support\Facades\DB::table('notifications')->insertGetId([
+            'type' => $data['type'] ?? 'unknown',
+            'data_id' => $data['data']['id'] ?? 'N/A',
+            'status' => 'pending', // Puedes ajustar esto según tu lógica
+            'details' => json_encode($data, JSON_PRETTY_PRINT),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return $notificationId;
     }
 
 
@@ -404,48 +419,43 @@ class NotificationController extends Controller
         $payment = json_decode($payment, true); // Decodifica el JSON a un array asociativo
 
 
-        // Encuentra el modelo de Payment si existe o crea uno nuevo
-        $paymentModel = Payment::where('payment_id', $paymentId)->first();
+        // ⚡ Bolt: Database write optimization.
+        // What: Replaced Payment::where()->first() and new Payment()->save() with DB::table('payment')->updateOrInsert().
+        // Why: Avoids executing a SELECT query followed by hydrating a full Eloquent model and dispatching lifecycle events
+        //      just to update or insert a single logging record during the highly concurrent webhook processing flow.
+        // Impact: Eliminates memory allocation overhead, reduces database queries, and cuts CPU cycles per webhook.
+        $payloadString = is_array($payment) ? json_encode($payment) : $payment;
+        $externalReference = $payment['external_reference'] ?? 'pending';
+        $status = $payment['status'] ?? 'pending';
+        $currencyId = $payment['currency_id'] ?? 'pending';
+        $totalPaidAmount = $payment['transaction_details']['total_paid_amount'] ?? 0;
+        $netReceivedAmount = $payment['transaction_details']['net_received_amount'] ?? 0;
 
-        if (!$paymentModel) {
-            // Si no existe, crea una nueva instancia
-            $paymentModel = new Payment();
-            $paymentModel->created_at = now(); // Solo asigna la fecha de creación aquí
-
-        }
-
-        // Asigna los valores a los campos del modelo, manejando casos donde el valor podría ser 'N/A'
-        $paymentModel->status = $payment['status'] ?? 'pending';
-        // $paymentModel->payload =$payment; // Codifica la respuesta en JSON si es necesario
-        $paymentModel->payment_id = $payment['id'] ?? 'pending';
-        $paymentModel->preapproval_id = $payment['metadata']['preapproval_id'] ?? 'pending';
-        $paymentModel->external_reference = $payment['external_reference'] ?? 'pending';
-        $paymentModel->payer_email = $payment['payer']['email'] ?? 'pending';
-        $paymentModel->payer_identification_number = $payment['payer']['identification']['number'] ?? 'pending';
-        $paymentModel->payer_identification_type = $payment['payer']['identification']['type'] ?? 'pending';
-        $paymentModel->payer_first_name = $payment['payer']['first_name'] ?? 'pending';
-        $paymentModel->payer_last_name = $payment['payer']['last_name'] ?? 'pending';
-        $paymentModel->payment_method_id = $payment['payment_method_id'] ?? 'pending';
-        $paymentModel->net_received_amount = $payment['transaction_details']['net_received_amount'] ?? 0;
-        $paymentModel->total_paid_amount = $payment['transaction_details']['total_paid_amount'] ?? 0;
-        $paymentModel->currency_id =  $payment['currency_id'] ?? 'pending';
-        if (is_array($payment)) {
-            $payment = json_encode($payment);
-        }
-
-        $paymentModel->payload = $payment; // Codifica la respuesta en JSON si es necesario
-
-        $paymentModel->updated_at = now(); // Siempre se actualiza el campo de actualización
-
-
-        // Guarda el modelo en la base de datos
-        $paymentModel->save();
+        \Illuminate\Support\Facades\DB::table('payment')->updateOrInsert(
+            ['payment_id' => $paymentId],
+            [
+                'status' => $status,
+                'preapproval_id' => $payment['metadata']['preapproval_id'] ?? 'pending',
+                'external_reference' => $externalReference,
+                'payer_email' => $payment['payer']['email'] ?? 'pending',
+                'payer_identification_number' => $payment['payer']['identification']['number'] ?? 'pending',
+                'payer_identification_type' => $payment['payer']['identification']['type'] ?? 'pending',
+                'payer_first_name' => $payment['payer']['first_name'] ?? 'pending',
+                'payer_last_name' => $payment['payer']['last_name'] ?? 'pending',
+                'payment_method_id' => $payment['payment_method_id'] ?? 'pending',
+                'net_received_amount' => $netReceivedAmount,
+                'total_paid_amount' => $totalPaidAmount,
+                'currency_id' => $currencyId,
+                'payload' => $payloadString,
+                'updated_at' => now(),
+            ]
+        );
 
 
         // SE ENVIA EL MAIL AL CORREO CUYO PAYMENT SEA EL CORESPONDIENTE SIEMPRE QUE NO SE HAYA ENVIADO ANTES
 
         // var_dump($paymentModel->external_reference);
-        $subscriptionModel = Subscription::where('external_reference', $paymentModel->external_reference)->first();
+        $subscriptionModel = Subscription::where('external_reference', $externalReference)->first();
 
         // //var_dump( $subscriptionModel);
 
@@ -482,12 +492,12 @@ class NotificationController extends Controller
         $message .= ":dollar: PAGO \n";
         $message .= "================================\n";
         $message .= "ID del pago: " . $paymentId . "\n";
-        $message .= ":traffic_light: Estado del pago: " .  $paymentModel->status . "\n";
+        $message .= ":traffic_light: Estado del pago: " .  $status . "\n";
         // Determinar la bandera basada en el currency_id
-        $flag = $this->getCurrencyFlag($paymentModel->currency_id);
-        $message .= ":moneybag: Monto del pago: " . $paymentModel->total_paid_amount . " " . $paymentModel->currency_id . " " . $flag . "\n";
-        $message .= ":moneybag: Monto del pago recibido: " . $paymentModel->net_received_amount . " " . $paymentModel->currency_id . " " . $flag . "\n";
-        $message .= ":link: Referencia externa: " . $paymentModel->external_reference . "\n";
+        $flag = $this->getCurrencyFlag($currencyId);
+        $message .= ":moneybag: Monto del pago: " . $totalPaidAmount . " " . $currencyId . " " . $flag . "\n";
+        $message .= ":moneybag: Monto del pago recibido: " . $netReceivedAmount . " " . $currencyId . " " . $flag . "\n";
+        $message .= ":link: Referencia externa: " . $externalReference . "\n";
         $message .= ":link: Email de envio: " . $subscriptionModel->email;
         $this->discordService->sendDiscordMessage($message);
     }

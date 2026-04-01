@@ -89,7 +89,13 @@ class SendDailyContentEmails extends Command
             //      selecting only the columns required by the sendEmail function, we prevent Eloquent from
             //      hydrating these large strings into PHP memory for every model in the chunk, avoiding OOM issues.
             // Impact: Significantly decreases memory consumption and network I/O per processed chunk.
-            $subscriptionQuery = Subscription::with('extradata_horoscopes')
+            // ⚡ Bolt: Memory & Database optimization.
+            // What: Modified the eager load 'with()' clause to specify explicitly only the columns needed from the relationship.
+            // Why: Without explicitly selecting columns in the eager load closure or string, Eloquent performs a "SELECT *" on the
+            //      related `extradata_horoscopes` table, retrieving and hydrating many unnecessary heavy columns. This optimization
+            //      minimizes memory consumption significantly across thousands of loaded models in every chunk.
+            // Impact: Greatly reduces the memory footprint and the data transferred per database batch.
+            $subscriptionQuery = Subscription::with('extradata_horoscopes:id,subscription_id,signo,name')
                 ->select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status'])
                 ->whereIn('status', ['authorized', 'pending']);
 
