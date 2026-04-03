@@ -61,3 +61,6 @@
 ## 2026-03-24 - [Avoid select('*') with Joins When Only Specific Columns are Needed]
 **Learning:** Using `select('subscriptions.*', 'extradata_horoscopes.*')` with a `join` when loading a single subscription for an update view hydrates massive TEXT/JSON columns (like `response` and `payload`) into memory unnecessarily. If the blade view only uses a single field (like `$subscription->external_reference`), this wastes significant memory and database I/O, scaling poorly under concurrent traffic.
 **Action:** Always explicitly specify which columns are needed using `select()` when querying tables with large payload columns. Eliminate unnecessary `join` clauses if data from the related table is not actually consumed by the view or downstream logic.
+## 2024-04-03 - [Cache Static Pages]
+**Learning:** `PageController::show` was querying the database on every request to fetch static content like "Terms and Conditions" and "Privacy Policy", which rarely changes, creating unnecessary database load and Eloquent hydration overhead.
+**Action:** When serving static or rarely changing content from a database, wrap the database query in `Cache::remember` to significantly improve response times and reduce database load under high concurrency.
