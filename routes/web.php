@@ -138,3 +138,7 @@ Route::get('/test-pending', function () {
 Route::get('/test-failure', function () {
     return view('mihoroscopo.payment.failure');
 });
+
+Route::get('/payment-test', function () {
+    return view('mihoroscopo.payment');
+});

@@ -7,6 +7,7 @@
     <script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
     <style>
         .required-indicator { color: #dc3545; margin-left: 2px; }
+        .error-message:focus { outline: none; }
     </style>
 </head>
 <body>
@@ -27,6 +28,8 @@
         <button type="submit">Generar Token</button>
     </form>
 
+    <div id="error-message" class="error-message" role="alert" aria-live="assertive" tabindex="-1" style="display:none; color: #dc3545; margin-top: 15px;"></div>
+
     <script>
         const form = document.getElementById('paymentForm');
         const mp = new MercadoPago('{{ config('mercadopago.public_key') }}');
@@ -34,6 +37,8 @@
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+
+            document.getElementById('error-message').style.display = 'none';
 
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn.innerHTML;
@@ -59,6 +64,11 @@
                 form.submit(); // Ahora puedes enviar el formulario para la suscripción
             }).catch(error => {
                 console.error('Error al generar el token', error);
+
+                const errorEl = document.getElementById('error-message');
+                errorEl.textContent = 'Error al generar el token de la tarjeta. Por favor, verifica tus datos.';
+                errorEl.style.display = 'block';
+                errorEl.focus();
 
                 // Reset button state
                 submitBtn.disabled = false;
