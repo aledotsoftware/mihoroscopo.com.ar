@@ -1,0 +1,12 @@
+
+   INFO  Server running on [http://127.0.0.1:8000].
+
+  Press Ctrl+C to stop the server
+
+  2026-04-04 01:53:25 /admin/articles/create ........................... ~ 1s
+  2026-04-06 01:59:40 /admin/articles/create ..................... ~ 513.36ms
+  2026-04-06 01:59:41 /admin/login ................................. ~ 0.05ms
+  2026-04-06 01:59:41 /assets/panel/css/styles.css ................. ~ 1.28ms
+  2026-04-06 01:59:41 /assets/panel/js/scripts.js .................. ~ 1.56ms
+  2026-04-06 01:59:41 /assets/panel/assets/fonts/metropolis/Metropolis-Light.otf  ~ 0.60ms
+  2026-04-06 01:59:41 /assets/panel/assets/fonts/metropolis/Metropolis-Regular.otf  ~ 0.04ms
