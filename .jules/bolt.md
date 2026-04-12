@@ -61,3 +61,7 @@
 ## 2026-03-24 - [Avoid select('*') with Joins When Only Specific Columns are Needed]
 **Learning:** Using `select('subscriptions.*', 'extradata_horoscopes.*')` with a `join` when loading a single subscription for an update view hydrates massive TEXT/JSON columns (like `response` and `payload`) into memory unnecessarily. If the blade view only uses a single field (like `$subscription->external_reference`), this wastes significant memory and database I/O, scaling poorly under concurrent traffic.
 **Action:** Always explicitly specify which columns are needed using `select()` when querying tables with large payload columns. Eliminate unnecessary `join` clauses if data from the related table is not actually consumed by the view or downstream logic.
+
+## 2024-11-20 - Optimizing Synchronous Tracking Webhooks with defer()
+**Learning:** High-concurrency tracking endpoints (e.g., pixel tracking and click tracking) can cause delays for users due to the time it takes to execute synchronous database operations.
+**Action:** Wrap synchronous database operations in these endpoints inside Laravel's `defer()` helper. This allows the endpoint to respond to the user immediately (with a pixel or a redirect) and executes the heavy I/O database operation in the background. Always ensure any required request properties (like IP or User Agent) are captured before the defer block.
