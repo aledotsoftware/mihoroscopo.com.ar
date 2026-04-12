@@ -91,13 +91,13 @@
                 <div class="col-lg-12 col-sm-12">
                     <div class="left-info">
                         <ul>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Horóscopo Gratis</a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Guía Astral </a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Consejo Diario</a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Horóscopo Amor</a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Ritual Lunar</a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Ritual de Prosperidad</a></li>
-                            <li><a href="/landing"><i class="fa fa-star"></i>Compatibilidad Zodiacal</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Horóscopo Gratis</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Guía Astral </a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Consejo Diario</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Horóscopo Amor</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Ritual Lunar</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Ritual de Prosperidad</a></li>
+                            <li><a href="/landing"><i class="fa fa-star" aria-hidden="true"></i>Compatibilidad Zodiacal</a></li>
 
                         </ul>
                     </div>
