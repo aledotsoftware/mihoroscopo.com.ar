@@ -306,7 +306,7 @@
                         <div class="down-content">
                             <h4>Aries</h4>
                             <p>Valiente, decidido y apasionado.</p>
-                            <a href="{{ asset('blog/aries') }}" aria-label="Leer más sobre Aries"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/aries') }}" aria-label="Leer más sobre Aries"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -314,7 +314,7 @@
                         <div class="down-content">
                             <h4>Tauro</h4>
                             <p>Confiable, paciente y devoto.</p>
-                            <a href="{{ asset('blog/tauro') }}" aria-label="Leer más sobre Tauro"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/tauro') }}" aria-label="Leer más sobre Tauro"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -322,7 +322,7 @@
                         <div class="down-content">
                             <h4>Géminis</h4>
                             <p>Curioso, adaptable y comunicativo.</p>
-                            <a href="{{ asset('blog/geminis') }}" aria-label="Leer más sobre Géminis"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/geminis') }}" aria-label="Leer más sobre Géminis"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -330,7 +330,7 @@
                         <div class="down-content">
                             <h4>Cáncer</h4>
                             <p>Emotivo, protector y perspicaz.</p>
-                            <a href="{{ asset('blog/cancer') }}" aria-label="Leer más sobre Cáncer"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/cancer') }}" aria-label="Leer más sobre Cáncer"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -338,7 +338,7 @@
                         <div class="down-content">
                             <h4>Leo</h4>
                             <p>Generoso, alegre y de gran corazón.</p>
-                            <a href="{{ asset('blog/leo') }}" aria-label="Leer más sobre Leo"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/leo') }}" aria-label="Leer más sobre Leo"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -346,7 +346,7 @@
                         <div class="down-content">
                             <h4>Virgo</h4>
                             <p>Meticuloso, leal y trabajador.</p>
-                            <a href="{{ asset('blog/virgo') }}" aria-label="Leer más sobre Virgo"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/virgo') }}" aria-label="Leer más sobre Virgo"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -354,7 +354,7 @@
                         <div class="down-content">
                             <h4>Libra</h4>
                             <p>Diplomático, justo y sociable.</p>
-                            <a href="{{ asset('blog/libra') }}" aria-label="Leer más sobre Libra"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/libra') }}" aria-label="Leer más sobre Libra"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -362,7 +362,7 @@
                         <div class="down-content">
                             <h4>Escorpio</h4>
                             <p>Apasionado, valiente e ingenioso.</p>
-                            <a href="{{ asset('blog/escorpio') }}" aria-label="Leer más sobre Escorpio"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/escorpio') }}" aria-label="Leer más sobre Escorpio"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -370,7 +370,7 @@
                         <div class="down-content">
                             <h4>Sagitario</h4>
                             <p>Aventurero, optimista y honesto.</p>
-                            <a href="{{ asset('blog/sagitario') }}" aria-label="Leer más sobre Sagitario"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/sagitario') }}" aria-label="Leer más sobre Sagitario"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -378,7 +378,7 @@
                         <div class="down-content">
                             <h4>Capricornio</h4>
                             <p>Disciplinado, responsable y ambicioso.</p>
-                            <a href="{{ asset('blog/capricornio') }}" aria-label="Leer más sobre Capricornio"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/capricornio') }}" aria-label="Leer más sobre Capricornio"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -386,7 +386,7 @@
                         <div class="down-content">
                             <h4>Acuario</h4>
                             <p>Progresista, original y humanitario.</p>
-                            <a href="{{ asset('blog/acuario') }}" aria-label="Leer más sobre Acuario"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/acuario') }}" aria-label="Leer más sobre Acuario"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                     <div class="item">
@@ -394,7 +394,7 @@
                         <div class="down-content">
                             <h4>Piscis</h4>
                             <p>Compasivo, artístico e intuitivo.</p>
-                            <a href="{{ asset('blog/piscis') }}" aria-label="Leer más sobre Piscis"><i class="fa fa-link"></i></a>
+                            <a href="{{ asset('blog/piscis') }}" aria-label="Leer más sobre Piscis"><i class="fa fa-link" aria-hidden="true"></i></a>
                         </div>
                     </div>
                 </div>
@@ -453,9 +453,9 @@
                     </div>
                 </div>
                 <div class="text-start p-5">
-                    <p><i class="fas fa-check text-success me-1"></i> Horóscopo Diario</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Acceso a Contenido Exclusivo</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Notificaciones Personalizadas</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Diario</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
                     <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
                 </div>
             </div>
@@ -470,9 +470,9 @@
                     </div>
                 </div>
                 <div class="text-start p-5">
-                    <p><i class="fas fa-check text-success me-1"></i> Horóscopo Semanal</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Acceso a Contenido Exclusivo</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Notificaciones Personalizadas</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Semanal</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
                     <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
                 </div>
             </div>
@@ -487,9 +487,9 @@
                     </div>
                 </div>
                 <div class="text-start p-5">
-                    <p><i class="fas fa-check text-success me-1"></i> Horóscopo Mensual</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Acceso a Contenido Exclusivo</p>
-                    <p><i class="fas fa-check text-success me-1"></i> Notificaciones Personalizadas</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Mensual</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
+                    <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
                     <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
                 </div>
             </div>
@@ -540,20 +540,20 @@
                                 <div class="row">
                                     <div class="col-lg-4">
                                         <div class="info-item">
-                                            <i class="fa fa-phone"></i>
+                                            <i class="fa fa-phone" aria-hidden="true"></i>
                                             <h4><a href="#">010-020-0340</a></h4>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="info-item">
-                                            <i class="fa fa-envelope"></i>
+                                            <i class="fa fa-envelope" aria-hidden="true"></i>
                                             <h4><a href="#">info@horoscopos.com</a></h4>
                                             <h4><a href="#">support@horoscopos.com</a></h4>
                                         </div>
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="info-item">
-                                            <i class="fa fa-map-marker"></i>
+                                            <i class="fa fa-map-marker" aria-hidden="true"></i>
                                             <h4><a href="#">123 Calle del Zodiaco, Ciudad de los Astros, 45678,
                                                     País</a></h4>
                                         </div>
