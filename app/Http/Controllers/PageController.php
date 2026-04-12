@@ -11,11 +11,10 @@ class PageController extends Controller
     public function show($slug)
     {
         // ⚡ Bolt: Database and memory optimization.
-        // What: Wrapped the Page model retrieval in Cache::remember with a 5-minute TTL.
-        // Why: Static pages (like privacy policy, terms) are rarely updated but frequently accessed.
+        // What: Wrapped the Page model retrieval in Cache::remember with a 300-second TTL.
+        // Why: Static pages (like terms, about, etc.) are frequently accessed but rarely updated.
         //      Fetching the Eloquent model from the database on every request adds unnecessary overhead.
-        // Impact: Reduces database load and Eloquent hydration overhead for repeatedly visited pages,
-        //         speeding up response times.
+        // Impact: Eliminates database query and Eloquent model hydration for cached requests, speeding up page load time.
         $page = Cache::remember('page_' . $slug, 300, function () use ($slug) {
             return Page::where('slug', $slug)->firstOrFail();
         });

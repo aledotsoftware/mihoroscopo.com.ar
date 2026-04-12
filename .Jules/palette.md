@@ -52,3 +52,7 @@
 ## 2026-03-26 - Focus Management for General Error Containers
 **Learning:** When dynamically displaying general error message containers (e.g., `#error-message` after a failed form submission or API fetch), screen readers may not reliably announce the new content if focus remains on the triggering element or is lost. Additionally, keyboard users lose logical proximity to the error state.
 **Action:** Always add `tabindex="-1"` to dynamically displayed general error message containers and programmatically call `.focus()` on them when shown. Add CSS `outline: none;` on `:focus` to prevent default browser focus rings on these non-interactive semantic elements.
+
+## 2024-11-23 - Hide Decorative Icons from Screen Readers
+**Learning:** Purely decorative icons in Blade templates (like `<i class="fa fa-star"></i>` next to "Horóscopo Gratis" or `<i class="fa fa-link"></i>` inside an anchor that already has an `aria-label`) are read aloud by screen readers if they lack `aria-hidden="true"`. This adds noise and redundant announcements for assistive technology users.
+**Action:** Always add `aria-hidden="true"` to FontAwesome or similar purely decorative visual icons so they are skipped by screen readers.
