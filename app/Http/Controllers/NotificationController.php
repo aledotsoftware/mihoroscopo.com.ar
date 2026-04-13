@@ -191,17 +191,25 @@ class NotificationController extends Controller
                 return;
             }
 
-            // Buscar la suscripción
-            $subscription = Subscription::where('email', $executionData['subscription']['client_email'])->first();
+            // ⚡ Bolt: Memory & CPU optimization.
+            // What: Replaced fetching the full Eloquent model and saving it with a select query and mass DB update.
+            // Why: Hydrating the full Subscription model (which contains heavy TEXT/JSON columns like 'response')
+            //      consumes significant memory and CPU. We only need the 'id' and 'external_reference' fields
+            //      to process the notification and insert the payment. Bypassing Eloquent for the update reduces overhead.
+            // Impact: Drastically reduces memory overhead and database operations per dLocalGo webhook.
+            $subscription = \Illuminate\Support\Facades\DB::table('subscriptions')
+                ->select('id', 'external_reference', 'status')
+                ->where('email', $executionData['subscription']['client_email'])
+                ->first();
+
             if (!$subscription) {
                 $this->discordService->sendDiscordMessage("Error: No se encontró la suscripción para el email: " . $executionData['subscription']['client_email']);
                 return;
             }
 
-            $subscription->subscription_id = $executionData['subscription']['id'];
-
+            $status = $subscription->status;
             if ($executionData['status'] == 'COMPLETED') {
-                $subscription->status = 'authorized';
+                $status = 'authorized';
             }
 
             // Calcular valid_until según el tipo de frecuencia y valor
@@ -210,23 +218,29 @@ class NotificationController extends Controller
             
             switch (strtoupper($frequencyType)) {
                 case 'DAILY':
-                    $subscription->valid_until = now()->addDays($frequencyValue);
+                    $validUntil = now()->addDays($frequencyValue);
                     break;
                 case 'MONTHLY': 
-                    $subscription->valid_until = now()->addMonths($frequencyValue);
+                    $validUntil = now()->addMonths($frequencyValue);
                     break;
                 case 'YEARLY':
-                    $subscription->valid_until = now()->addYears($frequencyValue);
+                    $validUntil = now()->addYears($frequencyValue);
                     break;
                 default:
-                    $subscription->valid_until = now()->addDays($frequencyValue);
+                    $validUntil = now()->addDays($frequencyValue);
             }
            
-            $subscription->response = json_encode($executionData);
-            $subscription->charged_amount = $executionData['subscription']['plan']['amount'];
-            $subscription->charged_quantity = $executionData['subscription']['plan']['frequency_value'];
-        
-            $subscription->save();
+            \Illuminate\Support\Facades\DB::table('subscriptions')
+                ->where('id', $subscription->id)
+                ->update([
+                    'subscription_id' => $executionData['subscription']['id'],
+                    'status' => $status,
+                    'valid_until' => $validUntil,
+                    'response' => json_encode($executionData),
+                    'charged_amount' => $executionData['subscription']['plan']['amount'],
+                    'charged_quantity' => $executionData['subscription']['plan']['frequency_value'],
+                    'updated_at' => now(),
+                ]);
 
             // Crear un nuevo pago
             // ⚡ Bolt: Database write optimization.
@@ -338,20 +352,37 @@ class NotificationController extends Controller
             return;
         }
 
-        $subscriptionModel = Subscription::where('subscription_id', $subscriptionId)->first();
-        $subscriptionModel->status = $subscription['status'] ?? 'null';
-        $subscriptionModel->response = $subscription; // Asegúrate de codificar la respuesta en JSON si es necesario
-        $subscriptionModel->next_payment_date = $subscription['next_payment_date'] ?? null;
-        $subscriptionModel->payment_method_id = $subscription['payment_method_id'] ?? null;
-        $subscriptionModel->charged_quantity = $subscription['summarized']['charged_quantity'] ?? null;
-        $subscriptionModel->charged_amount = $subscription['summarized']['charged_amount'] ?? null;
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Replaced fetching the full Eloquent model and saving it with a select query and mass DB update.
+        // Why: Hydrating the full Subscription model (which contains heavy TEXT/JSON columns like 'response')
+        //      consumes significant memory and CPU. We only need basic fields for Discord notification,
+        //      and bypassing Eloquent for the update reduces overhead during webhook processing.
+        // Impact: Drastically reduces memory overhead and database operations per MercadoPago preapproval webhook.
+        $subscriptionModel = \Illuminate\Support\Facades\DB::table('subscriptions')
+            ->select('id', 'frequency', 'frequency_type')
+            ->where('subscription_id', $subscriptionId)
+            ->first();
 
-        $subscriptionModel->pending_charge_amount = $subscription['summarized']['pending_charge_amount'] ?? null;
-        $subscriptionModel->semaphore = $subscription['summarized']['semaphore'] ?? null;
-        $subscriptionModel->last_charged_date = $subscription['summarized']['last_charged_date'] ?? null;
-        $subscriptionModel->last_charged_amount = $subscription['summarized']['last_charged_amount'] ?? null;
-        $subscriptionModel->updated_at = now(); // Actualiza la fecha de actualización
-        $subscriptionModel->save();
+        if (!$subscriptionModel) {
+            $this->discordService->sendDiscordMessage("Error: No se encontró la suscripción local con ID: $subscriptionId.");
+            return;
+        }
+
+        \Illuminate\Support\Facades\DB::table('subscriptions')
+            ->where('id', $subscriptionModel->id)
+            ->update([
+                'status' => $subscription['status'] ?? 'null',
+                'response' => json_encode($subscription),
+                'next_payment_date' => $subscription['next_payment_date'] ?? null,
+                'payment_method_id' => $subscription['payment_method_id'] ?? null,
+                'charged_quantity' => $subscription['summarized']['charged_quantity'] ?? null,
+                'charged_amount' => $subscription['summarized']['charged_amount'] ?? null,
+                'pending_charge_amount' => $subscription['summarized']['pending_charge_amount'] ?? null,
+                'semaphore' => $subscription['summarized']['semaphore'] ?? null,
+                'last_charged_date' => $subscription['summarized']['last_charged_date'] ?? null,
+                'last_charged_amount' => $subscription['summarized']['last_charged_amount'] ?? null,
+                'updated_at' => now(),
+            ]);
 
         // $this->emailService->sendWelcomeEmail($email,$email);
         $message = "";
@@ -360,12 +391,12 @@ class NotificationController extends Controller
         $message .= "ACTUALIZACIÓN DE SUSCRIPCIÓN\n";
         $message .= "================================\n";
         $message .= "ID : " . $subscriptionId . "\n";
-        $message .= ":traffic_light: Estado : " . $subscriptionModel->status . "\n";
-        $message .= ":calendar_spiral: Fecha próximo pago: " . $subscriptionModel->next_payment_date . "\n";
-        $message .= "Frecuencia: " . $subscriptionModel->frequency . "\n";
-        $message .= "Tipo: " . $subscriptionModel->frequency_type . "\n";
-        $message .= ":timer: Dias desde el alta: " . $subscriptionModel->charged_quantity  . "\n";
-        $message .= ":moneybag: Monto cargado: " . $subscriptionModel->charged_amount  . "\n";
+        $message .= ":traffic_light: Estado : " . ($subscription['status'] ?? 'null') . "\n";
+        $message .= ":calendar_spiral: Fecha próximo pago: " . ($subscription['next_payment_date'] ?? '') . "\n";
+        $message .= "Frecuencia: " . ($subscriptionModel->frequency ?? '') . "\n";
+        $message .= "Tipo: " . ($subscriptionModel->frequency_type ?? '') . "\n";
+        $message .= ":timer: Dias desde el alta: " . ($subscription['summarized']['charged_quantity'] ?? '') . "\n";
+        $message .= ":moneybag: Monto cargado: " . ($subscription['summarized']['charged_amount'] ?? '') . "\n";
         $message .= ":calendar_spiral: Última fecha de carga: " . ($subscription['summarized']['last_charged_date'] ?? 'N/A') . "\n";
 
         $this->discordService->sendDiscordMessage($message);

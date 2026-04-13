@@ -64,3 +64,7 @@
 ## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
 **Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
 **Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2026-03-24 - [Avoid Eloquent Hydration in Webhook Handlers]
+**Learning:** During high-concurrency webhook events (like processing `SubscriptionPreapproval` from Mercado Pago or dLocalGo subscription updates), loading the full Eloquent model (e.g., `Subscription::where(...)->first()`) to then perform an update creates significant overhead. In the case of the `Subscription` model, it often entails fetching large JSON/TEXT columns like `response` into memory that aren't even strictly necessary for the update logic.
+**Action:** When updating single records inside high-throughput webhook handlers, replace `Model::first()` followed by `$model->save()` with direct queries via `DB::table(...)->select(...)->first()` to fetch minimal necessary data (e.g., IDs, basic fields for logging) and execute updates using `DB::table(...)->where(...)->update(...)`. This mitigates memory exhaustion and minimizes database operations.
