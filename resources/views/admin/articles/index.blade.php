@@ -10,7 +10,7 @@
                     <div class="row align-items-center justify-content-between pt-3">
                         <div class="col-auto mb-3">
                             <h1 class="page-header-title">
-                                <div class="page-header-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                <div class="page-header-icon"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                                         height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                         class="feather feather-list">
@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-12 col-xl-auto mb-3">
                             <a class="btn btn-sm btn-light text-primary" href="{{ asset('admin/articles/create')}}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="feather feather-plus me-1">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -96,7 +96,7 @@
                                             </td>
                                             <td>
                                                 <a class="btn btn-datatable btn-icon btn-transparent-dark me-2"
-                                                    href="blog-management-edit-post.html" aria-label="Edit Article"><svg
+                                                    href="blog-management-edit-post.html" aria-label="Edit Article"><svg aria-hidden="true"
                                                         xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -108,7 +108,7 @@
                                                         </path>
                                                     </svg></a>
                                                 <a class="btn btn-datatable btn-icon btn-transparent-dark"
-                                                    href="#!" aria-label="Delete Article"><svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                    href="#!" aria-label="Delete Article"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                                                         height="24" viewBox="0 0 24 24" fill="none"
                                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                         stroke-linejoin="round" class="feather feather-trash-2">
@@ -142,7 +142,7 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-datatable btn-icon btn-transparent-dark me-2"
-                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg
+                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -152,7 +152,7 @@
                                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z">
                                                     </path>
                                                 </svg></a>
-                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg
+                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -180,7 +180,7 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-datatable btn-icon btn-transparent-dark me-2"
-                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg
+                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -190,7 +190,7 @@
                                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z">
                                                     </path>
                                                 </svg></a>
-                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg
+                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -214,7 +214,7 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-datatable btn-icon btn-transparent-dark me-2"
-                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg
+                                                href="blog-management-edit-post.html" aria-label="Edit Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -224,7 +224,7 @@
                                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z">
                                                     </path>
                                                 </svg></a>
-                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg
+                                            <a class="btn btn-datatable btn-icon btn-transparent-dark" href="#!" aria-label="Delete Article"><svg aria-hidden="true"
                                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
