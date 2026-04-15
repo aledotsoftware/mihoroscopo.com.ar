@@ -64,3 +64,7 @@
 ## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
 **Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
 **Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2026-04-15 - [Model Hydration and Processing Overhead in Index Views]
+**Learning:** In controllers like `ArticleController`, applying computationally expensive regex operations (`applyReplacements`) across a paginated collection of Eloquent models on every request wastes massive CPU resources, even if `select()` is used to omit large text columns.
+**Action:** When an index controller performs computationally expensive formatting on a paginated collection of Eloquent models, wrap both the query and the formatting loop in a `Cache::remember` block (keyed by the page number) to eliminate redundant CPU load and model hydration on every request.
