@@ -157,21 +157,33 @@ class ArticleController extends Controller
         }, $text);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // ⚡ Bolt: Memory optimization.
-        // What: Added select(['id', 'slug', 'title', 'created_at']) to the query.
-        // Why: The 'content' column contains large markdown text. Fetching it for the index view
-        //      (which only displays the title and slug) wastes significant memory and CPU during model hydration.
-        // Impact: Reduces memory footprint per request and speeds up database retrieval for the article list.
-        $articles = Article::select(['id', 'slug', 'title', 'created_at'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $page = $request->integer('page', 1);
 
-        // Aplicar reemplazos en los títulos de todos los artículos
-        foreach ($articles as $article) {
-            $article->title = $this->applyReplacements($article->title);
-        }
+        // ⚡ Bolt: CPU/Memory optimization.
+        // What: Wrapped the paginated database query and regex title replacement loop in a Cache::remember block.
+        // Why: The index page frequently executes an expensive preg_replace_callback operation on every article title
+        //      and fetches models from the database on every request. Caching by page number eliminates
+        //      redundant CPU load and model hydration for subsequent hits.
+        // Impact: Greatly reduces response time, database load, and CPU cycles on the heavily accessed index page.
+        $articles = Cache::remember('articles_index_page_' . $page, 300, function () {
+            // ⚡ Bolt: Memory optimization.
+            // What: Added select(['id', 'slug', 'title', 'created_at']) to the query.
+            // Why: The 'content' column contains large markdown text. Fetching it for the index view
+            //      (which only displays the title and slug) wastes significant memory and CPU during model hydration.
+            // Impact: Reduces memory footprint per request and speeds up database retrieval for the article list.
+            $paginator = Article::select(['id', 'slug', 'title', 'created_at'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            // Aplicar reemplazos en los títulos de todos los artículos
+            foreach ($paginator as $article) {
+                $article->title = $this->applyReplacements($article->title);
+            }
+
+            return $paginator;
+        });
 
         return view('mihoroscopo/articles.index', compact('articles'));
     }

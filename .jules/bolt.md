@@ -64,3 +64,7 @@
 ## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
 **Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
 **Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2024-05-19 - Cache computationally expensive view operations
+**Learning:** In applications where database content undergoes heavy formatting (e.g., regex replacements for highlights) before rendering in index views, caching the formatted paginator object significantly reduces CPU utilization and database hits without requiring application-wide structural changes.
+**Action:** When a controller fetches a collection (like index pages) and loops over them to apply regex replacements or Markdown parsing, wrap both the database query and the formatting loop in a `Cache::remember` block keyed by the pagination page number. Use a short TTL (like 300 seconds) if real-time updates aren't critical, as this prevents excessive hydration and regex operations on every request.
