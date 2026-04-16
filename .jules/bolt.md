@@ -64,3 +64,7 @@
 ## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
 **Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
 **Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2026-03-25 - [Avoid select('*') in Eloquent `first()` Single Record Lookups]
+**Learning:** In highly concurrent checkout flows (`subscribe()`), using `Subscription::where()->first()` hydrates all columns into an Eloquent model. The `subscriptions` table contains massive TEXT/JSON columns (`response`, `payload`). Fetching these when only a few fields (e.g., `status`, `external_reference`) are needed to process a checkout is highly wasteful, increasing memory footprint and query latency.
+**Action:** Always explicitly use `->select(...)` when fetching Eloquent models that contain heavy text/JSON columns, even for single record lookups using `first()`, unless the entire record is demonstrably needed.

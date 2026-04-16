@@ -117,7 +117,13 @@ class SubscriptionController extends Controller
     private function getSubscriptionByEmail($email)
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Added ->select() to avoid fetching heavy JSON/TEXT columns ('response', 'payload').
+        // Why: This method is used in the highly concurrent subscribe() flow to check subscription status.
+        //      Hydrating the massive payload fields into memory just to check existence and status causes unnecessary overhead.
+        // Impact: Reduces memory footprint and query response time per checkout request.
+        return Subscription::where('email', $email)
+            ->select('id', 'email', 'status', 'external_reference', 'payment_provider_id')->first();
     }
 
     /**
@@ -130,7 +136,13 @@ class SubscriptionController extends Controller
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
 
-        return Subscription::where('external_reference', $externalReference)->first();
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Added ->select() to avoid fetching heavy JSON/TEXT columns ('response', 'payload').
+        // Why: When resolving a subscription for reactivation or status checks, loading all massive columns
+        //      wastes RAM and network bandwidth, dragging down endpoint performance under high concurrency.
+        // Impact: Reduces memory footprint per database fetch.
+        return Subscription::where('external_reference', $externalReference)
+            ->select('id', 'email', 'status', 'external_reference', 'payment_provider_id', 'subscription_id', 'payment_type')->first();
     }
 
 
