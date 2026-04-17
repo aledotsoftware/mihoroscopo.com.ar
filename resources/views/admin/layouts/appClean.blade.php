@@ -84,7 +84,7 @@
                 <a class="nav-link dropdown-toggle" id="navbarDropdownDocs" href="javascript:void(0);" role="button"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="fw-500">Documentation</div>
-                    <i class="fas fa-chevron-right dropdown-arrow"></i>
+                    <i class="fas fa-chevron-right dropdown-arrow" aria-hidden="true"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end py-0 me-sm-n15 me-lg-0 o-hidden animated--fade-in-up"
                     aria-labelledby="navbarDropdownDocs">
