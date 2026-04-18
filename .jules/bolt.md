@@ -64,3 +64,7 @@
 ## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
 **Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
 **Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2026-04-18 - [Avoid Eloquent Hydration for Confirmation Emails]
+**Learning:** Hydrating full Eloquent models from the `subscriptions` table to send confirmation emails via `SubscriptionConfirmationMail` unnecessarily retrieves massive `response` and `payload` JSON columns, wasting RAM and CPU on high-concurrency webhooks.
+**Action:** Use `select()` to fetch only the explicitly required columns (like email, status, and tracking flags) when querying Eloquent models that are passed into Mailable templates.
