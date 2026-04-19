@@ -123,7 +123,7 @@
                                                     </svg></a>
 
                                                 <a href="/admin/articles/{{ $article->id }}/edit">Editar</a>
-                                                <form action="" method="POST" style="display:inline;">
+                                                <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit">Eliminar</button>
@@ -294,7 +294,7 @@
             <td>{{ $article->author_id }}</td>
             <td>
                 <a href="">Editar</a>
-                <form action="" method="POST" style="display:inline;">
+                <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit">Eliminar</button>

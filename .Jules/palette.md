@@ -56,3 +56,6 @@
 ## 2024-11-23 - Hide Decorative Icons from Screen Readers
 **Learning:** Purely decorative icons in Blade templates (like `<i class="fa fa-star"></i>` next to "Horóscopo Gratis" or `<i class="fa fa-link"></i>` inside an anchor that already has an `aria-label`) are read aloud by screen readers if they lack `aria-hidden="true"`. This adds noise and redundant announcements for assistive technology users.
 **Action:** Always add `aria-hidden="true"` to FontAwesome or similar purely decorative visual icons so they are skipped by screen readers.
+## 2026-04-19 - Added confirmation dialog to article deletion
+**Learning:** Destructive actions like deleting an article from an admin panel can easily lead to data loss without proper confirmation. Adding a simple native browser `confirm()` dialog is an easy and effective way to prevent accidental clicks on the 'Eliminar' (Delete) button.
+**Action:** When creating forms for destructive actions (e.g., DELETE methods), ensure there is an `onsubmit` handler or equivalent confirmation mechanism in place.
