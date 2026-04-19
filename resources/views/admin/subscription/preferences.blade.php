@@ -55,7 +55,7 @@
                                         12%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                                         3%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-tag fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-tag fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                                         12%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-mouse-pointer fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-mouse-pointer fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                                         1%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-percentage fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-percentage fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>

@@ -56,3 +56,7 @@
 ## 2024-11-23 - Hide Decorative Icons from Screen Readers
 **Learning:** Purely decorative icons in Blade templates (like `<i class="fa fa-star"></i>` next to "Horóscopo Gratis" or `<i class="fa fa-link"></i>` inside an anchor that already has an `aria-label`) are read aloud by screen readers if they lack `aria-hidden="true"`. This adds noise and redundant announcements for assistive technology users.
 **Action:** Always add `aria-hidden="true"` to FontAwesome or similar purely decorative visual icons so they are skipped by screen readers.
+
+## 2024-11-23 - Hide Decorative Icons from Screen Readers in Admin Views
+**Learning:** Just like frontend templates, backend/admin Blade views (`resources/views/admin/subscription/*`) contained purely decorative FontAwesome icons (`<i class="fas fa-dollar-sign..."></i>`) that lacked `aria-hidden="true"`, leading to noisy, redundant announcements for screen reader users navigating the dashboard.
+**Action:** Always verify that FontAwesome (`<i class="fas fa-...">`) or similar purely decorative visual icons used in admin or dashboard views include `aria-hidden="true"` to prevent assistive technology from reading out the icon names.
