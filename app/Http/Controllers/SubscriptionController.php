@@ -116,8 +116,14 @@ class SubscriptionController extends Controller
      */
     private function getSubscriptionByEmail($email)
     {
-        // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Added explicit select() to avoid hydrating massive TEXT/JSON columns ('response').
+        // Why: In the highly concurrent checkout flow, we only need a few fields to check if the subscription exists
+        //      and potentially update it. Fetching the full record including large JSON payloads causes severe memory spikes.
+        // Impact: Drastically reduces memory footprint and database overhead.
+        return Subscription::select(['id', 'email', 'status', 'external_reference', 'payment_provider_id', 'country'])
+            ->where('email', $email)
+            ->first();
     }
 
     /**
@@ -128,9 +134,14 @@ class SubscriptionController extends Controller
      */
     private function getSubscriptionByExternalReference($externalReference)
     {
-        // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
-
-        return Subscription::where('external_reference', $externalReference)->first();
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Added explicit select() to avoid hydrating massive TEXT/JSON columns ('response').
+        // Why: In the highly concurrent webhook/reactivation flow, fetching the full record
+        //      including large JSON payloads wastes memory when we only need specific fields.
+        // Impact: Drastically reduces memory footprint and database overhead.
+        return Subscription::select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status', 'service_id'])
+            ->where('external_reference', $externalReference)
+            ->first();
     }
 
 

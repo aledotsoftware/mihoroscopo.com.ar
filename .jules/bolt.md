@@ -68,3 +68,7 @@
 ## 2026-04-18 - [Avoid Eloquent Hydration for Confirmation Emails]
 **Learning:** Hydrating full Eloquent models from the `subscriptions` table to send confirmation emails via `SubscriptionConfirmationMail` unnecessarily retrieves massive `response` and `payload` JSON columns, wasting RAM and CPU on high-concurrency webhooks.
 **Action:** Use `select()` to fetch only the explicitly required columns (like email, status, and tracking flags) when querying Eloquent models that are passed into Mailable templates.
+
+## 2026-04-20 - [Avoid Hydrating Massive JSON Columns on Subscription Existence Lookups]
+**Learning:** In highly concurrent flows like the `subscribe` and `reactivateSubscription` endpoints, calling `Subscription::where(...)->first()` implicitly performs a `SELECT *`, fetching the full record into memory. This table contains massive JSON columns (`response` and `payload`). Hydrating these fields on every existence check when we only need a few scalar fields (like `id`, `email`, `status`, `external_reference`) causes unnecessary RAM overhead and CPU spikes from Eloquent hydration.
+**Action:** When performing `first()` lookups on tables with large payload columns (like `subscriptions`) in highly concurrent endpoints, always append an explicit `select(['id', 'status', ...])` to fetch only the required columns, even if you are going to call `$model->update()` or `$model->save()` later.
