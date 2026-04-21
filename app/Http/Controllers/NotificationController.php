@@ -455,7 +455,14 @@ class NotificationController extends Controller
         // SE ENVIA EL MAIL AL CORREO CUYO PAYMENT SEA EL CORESPONDIENTE SIEMPRE QUE NO SE HAYA ENVIADO ANTES
 
         // var_dump($paymentModel->external_reference);
-        $subscriptionModel = Subscription::where('external_reference', $externalReference)->first();
+
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select() to prevent fetching heavy TEXT/JSON columns ('response', 'payload') when resolving a subscription for confirmation emails.
+        // Why: Hydrating massive payload columns into Eloquent models on a high-concurrency webhook wastes significant RAM and CPU.
+        //      We only retrieve the explicit fields needed for the confirmation email (status, amounts, dates) and logic flags.
+        // Impact: Drastically reduces memory footprint per webhook execution and improves endpoint latency.
+        $subscriptionModel = Subscription::select(['id', 'email', 'first_send', 'external_reference', 'status', 'last_charged_amount', 'next_payment_date', 'currency'])
+            ->where('external_reference', $externalReference)->first();
 
         // //var_dump( $subscriptionModel);
 

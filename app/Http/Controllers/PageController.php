@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Page; // Asumiendo que tienes un modelo Page
+use Illuminate\Support\Facades\Cache;
 
 class PageController extends Controller
 {
