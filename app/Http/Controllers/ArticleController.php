@@ -159,19 +159,30 @@ class ArticleController extends Controller
 
     public function index()
     {
-        // ⚡ Bolt: Memory optimization.
-        // What: Added select(['id', 'slug', 'title', 'created_at']) to the query.
-        // Why: The 'content' column contains large markdown text. Fetching it for the index view
-        //      (which only displays the title and slug) wastes significant memory and CPU during model hydration.
-        // Impact: Reduces memory footprint per request and speeds up database retrieval for the article list.
-        $articles = Article::select(['id', 'slug', 'title', 'created_at'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $page = request()->get('page', 1);
 
-        // Aplicar reemplazos en los títulos de todos los artículos
-        foreach ($articles as $article) {
-            $article->title = $this->applyReplacements($article->title);
-        }
+        // ⚡ Bolt: CPU/Memory optimization.
+        // What: Cached the article pagination query and the expensive regex loop.
+        // Why: Fetching articles, hydrating Eloquent models, and applying complex regex replacements on the titles
+        //      in a foreach loop on every page load wastes CPU cycles and database bandwidth for content that rarely changes.
+        // Impact: Reduces database load and speeds up server response time for the main articles index by skipping redundant processing.
+        $articles = Cache::remember('articles_index_page_' . $page, 300, function () {
+            // ⚡ Bolt: Memory optimization.
+            // What: Added select(['id', 'slug', 'title', 'created_at']) to the query.
+            // Why: The 'content' column contains large markdown text. Fetching it for the index view
+            //      (which only displays the title and slug) wastes significant memory and CPU during model hydration.
+            // Impact: Reduces memory footprint per request and speeds up database retrieval for the article list.
+            $paginator = Article::select(['id', 'slug', 'title', 'created_at'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            // Aplicar reemplazos en los títulos de todos los artículos
+            foreach ($paginator as $article) {
+                $article->title = $this->applyReplacements($article->title);
+            }
+
+            return $paginator;
+        });
 
         return view('mihoroscopo/articles.index', compact('articles'));
     }
