@@ -56,3 +56,7 @@
 ## 2024-11-23 - Hide Decorative Icons from Screen Readers
 **Learning:** Purely decorative icons in Blade templates (like `<i class="fa fa-star"></i>` next to "Horóscopo Gratis" or `<i class="fa fa-link"></i>` inside an anchor that already has an `aria-label`) are read aloud by screen readers if they lack `aria-hidden="true"`. This adds noise and redundant announcements for assistive technology users.
 **Action:** Always add `aria-hidden="true"` to FontAwesome or similar purely decorative visual icons so they are skipped by screen readers.
+
+## 2026-04-16 - Admin Action Buttons Missing ARIA labels
+**Learning:** Action buttons in admin dashboards (e.g. 'Eliminar' or 'Edit' inside tables) often lack descriptive `aria-label` attributes. Screen reader users navigating by buttons might just hear 'Eliminar' repeated multiple times without context of what they are deleting.
+**Action:** Always add descriptive `aria-label` attributes to generic action buttons (e.g., `aria-label="Eliminar artículo"`) to provide proper context for screen reader users.

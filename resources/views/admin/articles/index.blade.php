@@ -126,7 +126,7 @@
                                                 <form action="" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit">Eliminar</button>
+                                                    <button type="submit" aria-label="Eliminar artículo" title="Eliminar artículo">Eliminar</button>
                                                 </form>
                                             </td>
                                     @endforeach
@@ -297,7 +297,7 @@
                 <form action="" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
-                    <button type="submit">Eliminar</button>
+                    <button type="submit" aria-label="Eliminar artículo" title="Eliminar artículo">Eliminar</button>
                 </form>
             </td>
         </tr>
