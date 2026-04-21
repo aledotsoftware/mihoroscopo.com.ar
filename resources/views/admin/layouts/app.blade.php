@@ -89,7 +89,7 @@
                 <a class="nav-link dropdown-toggle" id="navbarDropdownDocs" href="javascript:void(0);" role="button"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="fw-500">Documentation</div>
-                    <i class="fas fa-chevron-right dropdown-arrow"></i>
+                    <i class="fas fa-chevron-right dropdown-arrow" aria-hidden="true"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end py-0 me-sm-n15 me-lg-0 o-hidden animated--fade-in-up"
                     aria-labelledby="navbarDropdownDocs">
@@ -320,7 +320,7 @@
                             aria-controls="collapseDashboards">
                             <div class="nav-link-icon"><i data-feather="activity"></i></div>
                             Dashboards
-                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                         </a>
                         <div class="collapse" id="collapseDashboards" data-bs-parent="#accordionSidenav">
                             <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPages">
@@ -341,7 +341,7 @@
                             data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
                             <div class="nav-link-icon"><i data-feather="grid"></i></div>
                             Articulos
-                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                         </a>
                         <div class="collapse" id="collapsePages" data-bs-parent="#accordionSidenav">
                             <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavPagesMenu">
@@ -361,7 +361,7 @@
                             data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                             <div class="nav-link-icon"><i data-feather="layout"></i></div>
                             Layout
-                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                         </a>
                         <div class="collapse" id="collapseLayouts" data-bs-parent="#accordionSidenav">
                             <nav class="sidenav-menu-nested nav accordion" id="accordionSidenavLayout">
@@ -370,7 +370,7 @@
                                     data-bs-target="#collapseLayoutSidenavVariations" aria-expanded="false"
                                     aria-controls="collapseLayoutSidenavVariations">
                                     Navigation
-                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                                 </a>
                                 <div class="collapse" id="collapseLayoutSidenavVariations"
                                     data-bs-parent="#accordionSidenavLayout">
@@ -385,7 +385,7 @@
                                     data-bs-target="#collapseLayoutContainers" aria-expanded="false"
                                     aria-controls="collapseLayoutContainers">
                                     Container Options
-                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                                 </a>
                                 <div class="collapse" id="collapseLayoutContainers"
                                     data-bs-parent="#accordionSidenavLayout">
@@ -399,7 +399,7 @@
                                     data-bs-target="#collapseLayoutsPageHeaders" aria-expanded="false"
                                     aria-controls="collapseLayoutsPageHeaders">
                                     Page Headers
-                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                                 </a>
                                 <div class="collapse" id="collapseLayoutsPageHeaders"
                                     data-bs-parent="#accordionSidenavLayout">
@@ -416,7 +416,7 @@
                                     data-bs-target="#collapseLayoutsStarterTemplates" aria-expanded="false"
                                     aria-controls="collapseLayoutsStarterTemplates">
                                     Starter Layouts
-                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                                 </a>
                                 <div class="collapse" id="collapseLayoutsStarterTemplates"
                                     data-bs-parent="#accordionSidenavLayout">
@@ -433,7 +433,7 @@
                             aria-controls="collapseComponents">
                             <div class="nav-link-icon"><i data-feather="package"></i></div>
                             Components
-                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                         </a>
                         <div class="collapse" id="collapseComponents" data-bs-parent="#accordionSidenav">
                             <nav class="sidenav-menu-nested nav">
@@ -465,7 +465,7 @@
                             aria-controls="collapseUtilities">
                             <div class="nav-link-icon"><i data-feather="tool"></i></div>
                             Utilities
-                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down" aria-hidden="true"></i></div>
                         </a>
                         <div class="collapse" id="collapseUtilities" data-bs-parent="#accordionSidenav">
                             <nav class="sidenav-menu-nested nav">
@@ -622,19 +622,19 @@
                                     <a class="list-group-item list-group-item-action p-3" href="layout-static.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Static Sidenav
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="layout-dark.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Dark Sidenav
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="layout-rtl.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             RTL Layout
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                 </div>
@@ -643,13 +643,13 @@
                                     <a class="list-group-item list-group-item-action p-3" href="layout-boxed.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Boxed Layouts
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="layout-fluid.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Fluid Layout
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                 </div>
@@ -660,31 +660,31 @@
                                     <a class="list-group-item list-group-item-action p-3" href="header-simplified.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Simplified
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="header-compact.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Compact
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="header-overlap.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Content Overlap
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="header-breadcrumbs.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Breadcrumbs
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="header-light.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Light
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                 </div>
@@ -695,13 +695,13 @@
                                     <a class="list-group-item list-group-item-action p-3" href="starter-default.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Default
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                     <a class="list-group-item list-group-item-action p-3" href="starter-minimal.html">
                                         <div class="d-flex align-items-center justify-content-between">
                                             Minimal
-                                            <i class="text-muted" data-feather="arrow-right"></i>
+                                            <i class="text-muted" data-feather="arrow-right" aria-hidden="true"></i>
                                         </div>
                                     </a>
                                 </div>

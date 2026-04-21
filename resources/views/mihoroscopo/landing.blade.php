@@ -299,7 +299,7 @@
     <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-message">
         <div class="modal-content">
             <button class="close" aria-label="Cerrar">&times;</button>
-            <p id="modal-message" role="alert">
+            <p id="modal-message" role="alert" tabindex="-1">
 
             </p>
         </div>
@@ -652,8 +652,8 @@
             modalMessage.textContent = message;
             modal.style.display = 'flex';
 
-            if (closeBtn) {
-                closeBtn.focus();
+            if (modalMessage) {
+                modalMessage.focus();
             }
 
             modal.addEventListener('keydown', trapFocus);

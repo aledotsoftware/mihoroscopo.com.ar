@@ -61,3 +61,10 @@
 ## 2026-03-24 - [Avoid select('*') with Joins When Only Specific Columns are Needed]
 **Learning:** Using `select('subscriptions.*', 'extradata_horoscopes.*')` with a `join` when loading a single subscription for an update view hydrates massive TEXT/JSON columns (like `response` and `payload`) into memory unnecessarily. If the blade view only uses a single field (like `$subscription->external_reference`), this wastes significant memory and database I/O, scaling poorly under concurrent traffic.
 **Action:** Always explicitly specify which columns are needed using `select()` when querying tables with large payload columns. Eliminate unnecessary `join` clauses if data from the related table is not actually consumed by the view or downstream logic.
+## 2026-03-24 - [Avoid Eloquent Hydration for Static Content]
+**Learning:** Fetching Eloquent models (like `Page`) from the database on every request for static or rarely-changing content adds significant, redundant CPU overhead for model hydration and network latency.
+**Action:** Always wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages like Terms of Service) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times.
+
+## 2026-04-18 - [Avoid Eloquent Hydration for Confirmation Emails]
+**Learning:** Hydrating full Eloquent models from the `subscriptions` table to send confirmation emails via `SubscriptionConfirmationMail` unnecessarily retrieves massive `response` and `payload` JSON columns, wasting RAM and CPU on high-concurrency webhooks.
+**Action:** Use `select()` to fetch only the explicitly required columns (like email, status, and tracking flags) when querying Eloquent models that are passed into Mailable templates.
