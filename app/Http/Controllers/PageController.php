@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Page; // Asumiendo que tienes un modelo Page
 use Illuminate\Support\Facades\Cache;
 
@@ -11,13 +12,13 @@ class PageController extends Controller
     public function show($slug)
     {
         // ⚡ Bolt: Database and memory optimization.
-        // What: Added caching using Cache::remember() for fetching Page models by their slug.
-        // Why: Static pages (like Privacy Policy, Terms, etc.) are rarely updated but frequently accessed.
-        //      Fetching the entire Page model on every single request consumes unnecessary database connections,
-        //      query execution time, and CPU/memory overhead for Eloquent model hydration.
-        // Impact: Eliminates redundant database queries for static content, drastically improving response times
-        //         and reducing database load under high concurrency.
-        $page = \Illuminate\Support\Facades\Cache::remember('page_' . $slug, 300, function () use ($slug) {
+        // What: Wrapped the Page model retrieval inside Cache::remember for 24 hours.
+        // Why: The 'pages' table contains static content (like Terms and Conditions, Privacy Policy)
+        //      that rarely changes but is frequently accessed by users. Retrieving the model from the DB
+        //      on every request causes unnecessary database queries and model hydration overhead.
+        // Impact: Eliminates redundant database SELECT queries and Eloquent ORM hydration for static content,
+        //         significantly improving response times under high load.
+        $page = Cache::remember('page_' . $slug, 86400, function () use ($slug) {
             return Page::where('slug', $slug)->firstOrFail();
         });
 
