@@ -51,7 +51,7 @@
                                     <div class="small fw-bold text-primary mb-1">Earnings (monthly)</div>
                                     <div class="h5">$4,390</div>
                                     <div class="text-xs fw-bold text-success d-inline-flex align-items-center">
-                                        <i class="me-1" data-feather="trending-up"></i>
+                                        <i class="me-1" data-feather="trending-up" aria-hidden="true"></i>
                                         12%
                                     </div>
                                 </div>
@@ -69,11 +69,11 @@
                                     <div class="small fw-bold text-secondary mb-1">Average sale price</div>
                                     <div class="h5">$27.00</div>
                                     <div class="text-xs fw-bold text-danger d-inline-flex align-items-center">
-                                        <i class="me-1" data-feather="trending-down"></i>
+                                        <i class="me-1" data-feather="trending-down" aria-hidden="true"></i>
                                         3%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-tag fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-tag fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
@@ -87,11 +87,11 @@
                                     <div class="small fw-bold text-success mb-1">Clicks</div>
                                     <div class="h5">11,291</div>
                                     <div class="text-xs fw-bold text-success d-inline-flex align-items-center">
-                                        <i class="me-1" data-feather="trending-up"></i>
+                                        <i class="me-1" data-feather="trending-up" aria-hidden="true"></i>
                                         12%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-mouse-pointer fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-mouse-pointer fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
@@ -105,11 +105,11 @@
                                     <div class="small fw-bold text-info mb-1">Conversion rate</div>
                                     <div class="h5">1.23%</div>
                                     <div class="text-xs fw-bold text-danger d-inline-flex align-items-center">
-                                        <i class="me-1" data-feather="trending-down"></i>
+                                        <i class="me-1" data-feather="trending-down" aria-hidden="true"></i>
                                         1%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-percentage fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-percentage fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
