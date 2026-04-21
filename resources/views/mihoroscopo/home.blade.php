@@ -19,7 +19,7 @@
                             revelación importante.
                             Explora nuestras opciones pagas y encuentra la que mejor se adapte a ti.</p>
                         <div class="main-button scroll-to-section"><a href="/landing">Ver Planes</a></div>
-                        <span>o</span>
+                        <span aria-hidden="true">o</span>
                         <div class="second-button"><a href="/landing">Suscríbete</a></div>
                     </div>
                 </div>
