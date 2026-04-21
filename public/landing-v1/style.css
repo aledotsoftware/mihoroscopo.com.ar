@@ -751,6 +751,10 @@ a {
   color: #6f530e;
 }
 
+#modal-message:focus {
+  outline: none;
+}
+
 .landing .modal .modal-content .close {
   position: absolute;
   right: 1.5rem;
