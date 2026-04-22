@@ -181,4 +181,24 @@
             </div>
         </div>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    const btn = e.submitter || this.querySelector('button:not([type="button"]), input[type="submit"]');
+                    if (btn) {
+                        setTimeout(function() {
+                            btn.disabled = true;
+                            btn.setAttribute('aria-busy', 'true');
+                            // Keep existing content but add text if it's text-only, or append spinner.
+                            // For simplicity and safety, just change text if there are no icons, otherwise just dim it.
+                            btn.innerHTML = 'Procesando...';
+                            btn.style.opacity = '0.7';
+                            btn.style.cursor = 'not-allowed';
+                        }, 0);
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
