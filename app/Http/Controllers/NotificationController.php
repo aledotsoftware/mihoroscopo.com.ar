@@ -191,8 +191,13 @@ class NotificationController extends Controller
                 return;
             }
 
+            // ⚡ Bolt: Memory optimization.
+            // What: Added select() to prevent fetching heavy TEXT/JSON columns ('response') when fetching the subscription.
+            // Why: Hydrating massive payload columns into Eloquent models on a high-concurrency webhook wastes significant RAM and CPU.
+            // Impact: Drastically reduces memory footprint per webhook execution and improves endpoint latency.
             // Buscar la suscripción
-            $subscription = Subscription::where('email', $executionData['subscription']['client_email'])->first();
+            $subscription = Subscription::select(['id', 'email', 'subscription_id', 'status', 'valid_until', 'charged_amount', 'charged_quantity'])
+                ->where('email', $executionData['subscription']['client_email'])->first();
             if (!$subscription) {
                 $this->discordService->sendDiscordMessage("Error: No se encontró la suscripción para el email: " . $executionData['subscription']['client_email']);
                 return;
@@ -338,7 +343,12 @@ class NotificationController extends Controller
             return;
         }
 
-        $subscriptionModel = Subscription::where('subscription_id', $subscriptionId)->first();
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select() to prevent fetching heavy TEXT/JSON columns ('response') when fetching the subscription.
+        // Why: Hydrating massive payload columns into Eloquent models on a high-concurrency webhook wastes significant RAM and CPU.
+        // Impact: Drastically reduces memory footprint per webhook execution and improves endpoint latency.
+        $subscriptionModel = Subscription::select(['id', 'subscription_id', 'status', 'next_payment_date', 'payment_method_id', 'charged_quantity', 'charged_amount', 'pending_charge_amount', 'semaphore', 'last_charged_date', 'last_charged_amount'])
+            ->where('subscription_id', $subscriptionId)->first();
         $subscriptionModel->status = $subscription['status'] ?? 'null';
         $subscriptionModel->response = $subscription; // Asegúrate de codificar la respuesta en JSON si es necesario
         $subscriptionModel->next_payment_date = $subscription['next_payment_date'] ?? null;
