@@ -68,3 +68,7 @@
 ## 2026-04-15 - [Model Hydration and Processing Overhead in Index Views]
 **Learning:** In controllers like `ArticleController`, applying computationally expensive regex operations (`applyReplacements`) across a paginated collection of Eloquent models on every request wastes massive CPU resources, even if `select()` is used to omit large text columns.
 **Action:** When an index controller performs computationally expensive formatting on a paginated collection of Eloquent models, wrap both the query and the formatting loop in a `Cache::remember` block (keyed by the page number) to eliminate redundant CPU load and model hydration on every request.
+
+## 2026-04-21 - [Safe select() optimization for single record updates]
+**Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
+**Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
