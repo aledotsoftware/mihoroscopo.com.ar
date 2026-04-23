@@ -18,15 +18,23 @@ class EmailTrackingController extends Controller
 
         // Verificar si el email_id existe
         if ($emailId) {
-            // ⚡ Bolt: Database update optimization.
-            // What: Replaced EmailLog::find()->update() with a direct where()->update() query.
-            // Why: Avoids executing an unnecessary SELECT query and prevents loading the
-            //      entire Eloquent model into memory just to update a single timestamp column.
-            // Impact: Eliminates O(1) memory overhead and 1 database query per tracking request,
-            //         significantly improving throughput for this highly concurrent endpoint.
-            EmailLog::where('id', $emailId)->update([
-                'opened_at' => Carbon::now(),
-            ]);
+            // ⚡ Bolt: Background execution optimization.
+            // What: Wrapped the database update inside Laravel's `defer()` helper.
+            // Why: Database I/O is a synchronous blocking operation that delays returning the 1x1 tracking pixel.
+            //      By deferring the update, the endpoint responds immediately, which improves server throughput
+            //      and prevents stalling the user's email client.
+            // Impact: Drastically reduces HTTP latency on a highly concurrent endpoint.
+            defer(function () use ($emailId) {
+                // ⚡ Bolt: Database update optimization.
+                // What: Replaced EmailLog::find()->update() with a direct where()->update() query.
+                // Why: Avoids executing an unnecessary SELECT query and prevents loading the
+                //      entire Eloquent model into memory just to update a single timestamp column.
+                // Impact: Eliminates O(1) memory overhead and 1 database query per tracking request,
+                //         significantly improving throughput for this highly concurrent endpoint.
+                EmailLog::where('id', $emailId)->update([
+                    'opened_at' => Carbon::now(),
+                ]);
+            });
         }
 
         // Ruta a la imagen del logo
@@ -53,26 +61,39 @@ class EmailTrackingController extends Controller
         $url = $request->query('url');
 
         if ($emailLogId && $url) {
-            try {
-                // Registrar el click
-                // ⚡ Bolt: Database write optimization.
-                // What: Replaced EmailClick::create() with DB::table('email_clicks')->insert().
-                // Why: Avoids executing an unnecessary Eloquent Model hydration cycle on a high-concurrency
-                //      tracking endpoint where we don't need the resulting object.
-                // Impact: Eliminates memory allocation overhead per tracked click.
-                \Illuminate\Support\Facades\DB::table('email_clicks')->insert([
-                    'email_log_id' => $emailLogId,
-                    'url' => $url,
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'clicked_at' => Carbon::now(),
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-            } catch (\Exception $e) {
-                // Log error but continue redirect
-                \Log::error('Error tracking email click: ' . $e->getMessage());
-            }
+            // Eagerly resolve request properties before deferring
+            $ip = $request->ip();
+            $userAgent = $request->userAgent();
+
+            // ⚡ Bolt: Background execution optimization.
+            // What: Wrapped the database insert inside Laravel's `defer()` helper.
+            // Why: Executing synchronous DB writes blocks the HTTP thread, delaying the client redirect.
+            //      Deferring allows an immediate 302 redirect, improving perceived performance.
+            //      Note: $request->ip() and $request->userAgent() MUST be resolved before the closure
+            //      since the $request object state might change/clear once the response is sent.
+            // Impact: Reduces TTFB (Time To First Byte) for clicked links, improving conversion tracking reliability.
+            defer(function () use ($emailLogId, $url, $ip, $userAgent) {
+                try {
+                    // Registrar el click
+                    // ⚡ Bolt: Database write optimization.
+                    // What: Replaced EmailClick::create() with DB::table('email_clicks')->insert().
+                    // Why: Avoids executing an unnecessary Eloquent Model hydration cycle on a high-concurrency
+                    //      tracking endpoint where we don't need the resulting object.
+                    // Impact: Eliminates memory allocation overhead per tracked click.
+                    \Illuminate\Support\Facades\DB::table('email_clicks')->insert([
+                        'email_log_id' => $emailLogId,
+                        'url' => $url,
+                        'ip_address' => $ip,
+                        'user_agent' => $userAgent,
+                        'clicked_at' => Carbon::now(),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                } catch (\Exception $e) {
+                    // Log error but continue redirect
+                    \Log::error('Error tracking email click: ' . $e->getMessage());
+                }
+            });
         }
 
         // Redirigir a la URL original
