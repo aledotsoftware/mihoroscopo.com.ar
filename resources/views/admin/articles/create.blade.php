@@ -17,6 +17,19 @@
         <label for="author_id">Autor ID:</label>
         <input type="number" name="author_id">
 
-        <button type="submit">Guardar Artículo</button>
+        <button type="submit" id="submitArticleBtn">Guardar Artículo</button>
     </form>
+
+    <script>
+        document.getElementById('submitArticleBtn').closest('form').addEventListener('submit', function(e) {
+            const btn = e.submitter || document.getElementById('submitArticleBtn');
+            const originalText = btn.innerHTML;
+
+            setTimeout(() => {
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                btn.innerHTML = 'Guardando...';
+            }, 0);
+        });
+    </script>
 @endsection

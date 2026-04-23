@@ -119,7 +119,7 @@
 
                             <!-- Submit Button -->
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Submit Updates</button>
+                                <button type="submit" class="btn btn-primary" id="updateArticleBtn">Submit Updates</button>
                             </div>
                             </div>
                         </div>
@@ -128,7 +128,18 @@
             </div>
     </main>
 
+    <script>
+        document.getElementById('updateArticleBtn').closest('form').addEventListener('submit', function(e) {
+            const btn = e.submitter || document.getElementById('updateArticleBtn');
+            const originalText = btn.innerHTML;
 
+            setTimeout(() => {
+                btn.disabled = true;
+                btn.setAttribute('aria-busy', 'true');
+                btn.innerHTML = 'Actualizando...';
+            }, 0);
+        });
+    </script>
 
 @endsection
 
