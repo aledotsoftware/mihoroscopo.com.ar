@@ -14,7 +14,7 @@
             </div>
             <!-- Date range picker example-->
             <div class="input-group input-group-joined border-0 shadow" style="width: 16.5rem">
-                {{-- <span class="input-group-text"><i data-feather="calendar"></i></span> --}}
+                {{-- <span class="input-group-text"><i data-feather="calendar" aria-hidden="true"></i></span> --}}
                 {{-- <input class="form-control ps-0 pointer" id="litepickerRangePlugin"
                         placeholder="Select date range..." /> --}}
             </div>
@@ -30,7 +30,7 @@
                             acceder a nuestra colección de artículos exclusivos y guías.</p>
                         <a class="btn btn-primary p-3" href="{{ route('articles.index') }}">
                             Visitar Artículos
-                            <i class="ms-1" data-feather="arrow-right"></i>
+                            <i class="ms-1" data-feather="arrow-right" aria-hidden="true"></i>
                         </a>
                     </div>
                     <div class="col d-none d-lg-block mt-xxl-n4">
@@ -55,7 +55,7 @@
                                         12%
                                     </div>
                                 </div>
-                                <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200"></i></div>
+                                <div class="ms-2"><i class="fas fa-dollar-sign fa-2x text-gray-200" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>

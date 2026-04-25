@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2024-11-26 - Missing aria-hidden on Decorative Feather Icons in Admin Views
+**Learning:** Many decorative icon elements (e.g., `<i data-feather="...">`) inside admin layouts and components lacked `aria-hidden="true"`. Because these icons accompany text labels (like "Search", "Alerts", or sidebar navigation items), screen readers can announce them redundantly or with unhelpful descriptions if they aren't explicitly hidden from the accessibility tree.
+**Action:** Always ensure that purely decorative icons (such as FontAwesome or Feather icons used alongside descriptive text) explicitly include `aria-hidden="true"` to provide a cleaner, less noisy experience for screen reader users.
