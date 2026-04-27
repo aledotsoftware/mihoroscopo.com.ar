@@ -57,3 +57,7 @@
 **Learning:** Using FontAwesome icons (e.g., `<i class="fa fa-star"></i>`) or simple text characters (e.g., `<span>o</span>`) as purely visual separators without `aria-hidden="true"` causes screen readers to announce redundant words ("star", "o"), adding confusing noise and degrading the experience for non-sighted users.
 **Action:** Always add `aria-hidden="true"` to icons and text elements that are purely decorative or visual separators to keep the accessibility tree clean and focused on meaningful semantic content.
 ## 2024-11-25 - Confirmation Dialogs for Destructive Actions\n**Learning:** Destructive actions like deleting an article in an admin table were implemented with immediate form submissions without any confirmation, risking accidental data loss. \n**Action:** Always require explicit confirmation for destructive actions. A simple `onsubmit="return confirm('...');"` on the form prevents accidents and is a quick, native UX win.
+
+## 2026-04-27 - Merge mock UI with functional forms
+**Learning:** When integrating HTML admin templates, developers sometimes leave the beautifully styled template elements (like `<a href="#!">` with SVG icons) and add unstyled functional forms/links next to them, creating duplicate and confusing UI.
+**Action:** Always merge these elements by applying the template classes and SVG icons to the actual functional `<button type="submit">` or `<a>` elements, ensuring a clean, intuitive, and accessible interface.
