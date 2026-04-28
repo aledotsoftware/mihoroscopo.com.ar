@@ -56,7 +56,12 @@
 ## 2024-03-27 - Hide Decorative Icons and Text Separators
 **Learning:** Using FontAwesome icons (e.g., `<i class="fa fa-star"></i>`) or simple text characters (e.g., `<span>o</span>`) as purely visual separators without `aria-hidden="true"` causes screen readers to announce redundant words ("star", "o"), adding confusing noise and degrading the experience for non-sighted users.
 **Action:** Always add `aria-hidden="true"` to icons and text elements that are purely decorative or visual separators to keep the accessibility tree clean and focused on meaningful semantic content.
-## 2024-11-25 - Confirmation Dialogs for Destructive Actions\n**Learning:** Destructive actions like deleting an article in an admin table were implemented with immediate form submissions without any confirmation, risking accidental data loss. \n**Action:** Always require explicit confirmation for destructive actions. A simple `onsubmit="return confirm('...');"` on the form prevents accidents and is a quick, native UX win.
+## 2024-11-25 - Confirmation Dialogs for Destructive Actions
+**Learning:** Destructive actions like deleting an article in an admin table were implemented with immediate form submissions without any confirmation, risking accidental data loss.
+**Action:** Always require explicit confirmation for destructive actions. A simple `onsubmit="return confirm('...');"` on the form prevents accidents and is a quick, native UX win.
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-11-25 - Integration of Mock UI Elements
+**Learning:** When integrating HTML admin templates, plain-text functional links often duplicate beautifully styled template mock elements (e.g., icons with generic hrefs).
+**Action:** Ensure mock UI elements (e.g., `<a href="#!">` elements with icons) are functionally integrated or merged with actual backend forms/links, removing plain-text redundant links.
