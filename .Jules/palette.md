@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2026-04-30 - Fix Incomplete/Unstyled Form Buttons in Templates
+**Learning:** HTML templates frequently ship with mock, dummy anchor links (e.g., `<a href="#!" class="styled-icon"><svg.../></a>`) for destructive actions like deleting rows. Developers occasionally append the real functional links or forms directly adjacent to them in plain text, rather than integrating the logic into the styled components, leading to confusing dual-UI elements and a lack of visual polish.
+**Action:** Always fully integrate dynamic backend form logic (such as `@csrf` and `@method('DELETE')`) and necessary UX protections (like `onsubmit="return confirm('...');"`) directly into the provided styled UI components instead of leaving raw functional fallback links beside them. Ensure button elements mimicking anchors adopt native classes (like `border-0 p-0` in Bootstrap) to maintain visual consistency.
