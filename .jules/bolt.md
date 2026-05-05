@@ -72,3 +72,8 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-04-22 - [Avoid Hydrating Heavy JSON/TEXT Columns Using Select]
+**Learning:** In the `SubscriptionController`, when retrieving Eloquent models (like `Subscription`) using `getSubscriptionByEmail` or `getSubscriptionByExternalReference` where only a few simple attributes are needed (like `id`, `status`, etc.), not explicitly selecting the columns will force Eloquent to fetch all table columns.
+This includes massive TEXT or JSON columns (such as `response` or `payload`) into PHP memory, causing unnecessary memory consumption and slower query response times.
+**Action:** When creating getter methods for models that contain heavy text/JSON columns, pass an optional `$columns = ['*']` array to allow caller methods to explicitly list only the needed columns, greatly optimizing model hydration overhead in performance-critical sections.
