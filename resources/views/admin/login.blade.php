@@ -41,7 +41,7 @@
                                         <!-- Form Group (email address)-->
                                         <div class="mb-3">
                                             <label class="small mb-1" for="password">Clave Maestra</label>
-                                            <input class="form-control" type="password" name="password"
+                                            <input class="form-control" id="password" type="password" name="password"
                                                 placeholder="Ingrese Clave Maestra" />
                                         </div>
                                         <!-- Form Group (password)-->

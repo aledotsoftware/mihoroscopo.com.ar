@@ -6,16 +6,16 @@
     <form action="{{ route('articles.store') }}" method="POST">
         @csrf
         <label for="slug">Slug:</label>
-        <input type="text" name="slug" required>
+        <input type="text" id="slug" name="slug" required>
 
         <label for="title">Título:</label>
-        <input type="text" name="title" required>
+        <input type="text" id="title" name="title" required>
 
         <label for="content">Contenido:</label>
-        <textarea name="content" required></textarea>
+        <textarea id="content" name="content" required></textarea>
 
         <label for="author_id">Autor ID:</label>
-        <input type="number" name="author_id">
+        <input type="number" id="author_id" name="author_id">
 
         <button type="submit" id="submitArticleBtn">Guardar Artículo</button>
     </form>

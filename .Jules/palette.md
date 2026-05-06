@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-05-06 - Added missing id attributes to inputs
+**Learning:** Some forms in the application, like the admin login and article creation pages, had `<label for="...">` elements but the corresponding inputs lacked the matching `id` attributes. This broke the programmatic association for screen readers, meaning the labels were not announced when the inputs received focus. Sighted users could also not click the labels to focus the inputs.
+**Action:** Always ensure that every `<input>` or form field has an `id` that exactly matches the `for` attribute of its corresponding `<label>`. This is a foundational accessibility requirement.
