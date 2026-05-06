@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2025-02-12 - Fix redundant styled and unstyled admin links
+**Learning:** In Blade templates using HTML admin panel boilerplates, purely aesthetic styled mockup buttons for data table actions are often left incomplete. Later developers might append standard backend functional `<form>` and `<a>` links next to or underneath them rather than integrating the functionality directly into the beautifully styled template elements. This creates screen reader confusion (multiple buttons doing the same thing) and a messy UI.
+**Action:** When implementing UX for admin panels, verify that the template's styled icon-only buttons (which must have `aria-label`s) are the ones actually wired up to the functional routes or embedded within the functional `<form>` tags, rather than sitting uselessly alongside unstyled, plain-text functional links.
