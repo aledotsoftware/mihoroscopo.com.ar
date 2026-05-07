@@ -122,11 +122,11 @@
                                                             y2="17"></line>
                                                     </svg></a>
 
-                                                <a href="/admin/articles/{{ $article->id }}/edit" aria-label="Editar artículo">Editar</a>
+                                                <a href="/admin/articles/{{ $article->id }}/edit" aria-label="Editar artículo: {{ $article->title }}">Editar</a>
                                                 <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" aria-label="Eliminar artículo">Eliminar</button>
+                                                    <button type="submit" aria-label="Eliminar artículo: {{ $article->title }}">Eliminar</button>
                                                 </form>
                                             </td>
                                     @endforeach
@@ -293,11 +293,11 @@
             <td>{{ $article->slug }}</td>
             <td>{{ $article->author_id }}</td>
             <td>
-                <a href="" aria-label="Editar artículo">Editar</a>
+                <a href="" aria-label="Editar artículo: {{ $article->title }}">Editar</a>
                 <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" aria-label="Eliminar artículo">Eliminar</button>
+                    <button type="submit" aria-label="Eliminar artículo: {{ $article->title }}">Eliminar</button>
                 </form>
             </td>
         </tr>
