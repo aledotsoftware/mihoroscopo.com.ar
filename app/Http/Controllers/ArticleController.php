@@ -189,8 +189,15 @@ class ArticleController extends Controller
 
     public function show($slug)
     {
-
-        $article = Article::where('slug', $slug)->firstOrFail();
+        // ⚡ Bolt: Database and memory optimization.
+        // What: Wrapped the Article model retrieval inside Cache::remember for 300 seconds.
+        // Why: The 'articles' table contains static content (blog posts) that rarely changes but is frequently accessed.
+        //      Retrieving the model from the DB on every request causes unnecessary database queries and model hydration overhead.
+        //      A short TTL is used to prevent serving severely stale data since explicit cache invalidation is absent.
+        // Impact: Eliminates redundant database SELECT queries and Eloquent ORM hydration, significantly improving response times.
+        $article = Cache::remember('article_' . $slug, 300, function () use ($slug) {
+            return Article::where('slug', $slug)->firstOrFail();
+        });
 
         // ⚡ Bolt: CPU/Memory optimization.
         // What: Added caching to the Parsedown markdown compilation process.

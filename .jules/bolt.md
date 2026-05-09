@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-04-22 - [Avoid Eloquent Hydration for Static Content - Articles]
+**Learning:** Fetching Eloquent models from the database on every request for static or rarely-changing content (like blog articles) adds significant, redundant CPU overhead for model hydration and network latency.
+**Action:** Wrap read-heavy, rarely-updated queries (such as rendering CMS-driven static pages or blog posts) in a caching layer (like `Cache::remember`) to minimize database load and speed up response times. If explicit cache invalidation is absent, use a short TTL (e.g., 300 seconds) to prevent serving severely stale data.
