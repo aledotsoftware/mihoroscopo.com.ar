@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2026-05-11 - Merging HTML Template Action Buttons
+**Learning:** When adopting HTML admin templates, there are often visually appealing (but non-functional) buttons sitting right next to the functional plain-text links in repeated datatable rows. This clutters the UI and causes screen reader redundancy. Using standard SVG action buttons for 'edit' or 'delete' without specific `aria-label`s creates a poor experience for screen reader users where all buttons just announce as 'button' or 'link'.
+**Action:** Always verify that mock styled buttons from templates are properly merged with the application's actual forms/links (like `<form action="..."><button>` for deletes). Ensure these repeated icon-only buttons receive descriptive `aria-label`s (e.g. 'Eliminar artículo: [Title]') and that purely decorative child `<svg>` tags receive `aria-hidden="true"`.
