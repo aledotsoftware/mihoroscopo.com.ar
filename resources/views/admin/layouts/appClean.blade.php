@@ -165,7 +165,7 @@
                     <!-- Example Alert 3-->
                     <a class="dropdown-item dropdown-notifications-item" href="#!">
                         <div class="dropdown-notifications-item-icon bg-danger"><i
-                                class="fas fa-exclamation-triangle"></i></div>
+                                class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
                         <div class="dropdown-notifications-item-content">
                             <div class="dropdown-notifications-item-content-details">December 8, 2021</div>
                             <div class="dropdown-notifications-item-content-text">Critical system failure, systems
