@@ -60,3 +60,11 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2026-05-17 - Enhance accessibility and usability of action buttons in data tables
+**Learning:** In admin data tables (like the articles index), action buttons that are purely visual icons without text labels are completely inaccessible to screen reader users. Additionally, using standard  dialogs for destructive actions without context (e.g., 'Are you sure?') forces users to guess what they are deleting.
+**Action:** Always add descriptive  attributes to icon-only buttons, incorporating dynamic data (e.g., ) to provide clear context.  Also, pass specific context to  dialogs and use  on dynamic data within inline JS attributes to prevent syntax errors and potential XSS issues.
+
+## 2024-11-26 - Enhance accessibility and usability of action buttons in data tables
+**Learning:** In admin data tables (like the articles index), action buttons that are purely visual icons without text labels are completely inaccessible to screen reader users. Additionally, using standard `confirm()` dialogs for destructive actions without context (e.g., 'Are you sure?') forces users to guess what they are deleting.
+**Action:** Always add descriptive `aria-label` attributes to icon-only buttons, incorporating dynamic data (e.g., `aria-label="Eliminar artículo: {{ $article->title }}"`) to provide clear context. Also, pass specific context to `confirm()` dialogs and use `addslashes()` on dynamic data within inline JS attributes to prevent syntax errors and potential XSS issues.
