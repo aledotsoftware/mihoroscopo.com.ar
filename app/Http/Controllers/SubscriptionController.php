@@ -112,25 +112,27 @@ class SubscriptionController extends Controller
      * Obtiene una suscripción existente por correo electrónico.
      *
      * @param string $email El correo electrónico del usuario.
+     * @param array $columns Columnas a seleccionar de la base de datos.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByEmail($email)
+    private function getSubscriptionByEmail($email, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        return Subscription::select($columns)->where('email', $email)->first();
     }
 
     /**
      * Obtiene una suscripción existente por correo electrónico.
      *
-     * @param string $email El correo electrónico del usuario.
+     * @param string $externalReference La referencia externa de la suscripción.
+     * @param array $columns Columnas a seleccionar de la base de datos.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByExternalReference($externalReference)
+    private function getSubscriptionByExternalReference($externalReference, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
 
-        return Subscription::where('external_reference', $externalReference)->first();
+        return Subscription::select($columns)->where('external_reference', $externalReference)->first();
     }
 
 
@@ -164,7 +166,12 @@ class SubscriptionController extends Controller
         $paymentType = $request->input('subscription');
 
         // Verificar si el correo ya tiene una suscripción
-        $existingSubscription = $this->getSubscriptionByEmail($email);
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Passed explicit columns array to getSubscriptionByEmail.
+        // Why: The 'subscriptions' table contains large TEXT/JSON columns ('response', 'payload')
+        //      that consume significant memory when hydrated. We only need specific fields for checkout flow.
+        // Impact: Drastically reduces memory footprint during high-concurrency checkout process.
+        $existingSubscription = $this->getSubscriptionByEmail($email, ['id', 'email', 'status', 'external_reference']);
 
         if ($existingSubscription) {
             // Si la suscripción existe y está pendiente o activa, devolver el punto de inicio existente
@@ -296,8 +303,11 @@ class SubscriptionController extends Controller
     {
         // Realizar la consulta para obtener los datos de la suscripción
         // Convertir el resultado en un objeto Subscription usando external_reference
-
-        $subscription =  $this->getSubscriptionByExternalReference($externalReference);
+        // ⚡ Bolt: Memory & CPU optimization.
+        // What: Passed explicit columns array to getSubscriptionByExternalReference.
+        // Why: Avoids hydrating massive TEXT/JSON payload columns into memory during reactivation.
+        // Impact: Reduces memory footprint during high-concurrency reactivation process.
+        $subscription =  $this->getSubscriptionByExternalReference($externalReference, ['id', 'email', 'subscription_id', 'status', 'payment_type']);
 
 
         // Depurar el objeto Subscription
