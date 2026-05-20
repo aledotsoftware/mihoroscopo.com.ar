@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-05-18 - [Eloquent Model Hydration Overhead on Getter Methods]
+**Learning:** Using `Model::where()->first()` in generic controller getter methods (like `getSubscriptionByEmail`) without `select()` hydrates massive columns (like `response` and `payload`) into memory for every caller. However, hardcoding `select()` in the getter signature breaks callers that implicitly depend on the fully hydrated model.
+**Action:** When optimizing generic getter methods on heavy tables, modify the method signature to accept an optional `$columns = ['*']` array. This allows performance-critical flows to pass specific columns (e.g., `['id', 'status']`) to bypass heavy hydration, while defaulting to `['*']` safely preserves existing behavior for unoptimized callers.
