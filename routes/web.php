@@ -138,3 +138,14 @@ Route::get('/test-pending', function () {
 Route::get('/test-failure', function () {
     return view('mihoroscopo.payment.failure');
 });
+Route::get('/test-admin-articles', function () {
+    $articles = [
+        (object)[
+            'id' => 1,
+            'title' => 'Test Article',
+            'slug' => 'test-article',
+            'author_id' => 1,
+        ]
+    ];
+    return view('admin.articles.index', ['articles' => collect($articles)]);
+});

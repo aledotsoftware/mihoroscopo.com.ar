@@ -1,0 +1,38 @@
+
+   INFO  Server running on [http://127.0.0.1:8000].
+
+  Press Ctrl+C to stop the server
+
+  2026-05-22 01:51:12 /admin/login ............................... ~ 500.40ms
+  2026-05-22 01:51:12 /assets/panel/css/styles.css ................. ~ 0.06ms
+  2026-05-22 01:51:12 /assets/panel/js/scripts.js .................. ~ 0.21ms
+  2026-05-22 01:51:13 /assets/panel/assets/fonts/metropolis/Metropolis-Regular.otf  ~ 0.11ms
+  2026-05-22 01:51:13 /assets/panel/assets/fonts/metropolis/Metropolis-Light.otf  ~ 0.18ms
+
+   INFO  Environment modified. Restarting server...
+
+   INFO  Server running on [http://127.0.0.1:8000].
+
+  Press Ctrl+C to stop the server
+
+
+   INFO  Environment modified. Restarting server...
+
+   INFO  Server running on [http://127.0.0.1:8000].
+
+  Press Ctrl+C to stop the server
+
+  2026-05-22 01:53:32 /test-admin-articles ......................... ~ 0.11ms
+  2026-05-22 01:53:32 /assets/panel/assets/img/illustrations/profiles/profile-2.png  ~ 0.05ms
+  2026-05-22 01:53:32 /assets/panel/assets/img/illustrations/profiles/profile-3.png  ~ 0.10ms
+  2026-05-22 01:53:32 /assets/panel/css/styles.css ................. ~ 0.19ms
+  2026-05-22 01:53:32 /assets/panel/assets/img/illustrations/profiles/profile-4.png  ~ 0.04ms
+  2026-05-22 01:53:32 /assets/panel/assets/img/illustrations/profiles/profile-5.png  ~ 0.09ms
+  2026-05-22 01:53:32 /assets/panel/assets/img/illustrations/profiles/profile-1.png  ~ 0.06ms
+  2026-05-22 01:53:32 /assets/panel/js/datatables/datatables-simple-demo.js  ~ 0.11ms
+  2026-05-22 01:53:32 /assets/panel/js/scripts.js .................. ~ 0.04ms
+  2026-05-22 01:53:32 /assets/panel/js/markdown.js ................. ~ 0.09ms
+  2026-05-22 01:53:32 /assets/panel/assets/fonts/metropolis/Metropolis-Regular.otf  ~ 0.08ms
+  2026-05-22 01:53:32 /assets/panel/assets/fonts/metropolis/Metropolis-Bold.otf  ~ 0.12ms
+  2026-05-22 01:53:32 /assets/panel/assets/fonts/metropolis/Metropolis-Medium.otf  ~ 0.16ms
+  2026-05-22 01:53:32 /assets/panel/assets/fonts/metropolis/Metropolis-RegularItalic.otf  ~ 0.21ms

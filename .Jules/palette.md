@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-05-22 - Styled Button Integration in Admin Table
+**Learning:** Admin templates often contain purely visual placeholder buttons (e.g. SB Admin Pro SVG icons) that are disconnected from the actual backend functionality, leading to a confusing UI where styled empty buttons sit next to plain text functional links.
+**Action:** When working in admin views, proactively search for unstyled backend functional links (like "Edit"/"Delete") and refactor them to use the template's beautiful SVG/icon button layouts. Always add context-specific `aria-label`s (like `aria-label="Delete: {{ $item->name }}"`) to these icon-only buttons for screen readers, and add `aria-hidden="true"` to the internal SVG.
