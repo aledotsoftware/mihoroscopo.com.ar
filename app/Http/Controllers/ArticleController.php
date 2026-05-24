@@ -159,7 +159,7 @@ class ArticleController extends Controller
 
     public function index()
     {
-        $page = request()->get('page', 1);
+        $page = request()->integer('page', 1);
 
         // ⚡ Bolt: CPU/Memory optimization.
         // What: Cached the article pagination query and the expensive regex loop.
