@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-11-26 - Added label ID association and visual indicators to admin forms
+**Learning:** Found admin form fields in 'articles/create.blade.php' missing 'id' attributes causing `<label>` disassociation, and missing required visual indicators, which are common UX issues that reduce accessibility and ease of use.
+**Action:** Always ensure all inputs have an ID that matches the 'for' attribute of their label, and add an explicit required indicator visually.
