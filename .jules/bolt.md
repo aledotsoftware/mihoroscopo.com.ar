@@ -72,3 +72,6 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+## 2026-05-18 - [Cache Key Pollution with query string parsing]
+**Learning:** When using user input like query string parameters (e.g., `page`) to construct cache keys in Laravel (e.g., `Cache::remember('articles_index_page_' . $page, ...)`), casting them implicitly or passing the raw value from `request()->get('page')` can lead to cache key pollution or fatal type errors if a malicious user passes an array instead of a string/integer (e.g., `?page[]=1`).
+**Action:** Always cast query parameters safely when used in cache keys, for example using `$request->integer('page', 1)` rather than `$request->get('page')`, to prevent cache key pollution and ensure type safety.
