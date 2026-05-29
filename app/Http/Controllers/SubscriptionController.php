@@ -114,10 +114,10 @@ class SubscriptionController extends Controller
      * @param string $email El correo electrónico del usuario.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByEmail($email)
+    private function getSubscriptionByEmail($email, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        return Subscription::select($columns)->where('email', $email)->first();
     }
 
     /**
@@ -126,11 +126,11 @@ class SubscriptionController extends Controller
      * @param string $email El correo electrónico del usuario.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByExternalReference($externalReference)
+    private function getSubscriptionByExternalReference($externalReference, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
 
-        return Subscription::where('external_reference', $externalReference)->first();
+        return Subscription::select($columns)->where('external_reference', $externalReference)->first();
     }
 
 
@@ -163,8 +163,12 @@ class SubscriptionController extends Controller
 
         $paymentType = $request->input('subscription');
 
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select() array to prevent fetching heavy TEXT/JSON columns when checking for existing subscriptions.
+        // Why: Hydrating massive payload columns into Eloquent models on a high-concurrency checkout flow wastes significant RAM and CPU.
+        // Impact: Drastically reduces memory footprint per checkout request and improves endpoint latency.
         // Verificar si el correo ya tiene una suscripción
-        $existingSubscription = $this->getSubscriptionByEmail($email);
+        $existingSubscription = $this->getSubscriptionByEmail($email, ['id', 'email', 'status', 'external_reference', 'payment_type', 'subscription_id', 'currency', 'country']);
 
         if ($existingSubscription) {
             // Si la suscripción existe y está pendiente o activa, devolver el punto de inicio existente
@@ -294,10 +298,15 @@ class SubscriptionController extends Controller
 
     public function reactivateSubscription($externalReference, $paymentType)
     {
+        // ⚡ Bolt: Memory optimization.
+        // What: Added select() array to prevent fetching heavy TEXT/JSON columns when reactivating subscriptions.
+        // Why: Hydrating massive payload columns into Eloquent models on a high-concurrency checkout flow wastes significant RAM and CPU.
+        //      Eloquent's save() only updates dirty attributes and doesn't nullify unselected attributes, so selecting just 'id' and 'email' is safe.
+        // Impact: Drastically reduces memory footprint and improves endpoint latency during subscription reactivation.
         // Realizar la consulta para obtener los datos de la suscripción
         // Convertir el resultado en un objeto Subscription usando external_reference
 
-        $subscription =  $this->getSubscriptionByExternalReference($externalReference);
+        $subscription =  $this->getSubscriptionByExternalReference($externalReference, ['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status']);
 
 
         // Depurar el objeto Subscription
