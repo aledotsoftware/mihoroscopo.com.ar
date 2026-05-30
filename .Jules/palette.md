@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-05-30 - Merging functional backend links with mock UI template elements
+**Learning:** When adopting HTML admin templates, developers sometimes leave redundant, plain-text functional links alongside beautiful but broken mock SVG buttons.
+**Action:** Always merge functional logic (like `href=route(...)` or form wrappers) directly into the styled template elements. Ensure action buttons have context-aware `aria-label`s (e.g., `"Editar artículo: {{ $article->title }}"`) and use Blade's `@js()` directive to safely interpolate variables into inline JS event handlers (like `onsubmit="return confirm(...)"`) to prevent syntax errors and XSS.
