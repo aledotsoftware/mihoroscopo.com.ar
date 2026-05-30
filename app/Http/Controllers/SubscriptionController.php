@@ -112,25 +112,27 @@ class SubscriptionController extends Controller
      * Obtiene una suscripción existente por correo electrónico.
      *
      * @param string $email El correo electrónico del usuario.
+     * @param array $columns Las columnas a retornar.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByEmail($email)
+    private function getSubscriptionByEmail($email, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        return Subscription::select($columns)->where('email', $email)->first();
     }
 
     /**
      * Obtiene una suscripción existente por correo electrónico.
      *
-     * @param string $email El correo electrónico del usuario.
+     * @param string $externalReference Referencia externa.
+     * @param array $columns Las columnas a retornar.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByExternalReference($externalReference)
+    private function getSubscriptionByExternalReference($externalReference, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
 
-        return Subscription::where('external_reference', $externalReference)->first();
+        return Subscription::select($columns)->where('external_reference', $externalReference)->first();
     }
 
 
@@ -164,7 +166,12 @@ class SubscriptionController extends Controller
         $paymentType = $request->input('subscription');
 
         // Verificar si el correo ya tiene una suscripción
-        $existingSubscription = $this->getSubscriptionByEmail($email);
+        // ⚡ Bolt: Memory optimization.
+        // What: Added column selection to prevent hydrating massive TEXT/JSON payload columns during subscription creation.
+        // Why: Calling getSubscriptionByEmail previously loaded the entire record (including the heavy 'response' and 'payload' columns)
+        //      which are completely unnecessary for simply checking the subscription status and retrieving the external reference.
+        // Impact: Greatly reduces memory allocation overhead and database transfer latency during high-concurrency checkout flow.
+        $existingSubscription = $this->getSubscriptionByEmail($email, ['id', 'email', 'status', 'external_reference']);
 
         if ($existingSubscription) {
             // Si la suscripción existe y está pendiente o activa, devolver el punto de inicio existente
@@ -297,7 +304,12 @@ class SubscriptionController extends Controller
         // Realizar la consulta para obtener los datos de la suscripción
         // Convertir el resultado en un objeto Subscription usando external_reference
 
-        $subscription =  $this->getSubscriptionByExternalReference($externalReference);
+        // ⚡ Bolt: Memory optimization.
+        // What: Added column selection to prevent hydrating massive TEXT/JSON payload columns during reactivation.
+        // Why: Calling getSubscriptionByExternalReference previously loaded the entire record (including 'response' and 'payload')
+        //      which are unnecessary since we only need specific fields for the MercadoPago createSubscription call and saving.
+        // Impact: Greatly reduces memory allocation overhead and database transfer latency when reactivating subscriptions.
+        $subscription =  $this->getSubscriptionByExternalReference($externalReference, ['id', 'email', 'service_id', 'payment_type', 'subscription_id', 'status']);
 
 
         // Depurar el objeto Subscription
