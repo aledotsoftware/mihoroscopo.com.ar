@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-05-31 - Improve error handling on landing page
+**Learning:** Silently reloading the page on network errors or missing data drops user state without feedback, creating confusion and frustration.
+**Action:** Replaced silent reloads and redirects in fetch error blocks with an accessible UI error modal, preserving user inputs and restoring button states so they can easily retry the action.

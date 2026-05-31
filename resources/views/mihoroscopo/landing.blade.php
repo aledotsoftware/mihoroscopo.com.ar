@@ -588,7 +588,15 @@
                         // Redirigir al usuario al init_point
                         window.location.href = data.init_point;
                     } else {
-                        window.location.href = "https://mihoroscopo.com.ar/landing";
+                        // Reset button state
+                        btnConfirmName.disabled = false;
+                        nameInput.disabled = false;
+                        btnConfirmName.classList.remove('btn-loading');
+                        btnConfirmName.removeAttribute('aria-busy');
+                        btnConfirmName.removeAttribute('aria-live');
+                        btnConfirmName.innerHTML = originalBtnText;
+
+                        showModal('Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo.', btnConfirmName);
                     }
 
 
@@ -604,8 +612,7 @@
                     btnConfirmName.removeAttribute('aria-live');
                     btnConfirmName.innerHTML = originalBtnText;
 
-                    // Recargar la página y volver al inicio
-                    window.location.reload();
+                    showModal('Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo.', btnConfirmName);
                 });
 
 
