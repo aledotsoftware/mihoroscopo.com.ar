@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-06-03 - Improve Error Handling for Async Form Submission
+**Learning:** Silently reloading the page (`window.location.reload()`) upon a failed async form submission (like a `fetch` API request) wipes out user input and offers no explanation, resulting in poor UX and accessibility.
+**Action:** Always replace silent page reloads on error with descriptive, accessible modal alerts (e.g., using `showModal`) and restore focus to the triggering element to maintain context and allow the user to retry the action.
