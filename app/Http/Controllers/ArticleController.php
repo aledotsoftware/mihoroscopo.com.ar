@@ -159,7 +159,9 @@ class ArticleController extends Controller
 
     public function index()
     {
-        $page = request()->get('page', 1);
+        // Use integer() to safely cast the page parameter, preventing cache key pollution
+        // and fatal 'Array to string conversion' errors if an array is maliciously passed in the URL.
+        $page = request()->integer('page', 1);
 
         // ⚡ Bolt: CPU/Memory optimization.
         // What: Cached the article pagination query and the expensive regex loop.
@@ -190,7 +192,15 @@ class ArticleController extends Controller
     public function show($slug)
     {
 
-        $article = Article::where('slug', $slug)->firstOrFail();
+        // ⚡ Bolt: Database and memory optimization.
+        // What: Wrapped the Article model retrieval inside Cache::remember for 5 minutes.
+        // Why: Articles are static content that rarely changes. Retrieving the model from the database
+        //      on every request causes unnecessary database queries and model hydration overhead.
+        // Impact: Eliminates redundant database SELECT queries and Eloquent ORM hydration for static content,
+        //         significantly improving response times under high load.
+        $article = Cache::remember('article_model_' . $slug, 300, function () use ($slug) {
+            return Article::where('slug', $slug)->firstOrFail();
+        });
 
         // ⚡ Bolt: CPU/Memory optimization.
         // What: Added caching to the Parsedown markdown compilation process.
