@@ -126,7 +126,7 @@
                                                 <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" aria-label="Eliminar artículo">Eliminar</button>
+                                                    <button type="submit" aria-label="Eliminar artículo: {{ $article->title }}">Eliminar</button>
                                                 </form>
                                             </td>
                                     @endforeach
@@ -297,7 +297,7 @@
                 <form action="" method="POST" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este artículo?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" aria-label="Eliminar artículo">Eliminar</button>
+                    <button type="submit" aria-label="Eliminar artículo: {{ $article->title }}">Eliminar</button>
                 </form>
             </td>
         </tr>
