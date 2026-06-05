@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-05-15 - Explicit Action Context
+**Learning:** While adding `aria-label` to action buttons is important, including context like the item title (e.g., `aria-label="Editar artículo: {{ $article->title }}"`) provides necessary context for screen reader users navigating by buttons. Also, when modifying inline SVG inside the button, `aria-hidden="true"` ensures the icon is ignored by the screen reader, prioritizing the `aria-label` on the parent button.
+**Action:** Always interpolate the dynamic model attribute (e.g., `title` or `name`) into the `aria-label` attribute and use `@js()` when interpolating into JavaScript strings (e.g. `onsubmit`) within admin dashboards/data tables to ensure safe and contextual interaction for all users.
