@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-06-07 - Merging HTML Template Mocks with Functional Elements
+**Learning:** When integrating HTML admin templates, it's common to find beautifully styled mock UI elements (like disconnected edit/delete icons) left alongside plain-text functional links. Leaving them separate causes confusion and clutters the UI.
+**Action:** Always merge these mock UI elements with the actual backend forms/links, and enhance them by ensuring dynamic, context-aware `aria-label` attributes are added (e.g., including the item name) and adding `aria-hidden="true"` to decorative SVG icons.
