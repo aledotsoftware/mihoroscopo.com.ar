@@ -114,10 +114,10 @@ class SubscriptionController extends Controller
      * @param string $email El correo electrónico del usuario.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByEmail($email)
+    private function getSubscriptionByEmail($email, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        return Subscription::select($columns)->where('email', $email)->first();
     }
 
     /**
@@ -164,7 +164,12 @@ class SubscriptionController extends Controller
         $paymentType = $request->input('subscription');
 
         // Verificar si el correo ya tiene una suscripción
-        $existingSubscription = $this->getSubscriptionByEmail($email);
+        // ⚡ Bolt: Memory optimization.
+        // What: Passed an explicit array of required database columns (id, status, external_reference) to getSubscriptionByEmail().
+        // Why: The subscriptions table contains massive TEXT/JSON columns ('response', 'payload') which are expensive to hydrate into memory.
+        //      In this high-concurrency checkout flow, we only need a few specific fields to determine if the subscription exists
+        //      and what its status is. Avoiding hydration of large columns speeds up request time.
+        $existingSubscription = $this->getSubscriptionByEmail($email, ['id', 'status', 'external_reference']);
 
         if ($existingSubscription) {
             // Si la suscripción existe y está pendiente o activa, devolver el punto de inicio existente
