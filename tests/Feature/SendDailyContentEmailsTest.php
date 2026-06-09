@@ -88,6 +88,7 @@ class SendDailyContentEmailsTest extends TestCase
                 $table->string('zodiac_sign');
                 $table->text('content');
                 $table->timestamps();
+                $table->index('date');
             });
         }
     }
