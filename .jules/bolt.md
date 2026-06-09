@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2024-05-14 - Optimize Eloquent hydration for subscription lookups
+**Learning:** The `subscriptions` table contains large `TEXT/JSON` columns like `payload` and `response`. Fetching the full model via `Subscription::where(...)->first()` during checkout and webhook callbacks causes significant memory overhead and CPU cycles for hydrating these massive columns, which are often unnecessary for the specific logic being executed.
+**Action:** When performing `first()` lookups on the `Subscription` model, especially in high-concurrency endpoints like `subscribe` or `reactivateSubscription`, always modify the getter signatures to accept an optional `$columns = ['*']` array and explicitly select only the required fields to avoid hydrating massive JSON payloads.
