@@ -57,3 +57,6 @@
 **Learning:** Using FontAwesome icons (e.g., `<i class="fa fa-star"></i>`) or simple text characters (e.g., `<span>o</span>`) as purely visual separators without `aria-hidden="true"` causes screen readers to announce redundant words ("star", "o"), adding confusing noise and degrading the experience for non-sighted users.
 **Action:** Always add `aria-hidden="true"` to icons and text elements that are purely decorative or visual separators to keep the accessibility tree clean and focused on meaningful semantic content.
 ## 2024-11-25 - Confirmation Dialogs for Destructive Actions\n**Learning:** Destructive actions like deleting an article in an admin table were implemented with immediate form submissions without any confirmation, risking accidental data loss. \n**Action:** Always require explicit confirmation for destructive actions. A simple `onsubmit="return confirm('...');"` on the form prevents accidents and is a quick, native UX win.
+## 2026-06-09 - Added aria-labels to generic Pricing Plan buttons
+**Learning:** Generic button text like 'Elegir Plan' (Choose Plan) in pricing tables lacks context for screen reader users navigating outside the flow.
+**Action:** When creating repeating cards or tables, ensure call-to-action buttons have descriptive aria-labels (e.g., `aria-label="Elegir plan Diario"`) that provide specific context.
