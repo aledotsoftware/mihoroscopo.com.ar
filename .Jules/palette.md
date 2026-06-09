@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-05-18 - Functional Integration of Template Mock Forms
+**Learning:** When replacing mock HTML admin template actions (e.g. `<a href="#!">` delete icons) with functional `<form method="POST">` elements, omitting the `action` attribute (i.e. `action=""`) submits the request to the *current URL* (the index page) rather than the specific resource route. This causes `MethodNotAllowedHttpException` errors for `DELETE` methods in Laravel.
+**Action:** Always verify that `<form>` tags injected to replace mock UI actions explicitly define the correct target route (e.g., `action="/admin/articles/{{ $article->id }}"`) to ensure the request is routed properly.
