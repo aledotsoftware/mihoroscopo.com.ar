@@ -69,7 +69,8 @@ class SendDailyContentEmails extends Command
 
         if ($email) {
             // Eager load extradata_horoscopes
-            $subscription = Subscription::with('extradata_horoscopes')
+            $subscription = Subscription::with('extradata_horoscopes:id,subscription_id,signo,name')
+                ->select(['id', 'email', 'external_reference', 'payment_type', 'subscription_id', 'status'])
                 ->where('email', $email)
                 ->first();
         
@@ -167,7 +168,7 @@ class SendDailyContentEmails extends Command
                 if ($subscription instanceof Subscription && $subscription->relationLoaded('extradata_horoscopes')) {
                     $extradataHoroscope = $subscription->extradata_horoscopes->first();
                 } else {
-                    $extradataHoroscope = ExtradataHoroscope::where('subscription_id', $subscription->id)->first();
+                    $extradataHoroscope = ExtradataHoroscope::select(['subscription_id', 'signo', 'name'])->where('subscription_id', $subscription->id)->first();
                 }
 
                 if ($extradataHoroscope) {
