@@ -31,29 +31,37 @@ class DiscordService
      */
     public function sendDiscordMessage($message, $imageUrl = null)
     {
-        try {
-            $client = new \GuzzleHttp\Client();
+        // ⚡ Bolt: Background execution optimization.
+        // What: Wrapped the synchronous Guzzle HTTP POST request to Discord inside Laravel's `defer()` helper.
+        // Why: Discord notifications are sent frequently during high-throughput webhook processing and batch commands.
+        //      Making a synchronous external API call blocks the HTTP thread, increasing endpoint latency and risking timeouts
+        //      from external providers (like Mercado Pago / dLocalGo) calling our webhooks.
+        // Impact: Drastically reduces HTTP response times and prevents external API network latency from blocking the application.
+        defer(function () use ($message, $imageUrl) {
+            try {
+                $client = new \GuzzleHttp\Client();
 
-            // Configurar la estructura del mensaje
-            $messageData = [
-                'content' => $message,
-            ];
+                // Configurar la estructura del mensaje
+                $messageData = [
+                    'content' => $message,
+                ];
 
-            // Agregar la URL de la imagen si está disponible
-            if ($imageUrl) {
-                $messageData['content'] .= "\nImage URL:  https://static.tudexnetworks.com/$imageUrl";
+                // Agregar la URL de la imagen si está disponible
+                if ($imageUrl) {
+                    $messageData['content'] .= "\nImage URL:  https://static.tudexnetworks.com/$imageUrl";
+                }
+
+                // Realizar la solicitud POST con multipart/form-data
+                $response = $client->post($this->webhookUrl, [
+                    'multipart' => $this->prepareMultipartFormData($messageData),
+                ]);
+
+                // Verificar si la petición fue exitosa
+                $responseBody = $response->getBody()->getContents();
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error al enviar el mensaje a Discord: " . $e->getMessage());
             }
-
-            // Realizar la solicitud POST con multipart/form-data
-            $response = $client->post($this->webhookUrl, [
-                'multipart' => $this->prepareMultipartFormData($messageData),
-            ]);
-
-            // Verificar si la petición fue exitosa
-            $responseBody = $response->getBody()->getContents();
-        } catch (\Exception $e) {
-            echo "Error al enviar el mensaje a Discord: " . $e->getMessage();
-        }
+        });
     }
 
 

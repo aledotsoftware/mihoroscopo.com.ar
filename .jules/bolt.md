@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-06-09 - Defer External Notifications to Reduce Webhook Latency
+**Learning:** Synchronous external API calls (e.g., sending Discord notifications via Guzzle) executed inside webhooks or batch processes block the main HTTP thread, artificially inflating TTFB (Time to First Byte). If an external notification endpoint is slow, it can cause the primary webhook request to time out and trigger unnecessary retries from providers.
+**Action:** Always wrap non-critical external API requests (like logging and chat notifications) inside Laravel 11's `defer()` helper. This ensures the primary HTTP response is sent immediately, and the notification is processed in the background.
