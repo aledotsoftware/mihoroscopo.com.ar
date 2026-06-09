@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-05-18 - [Safe select() optimization for generic getters]
+**Learning:** When using Eloquent `first()` inside high-concurrency flows, avoiding hydrating massive JSON/TEXT columns improves memory usage and DB I/O. However, hardcoding `select()` into generic getter methods (like `getSubscriptionByEmail`) can silently break other callers expecting the full model.
+**Action:** Modify the generic getter signature to accept an optional `$columns = ['*']` parameter. Then, update the specific high-throughput endpoints (like `subscribe` or `reactivateSubscription`) to pass the precise array of columns they require (e.g., `['id', 'status', 'external_reference']`), ensuring safety and backward compatibility while maximizing performance.
