@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-06-09 - Changed decorative plan buttons to functional links
+**Learning:** Empty, non-functional <button> elements in pricing or plan selection cards create a dead end for users, leading to frustration and lost conversions. Users expect clicking 'Elegir Plan' to navigate them to the checkout or subscription flow.
+**Action:** Always verify that call-to-action buttons in pricing tables are either functional forms or use semantic <a> tags styled as buttons to direct the user appropriately (e.g., to the '/landing' subscription page).
