@@ -548,18 +548,18 @@ class NotificationController extends Controller
      */
     private function getCurrencyFlag($currencyId)
     {
-        switch ($currencyId) {
-            case 'ARS':
-                return '🇦🇷'; // Bandera de Argentina
-            case 'UYU':
-                return '🇺🇾'; // Bandera de Uruguay
-            case 'BRL':
-                return '🇧🇷'; // Bandera de Brasil
-            case 'PYG':
-                return '🇵🇾'; // Bandera de Paraguay
-            default:
-                return ''; // Bandera por defecto si no hay coincidencia
-        }
+        // ⚡ Bolt: CPU optimization.
+        // What: Replaced the switch statement with a static hash map lookup.
+        // Why: Switch statements on strings are slightly slower due to sequential evaluation, whereas array lookups are O(1). This speeds up webhook processing and improves readability.
+        // Impact: Minor CPU cycle reduction per processed webhook.
+        static $flagMap = [
+            'ARS' => '🇦🇷', // Bandera de Argentina
+            'UYU' => '🇺🇾', // Bandera de Uruguay
+            'BRL' => '🇧🇷', // Bandera de Brasil
+            'PYG' => '🇵🇾', // Bandera de Paraguay
+        ];
+
+        return $flagMap[$currencyId] ?? '';
     }
 
     private function verifyMercadoPagoSignature(Request $request)
