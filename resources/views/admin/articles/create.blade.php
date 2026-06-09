@@ -5,17 +5,17 @@
 
     <form action="{{ route('articles.store') }}" method="POST">
         @csrf
-        <label for="slug">Slug:</label>
-        <input type="text" name="slug" required>
+        <label for="slug">Slug:<span class="required-indicator" aria-hidden="true">*</span></label>
+        <input type="text" id="slug" name="slug" required aria-required="true">
 
-        <label for="title">Título:</label>
-        <input type="text" name="title" required>
+        <label for="title">Título:<span class="required-indicator" aria-hidden="true">*</span></label>
+        <input type="text" id="title" name="title" required aria-required="true">
 
-        <label for="content">Contenido:</label>
-        <textarea name="content" required></textarea>
+        <label for="content">Contenido:<span class="required-indicator" aria-hidden="true">*</span></label>
+        <textarea id="content" name="content" required aria-required="true"></textarea>
 
         <label for="author_id">Autor ID:</label>
-        <input type="number" name="author_id">
+        <input type="number" id="author_id" name="author_id">
 
         <button type="submit" id="submitArticleBtn">Guardar Artículo</button>
     </form>

@@ -50,18 +50,18 @@
                     <div class="col-lg-8">
 
                         <div class="card mb-4">
-                            <div class="card-header">Slug</div>
+                            <div class="card-header"><label for="slug">Slug<span class="required-indicator" aria-hidden="true">*</span></label></div>
                             <div class="card-body">
-                                <input class="form-control" id="postTitleInput" type="text" placeholder="slug" name="slug"
-                                    value="{{ $article->slug }}">
+                                <input class="form-control" id="slug" type="text" placeholder="slug" name="slug"
+                                    value="{{ $article->slug }}" required aria-required="true">
                             </div>
                         </div>
 
                         <div class="card mb-4">
-                            <div class="card-header">Titulo del articulo</div>
+                            <div class="card-header"><label for="title">Titulo del articulo<span class="required-indicator" aria-hidden="true">*</span></label></div>
                             <div class="card-body">
-                                <input class="form-control" id="postTitleInput" type="text"
-                                    placeholder="Enter your post title..." name="title" value="{{ $article->title }}">
+                                <input class="form-control" id="title" type="text"
+                                    placeholder="Enter your post title..." name="title" value="{{ $article->title }}" required aria-required="true">
                             </div>
                         </div>
                         <div class="card card-header-actions mb-4">
@@ -82,7 +82,7 @@
                         </div>
                         <div class="card card-header-actions mb-4 mb-lg-0">
                             <div class="card-header">
-                                Contenido del articulo
+                                <label for="postEditor">Contenido del articulo<span class="required-indicator" aria-hidden="true">*</span></label>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="feather feather-info text-muted" data-bs-toggle="tooltip"
@@ -95,7 +95,7 @@
                                 </svg>
                             </div>
                             <div class="card-body">
-                                <textarea id="postEditor" name="content"   style="display: none;">{{ $article->content }}</textarea>
+                                <textarea id="postEditor" name="content" aria-required="true" style="display: none;">{{ $article->content }}</textarea>
 
                             </div>
                         </div>
