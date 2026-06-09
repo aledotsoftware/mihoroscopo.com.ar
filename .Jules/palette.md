@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-06-09 - Adding aria-hidden to decorative SVGs in buttons with aria-label
+**Learning:** When using purely decorative SVG icons within action buttons (like Edit/Delete) that already possess an `aria-label`, it is essential to apply `aria-hidden="true"` to the `<svg>` element. This prevents screen readers from redundantly announcing the graphic when the parent button already provides full context via its aria-label.
+**Action:** Always verify that decorative icons nested inside elements with explicit aria labels include the `aria-hidden="true"` attribute.
