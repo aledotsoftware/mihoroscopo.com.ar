@@ -60,3 +60,9 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2026-06-11 - Merge Template UI with Backend Forms
+**Learning:** When using administrative dashboard templates, default template UI buttons (like delete icons) often point to dead links () or static HTML files. Leaving plain-text functional links below these styled template buttons creates visual clutter and a disjointed user experience.
+**Action:** Always wire the actual backend form submissions and dynamic route generation into the polished template buttons to unify form and function, ensuring proper  attributes are applied to the newly functional UI.
+## 2023-10-27 - Merge Template UI with Backend Forms
+**Learning:** When using administrative dashboard templates, default template UI buttons (like delete icons) often point to dead links (`#!`) or static HTML files. Leaving plain-text functional links below these styled template buttons creates visual clutter and a disjointed user experience.
+**Action:** Always wire the actual backend form submissions and dynamic route generation into the polished template buttons to unify form and function, ensuring proper `aria-label` attributes are applied to the newly functional UI.
