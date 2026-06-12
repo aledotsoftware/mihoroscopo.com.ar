@@ -72,3 +72,6 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+## 2026-06-12 - [Safe select() optimization for single record retrievals]
+**Learning:** When retrieving single records via Eloquent `first()` in controllers, passing an array of specific columns to `select()` (or passing it dynamically into a repository method) significantly reduces memory and CPU overhead by avoiding the hydration of large TEXT/JSON columns.
+**Action:** Always verify the required properties and implement explicit column selection in single record queries or repository getters, defaulting to `['*']` to preserve backwards compatibility for callers that might need the full model.
