@@ -72,3 +72,6 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+## 2026-06-15 - [O(1) Map Lookups Over Large Switch Statements]
+**Learning:** Using large string-based `switch` statements for simple key-value mappings (like mapping country codes to currencies in `SubscriptionController`) incurs redundant conditional branching overhead.
+**Action:** In high-throughput functions, prefer using static array maps (`static $map = [...]; return $map[$key] ?? $default;`) to provide constant-time O(1) lookups. This saves CPU cycles and significantly improves code readability.
