@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-11-25 - Contextual Admin Table Actions
+**Learning:** In admin data tables, generic icon-only action buttons (e.g., "Edit" or "Delete") lack context for screen reader users, who hear "Edit" repeatedly without knowing *which* item they are editing. Additionally, using standard `<a>` tags for destructive actions like deleting, or empty forms `action=""` which rely on implicit submission logic, create frustrating routing bugs and accidental data loss.
+**Action:** Always wrap delete actions in a semantic `<form>` pointing to the explicit resource URL (`action="/admin/resource/{{ $id }}"`), require confirmation via `onsubmit="return confirm(...);"`, and ensure action buttons include the item's title in their `aria-label` (e.g., `aria-label="Eliminar artículo: {{ $title }}"`) to provide vital context.
