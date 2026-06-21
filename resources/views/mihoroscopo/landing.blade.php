@@ -604,8 +604,8 @@
                     btnConfirmName.removeAttribute('aria-live');
                     btnConfirmName.innerHTML = originalBtnText;
 
-                    // Recargar la página y volver al inicio
-                    window.location.reload();
+                    // Mostrar error y no recargar
+                    showModal('Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo.', btnConfirmName);
                 });
 
 
