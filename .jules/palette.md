@@ -57,3 +57,7 @@
 **Learning:** Using FontAwesome icons (e.g., `<i class="fa fa-star"></i>`) or simple text characters (e.g., `<span>o</span>`) as purely visual separators without `aria-hidden="true"` causes screen readers to announce redundant words ("star", "o"), adding confusing noise and degrading the experience for non-sighted users.
 **Action:** Always add `aria-hidden="true"` to icons and text elements that are purely decorative or visual separators to keep the accessibility tree clean and focused on meaningful semantic content.
 ## 2024-11-25 - Confirmation Dialogs for Destructive Actions\n**Learning:** Destructive actions like deleting an article in an admin table were implemented with immediate form submissions without any confirmation, risking accidental data loss. \n**Action:** Always require explicit confirmation for destructive actions. A simple `onsubmit="return confirm('...');"` on the form prevents accidents and is a quick, native UX win.
+
+## 2024-06-22 - Integrated Mock Template Actions
+**Learning:** The admin index views often copy-paste third-party HTML template mockups directly alongside actual functional backend links (e.g. putting a working plain text "Eliminar" link directly underneath a styled, non-functional trashcan icon `<a href="#!">`). This causes severe UI clutter, redundant tab-stops for keyboard users, and confusion.
+**Action:** When adding or auditing admin views derived from templates, ensure mock UI elements are functionally integrated with the backend routes and the redundant plain text links are removed.
