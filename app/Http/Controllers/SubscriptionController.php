@@ -494,44 +494,31 @@ class SubscriptionController extends Controller
     //getCurrencyByCountr
     private function getCurrencyByCountry($country)
     {
+        // ⚡ Bolt: CPU optimization.
+        // What: Replaced string-based switch statement with a static array map.
+        // Why: Switch statements on strings are slower in PHP because they evaluate sequentially. A static hash map
+        //      provides an O(1) constant-time lookup and avoids re-initializing the array on every method call.
+        // Impact: Reduces CPU cycles and execution time during high-throughput subscription creation flows.
+        static $currencyMap = [
+            'AR' => 'ARS',
+            'BO' => 'BOB',
+            'BR' => 'BRL',
+            'CL' => 'CLP',
+            'CO' => 'COP',
+            'CR' => 'CRC',
+            'EC' => 'USD',
+            'GT' => 'GTQ',
+            'ID' => 'IDR',
+            'KE' => 'KES',
+            'MX' => 'MXN',
+            'MY' => 'MYR',
+            'NG' => 'NGN',
+            'PA' => 'USD',
+            'PE' => 'PEN',
+            'PY' => 'PYG',
+            'UY' => 'UYU',
+        ];
 
-        switch ($country) {
-            case 'AR':
-                return 'ARS';
-            case 'BO':
-                return 'BOB';
-            case 'BR':
-                return 'BRL';
-            case 'CL':
-                return 'CLP';
-            case 'CO':
-                return 'COP';
-            case 'CR':
-                return 'CRC';
-            case 'EC':
-                return 'USD';
-            case 'GT':
-                return 'GTQ';
-            case 'ID':
-                return 'IDR';
-            case 'KE':
-                return 'KES';
-            case 'MX':
-                return 'MXN';
-            case 'MY':
-                return 'MYR';
-            case 'NG':
-                return 'NGN';
-            case 'PA':
-                return 'USD';
-            case 'PE':
-                return 'PEN';
-            case 'PY':
-                return 'PYG';
-            case 'UY':
-                return 'UYU';
-            default:
-                return 'USD';
-        }
+        return $currencyMap[$country] ?? 'USD';
     }
 }
