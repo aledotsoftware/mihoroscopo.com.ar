@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-05-17 - Admin Template Integration UX Insights
+**Learning:** When importing third-party HTML admin templates (like SB Admin), the beautifully styled mock action buttons (e.g., Edit/Delete with SVGs) are often entirely disconnected from the actual backend logic, leaving duplicate plain-text functional links alongside them.
+**Action:** Always verify that decorative template action buttons within `@foreach` loops are properly wired up to backend routes (`href="/resource/{{ $id }}/edit"` and `<form action="/resource/{{ $id }}">`) and include descriptive dynamic `aria-label`s (e.g., `aria-label="Edit item: {{ $title }}"`). Never leave redundant plain functional links next to styled mock links.
