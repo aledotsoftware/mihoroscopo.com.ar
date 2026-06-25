@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2026-06-25 - Make Pricing Action Buttons Functional
+**Learning:** Pricing tables or decorative cards often contain non-functional `<button>` tags (e.g., `<button type="button">`) creating UX dead ends where users expect to click through to a checkout or sign-up flow.
+**Action:** Always verify that call-to-action buttons in pricing tables or decorative cards are functional. Convert empty, non-functional `<button>` elements into semantic `<a>` tags routing to the appropriate flow with `role="button"` and descriptive `aria-label` attributes.
