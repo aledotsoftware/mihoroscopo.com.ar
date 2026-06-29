@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\DiscordService;
-use App\Models\Subscription;
-use App\Services\MercadoPagoService;
-use App\Models\Notification; // Asegúrate de importar el modelo Notification
+use App\Mail\SubscriptionConfirmationMail;
+use App\Models\Notification;
 use App\Models\Payment;
+use App\Models\Subscription;
+use App\Services\DiscordService; // Asegúrate de importar el modelo Notification
+use App\Services\MercadoPagoService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
-use App\Mail\SubscriptionConfirmationMail;
 use Illuminate\Support\Facades\Mail;
 
 class NotificationController extends Controller
 {
-
     private $discordService;
+
     private $mercadoPagoService;
 
     /**
@@ -42,8 +42,7 @@ class NotificationController extends Controller
      * y envía un enlace público del archivo a un canal de Discord. Además, guarda la notificación en la base de datos y
      * la maneja según su tipo, llamando a los métodos apropiados para cada tipo de notificación.
      *
-     * @param \Illuminate\Http\Request $request La solicitud entrante que contiene los datos de la notificación.
-     *
+     * @param  \Illuminate\Http\Request  $request  La solicitud entrante que contiene los datos de la notificación.
      * @return void
      */
     public function toQueue(Request $request)
@@ -59,14 +58,16 @@ class NotificationController extends Controller
         // Authenticate signatures synchronously before deferring, and return 403 if invalid
         $data = $request->all();
         if (isset($data['type'])) {
-            if (!$this->verifyMercadoPagoSignature($request)) {
+            if (! $this->verifyMercadoPagoSignature($request)) {
                 \Log::warning('Invalid MercadoPago signature');
+
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
         } else {
             if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
-                if (!$this->verifyDlocalGoSignature($request)) {
+                if (! $this->verifyDlocalGoSignature($request)) {
                     \Log::warning('Invalid DlocalGo signature');
+
                     return response()->json(['error' => 'Unauthorized'], 403);
                 }
             }
@@ -77,29 +78,29 @@ class NotificationController extends Controller
         $headers = $request->headers->all();
         $queryParams = $request->query();
 
-        defer(function () use ($data, $body, $headers, $queryParams) {
+        defer(function () use ($data, $body, $headers) {
             // Reenviar la solicitud al endpoint externo
 
             // Crear un array con toda la información a guardar
             $log_data = [
                 'headers' => $headers,
                 'body' => $body,
-                'data' => $data
+                'data' => $data,
             ];
 
             // Convertir los datos a JSON para guardar en un archivo
             $log_json = json_encode($log_data, JSON_PRETTY_PRINT);
 
             // Definir el nombre del archivo
-            $file_name = 'logs/mercadopago_notification_' . now()->format('Y-m-d_H-i-s') . '.json';
+            $file_name = 'logs/mercadopago_notification_'.now()->format('Y-m-d_H-i-s').'.json';
 
             // Guardar el archivo directamente en la carpeta public/logs
             file_put_contents(public_path($file_name), $log_json);
 
             // Crear un link público al archivo
-            $public_link = url('logs/' . basename($file_name));
+            $public_link = url('logs/'.basename($file_name));
 
-            $this->discordService->sendDiscordMessage('Nueva notificación recibida: ' . $public_link);
+            $this->discordService->sendDiscordMessage('Nueva notificación recibida: '.$public_link);
 
             // Guardar la notificación en la base de datos
             $this->saveNotification($data);
@@ -132,6 +133,7 @@ class NotificationController extends Controller
                 if (isset($data['invoiceId']) && isset($data['mid']) && isset($data['subscriptionId'])) {
                     // Es una notificación de dLocalGo
                     $this->handleDlocalGoNotification($data);
+
                     return;
                 }
                 $this->handleDefault($data);
@@ -149,8 +151,9 @@ class NotificationController extends Controller
             $subscriptionId = $data['subscriptionId'] ?? null;
             $invoiceId = $data['invoiceId'] ?? null;
 
-            if (!$subscriptionId || !$invoiceId) {
-                $this->discordService->sendDiscordMessage("Error: Faltan parámetros necesarios en la notificación de dLocalGo");
+            if (! $subscriptionId || ! $invoiceId) {
+                $this->discordService->sendDiscordMessage('Error: Faltan parámetros necesarios en la notificación de dLocalGo');
+
                 return;
             }
 
@@ -163,7 +166,7 @@ class NotificationController extends Controller
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $apiKey
+                'Authorization: Bearer '.$apiKey,
             ]);
 
             $response = curl_exec($ch);
@@ -172,22 +175,25 @@ class NotificationController extends Controller
 
             if ($httpCode !== 200) {
                 $this->discordService->sendDiscordMessage("Error al obtener datos de dLocalGo: HTTP $httpCode");
+
                 return;
             }
 
             $executionData = json_decode($response, true);
-            if (!$executionData) {
-                $this->discordService->sendDiscordMessage("Error al decodificar respuesta de dLocalGo");
+            if (! $executionData) {
+                $this->discordService->sendDiscordMessage('Error al decodificar respuesta de dLocalGo');
+
                 return;
             }
 
             // Validar campos requeridos
-            if (!isset($executionData['subscription']['id']) || 
-                !isset($executionData['subscription']['client_email']) ||
-                !isset($executionData['status']) ||
-                !isset($executionData['subscription']['plan']['frequency_type']) ||
-                !isset($executionData['subscription']['plan']['frequency_value'])) {
-                $this->discordService->sendDiscordMessage("Error: Faltan campos requeridos en la respuesta de dLocalGo");
+            if (! isset($executionData['subscription']['id']) ||
+                ! isset($executionData['subscription']['client_email']) ||
+                ! isset($executionData['status']) ||
+                ! isset($executionData['subscription']['plan']['frequency_type']) ||
+                ! isset($executionData['subscription']['plan']['frequency_value'])) {
+                $this->discordService->sendDiscordMessage('Error: Faltan campos requeridos en la respuesta de dLocalGo');
+
                 return;
             }
 
@@ -198,8 +204,9 @@ class NotificationController extends Controller
             // Buscar la suscripción
             $subscription = Subscription::select(['id', 'email', 'subscription_id', 'status', 'valid_until', 'charged_amount', 'charged_quantity'])
                 ->where('email', $executionData['subscription']['client_email'])->first();
-            if (!$subscription) {
-                $this->discordService->sendDiscordMessage("Error: No se encontró la suscripción para el email: " . $executionData['subscription']['client_email']);
+            if (! $subscription) {
+                $this->discordService->sendDiscordMessage('Error: No se encontró la suscripción para el email: '.$executionData['subscription']['client_email']);
+
                 return;
             }
 
@@ -212,12 +219,12 @@ class NotificationController extends Controller
             // Calcular valid_until según el tipo de frecuencia y valor
             $frequencyType = $executionData['subscription']['plan']['frequency_type'];
             $frequencyValue = $executionData['subscription']['plan']['frequency_value'];
-            
+
             switch (strtoupper($frequencyType)) {
                 case 'DAILY':
                     $subscription->valid_until = now()->addDays($frequencyValue);
                     break;
-                case 'MONTHLY': 
+                case 'MONTHLY':
                     $subscription->valid_until = now()->addMonths($frequencyValue);
                     break;
                 case 'YEARLY':
@@ -226,11 +233,11 @@ class NotificationController extends Controller
                 default:
                     $subscription->valid_until = now()->addDays($frequencyValue);
             }
-           
+
             $subscription->response = json_encode($executionData);
             $subscription->charged_amount = $executionData['subscription']['plan']['amount'];
             $subscription->charged_quantity = $executionData['subscription']['plan']['frequency_value'];
-        
+
             $subscription->save();
 
             // Crear un nuevo pago
@@ -265,18 +272,10 @@ class NotificationController extends Controller
             // );
 
         } catch (\Exception $e) {
-            $this->discordService->sendDiscordMessage("Error procesando notificación dLocalGo: " . $e->getMessage());
+            $this->discordService->sendDiscordMessage('Error procesando notificación dLocalGo: '.$e->getMessage());
             throw $e;
         }
     }
-
-
-
-
-
-
-
-
 
     /**
      * Guarda una notificación en la base de datos.
@@ -285,9 +284,9 @@ class NotificationController extends Controller
      * basados en los datos proporcionados, y guarda la instancia en la base de datos. La función devuelve
      * el objeto `Notification` guardado.
      *
-     * @param array $data Datos de la notificación que se van a guardar. El array debe tener la siguiente estructura:
-     *                     - 'type' (string, opcional): Tipo de la notificación. Si no se proporciona, se usará 'unknown'.
-     *                     - 'data' (array): Datos relacionados con la notificación. Debe contener al menos un 'id'.
+     * @param  array  $data  Datos de la notificación que se van a guardar. El array debe tener la siguiente estructura:
+     *                       - 'type' (string, opcional): Tipo de la notificación. Si no se proporciona, se usará 'unknown'.
+     *                       - 'data' (array): Datos relacionados con la notificación. Debe contener al menos un 'id'.
      * @return \App\Models\Notification Devuelve el objeto `Notification` que se ha guardado en la base de datos.
      *
      * @throws \InvalidArgumentException Si el array `$data` no contiene una clave 'data' con un 'id' válido.
@@ -307,9 +306,9 @@ class NotificationController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
         return $notificationId;
     }
-
 
     /**
      * Maneja la preaprobación de suscripciones y actualiza la base de datos con la información recibida.
@@ -318,8 +317,8 @@ class NotificationController extends Controller
      * información de la suscripción a partir del ID proporcionado, actualiza el modelo de suscripción en la base
      * de datos y envía un mensaje a Discord con los detalles de la suscripción.
      *
-     * @param array $data Datos de la notificación de suscripción preaprobada. El array debe tener la siguiente estructura:
-     *                     - 'data' (array): Debe contener al menos una clave 'id' con el ID de la suscripción.
+     * @param  array  $data  Datos de la notificación de suscripción preaprobada. El array debe tener la siguiente estructura:
+     *                       - 'data' (array): Debe contener al menos una clave 'id' con el ID de la suscripción.
      * @return void
      *
      * @throws \Exception Si ocurre un error al intentar obtener la suscripción desde Mercado Pago.
@@ -330,7 +329,8 @@ class NotificationController extends Controller
         $subscriptionId = $data['data']['id'] ?? null;
         // Verifica que el ID de la suscripción no sea nulo
         if ($subscriptionId === null) {
-            $this->discordService->sendDiscordMessage("Error: ID de suscripción no encontrado en los datos.");
+            $this->discordService->sendDiscordMessage('Error: ID de suscripción no encontrado en los datos.');
+
             return;
         }
         // try {
@@ -338,8 +338,9 @@ class NotificationController extends Controller
         $subscription = $this->mercadoPagoService->getSubscription($subscriptionId);
 
         // Verifica que la suscripción haya sido recuperada
-        if (!$subscription) {
+        if (! $subscription) {
             $this->discordService->sendDiscordMessage("Error: No se pudo obtener la suscripción con ID: $subscriptionId.");
+
             return;
         }
 
@@ -364,23 +365,22 @@ class NotificationController extends Controller
         $subscriptionModel->save();
 
         // $this->emailService->sendWelcomeEmail($email,$email);
-        $message = "";
+        $message = '';
         $message .= "\n📩 Notificación de suscripción recibida.\n";
         $message .= "================================\n";
         $message .= "ACTUALIZACIÓN DE SUSCRIPCIÓN\n";
         $message .= "================================\n";
-        $message .= "ID : " . $subscriptionId . "\n";
-        $message .= ":traffic_light: Estado : " . $subscriptionModel->status . "\n";
-        $message .= ":calendar_spiral: Fecha próximo pago: " . $subscriptionModel->next_payment_date . "\n";
-        $message .= "Frecuencia: " . $subscriptionModel->frequency . "\n";
-        $message .= "Tipo: " . $subscriptionModel->frequency_type . "\n";
-        $message .= ":timer: Dias desde el alta: " . $subscriptionModel->charged_quantity  . "\n";
-        $message .= ":moneybag: Monto cargado: " . $subscriptionModel->charged_amount  . "\n";
-        $message .= ":calendar_spiral: Última fecha de carga: " . ($subscription['summarized']['last_charged_date'] ?? 'N/A') . "\n";
+        $message .= 'ID : '.$subscriptionId."\n";
+        $message .= ':traffic_light: Estado : '.$subscriptionModel->status."\n";
+        $message .= ':calendar_spiral: Fecha próximo pago: '.$subscriptionModel->next_payment_date."\n";
+        $message .= 'Frecuencia: '.$subscriptionModel->frequency."\n";
+        $message .= 'Tipo: '.$subscriptionModel->frequency_type."\n";
+        $message .= ':timer: Dias desde el alta: '.$subscriptionModel->charged_quantity."\n";
+        $message .= ':moneybag: Monto cargado: '.$subscriptionModel->charged_amount."\n";
+        $message .= ':calendar_spiral: Última fecha de carga: '.($subscription['summarized']['last_charged_date'] ?? 'N/A')."\n";
 
         $this->discordService->sendDiscordMessage($message);
     }
-
 
     /**
      * Maneja la notificación de un pago autorizado para una suscripción.
@@ -388,8 +388,7 @@ class NotificationController extends Controller
      * Esta función recibe los datos de un pago autorizado para una suscripción, consulta detalles adicionales
      * usando el servicio de Mercado Pago, y envía un mensaje a Discord con la información del pago.
      *
-     * @param array $data Los datos del pago recibido, típicamente desde una notificación o webhook.
-     *
+     * @param  array  $data  Los datos del pago recibido, típicamente desde una notificación o webhook.
      * @return void
      */
     private function handleSubscriptionAuthorizedPayment($data)
@@ -400,12 +399,11 @@ class NotificationController extends Controller
         $message = "\n\n================================\n";
         $message .= "PAGO DE SUSCRIPCIÓN AUTORIZADO\n";
         $message = "\n\n================================\n";
-        $message .= "ID del pago: " . $paymentId . "\n";
-        $message .= ":traffic_light: Estado del pago: " . ($payment['status'] ?? 'N/A') . "\n";
-        $message .= ":moneybag: Monto del pago: " . ($payment['total_paid_amount'] ?? 'N/A') . " " . ($payment['currency_id'] ?? '') . "\n";
+        $message .= 'ID del pago: '.$paymentId."\n";
+        $message .= ':traffic_light: Estado del pago: '.($payment['status'] ?? 'N/A')."\n";
+        $message .= ':moneybag: Monto del pago: '.($payment['total_paid_amount'] ?? 'N/A').' '.($payment['currency_id'] ?? '')."\n";
         $this->discordService->sendDiscordMessage($message);
     }
-
 
     /**
      * Maneja la información de un pago recibido y actualiza el modelo de pago en la base de datos.
@@ -414,20 +412,15 @@ class NotificationController extends Controller
      * actualiza o crea un registro en la base de datos con la información del pago, y envía un mensaje a Discord
      * con detalles del pago.
      *
-     * @param array $data Los datos del pago recibidos, típicamente desde una notificación o webhook.
-     *
+     * @param  array  $data  Los datos del pago recibidos, típicamente desde una notificación o webhook.
      * @return void
      */
-
-
     private function handlePayment($data)
     {
         $paymentId = $data['data']['id'] ?? 'N/A';
         $payment = $this->mercadoPagoService->getPayment($paymentId);
 
-
         $payment = json_decode($payment, true); // Decodifica el JSON a un array asociativo
-
 
         // ⚡ Bolt: Database write optimization.
         // What: Replaced Payment::where()->first() and new Payment()->save() with DB::table('payment')->updateOrInsert().
@@ -461,7 +454,6 @@ class NotificationController extends Controller
             ]
         );
 
-
         // SE ENVIA EL MAIL AL CORREO CUYO PAYMENT SEA EL CORESPONDIENTE SIEMPRE QUE NO SE HAYA ENVIADO ANTES
 
         // var_dump($paymentModel->external_reference);
@@ -476,8 +468,6 @@ class NotificationController extends Controller
 
         // //var_dump( $subscriptionModel);
 
-
-
         // $command = new SendDailyContentEmails();
 
         // // var_dump($subscriptionModel->email);
@@ -488,7 +478,7 @@ class NotificationController extends Controller
         if ($subscriptionModel) {
             if ($subscriptionModel->first_send != 1) {
                 // Verifica si el email existe antes de usarlo
-                if (!empty($subscriptionModel->email)) {
+                if (! empty($subscriptionModel->email)) {
                     Mail::to($subscriptionModel->email)->send(new SubscriptionConfirmationMail($subscriptionModel));
                     Artisan::call('send:daily-content-emails', ['email' => $subscriptionModel->email]);
 
@@ -500,22 +490,22 @@ class NotificationController extends Controller
             }
         } else {
             \Log::error('El modelo Subscription no existe o no pudo ser cargado.');
+
             return response()->json(['error' => 'Suscripción no encontrada'], 404);
         }
 
-
-        $message  = "";
-        $message  .= "================================\n";
+        $message = '';
+        $message .= "================================\n";
         $message .= ":dollar: PAGO \n";
         $message .= "================================\n";
-        $message .= "ID del pago: " . $paymentId . "\n";
-        $message .= ":traffic_light: Estado del pago: " .  $status . "\n";
+        $message .= 'ID del pago: '.$paymentId."\n";
+        $message .= ':traffic_light: Estado del pago: '.$status."\n";
         // Determinar la bandera basada en el currency_id
         $flag = $this->getCurrencyFlag($currencyId);
-        $message .= ":moneybag: Monto del pago: " . $totalPaidAmount . " " . $currencyId . " " . $flag . "\n";
-        $message .= ":moneybag: Monto del pago recibido: " . $netReceivedAmount . " " . $currencyId . " " . $flag . "\n";
-        $message .= ":link: Referencia externa: " . $externalReference . "\n";
-        $message .= ":link: Email de envio: " . $subscriptionModel->email;
+        $message .= ':moneybag: Monto del pago: '.$totalPaidAmount.' '.$currencyId.' '.$flag."\n";
+        $message .= ':moneybag: Monto del pago recibido: '.$netReceivedAmount.' '.$currencyId.' '.$flag."\n";
+        $message .= ':link: Referencia externa: '.$externalReference."\n";
+        $message .= ':link: Email de envio: '.$subscriptionModel->email;
         $this->discordService->sendDiscordMessage($message);
     }
 
@@ -525,16 +515,14 @@ class NotificationController extends Controller
      * Esta función crea un mensaje estándar para las notificaciones que no tienen detalles
      * específicos y lo envía a través del servicio de Discord.
      *
-     * @param mixed $data Datos recibidos que no se utilizan en esta función.
-     *
+     * @param  mixed  $data  Datos recibidos que no se utilizan en esta función.
      * @return void
      */
     private function handleDefault($data)
     {
-        $message = ":rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light:  notificacion desonocida";
+        $message = ':rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light: :rotating_light:  notificacion desonocida';
         $this->discordService->sendDiscordMessage($message);
     }
-
 
     /**
      * Obtiene la bandera correspondiente a una moneda basada en su ID.
@@ -542,24 +530,25 @@ class NotificationController extends Controller
      * Esta función recibe un ID de moneda y devuelve el emoji de la bandera asociada a esa moneda.
      * Si no se encuentra una coincidencia para el ID de moneda, se devuelve una cadena vacía.
      *
-     * @param string $currencyId El ID de la moneda para la cual se desea obtener la bandera.
-     *
+     * @param  string  $currencyId  El ID de la moneda para la cual se desea obtener la bandera.
      * @return string El emoji de la bandera correspondiente a la moneda proporcionada, o una cadena vacía si no hay coincidencia.
      */
     private function getCurrencyFlag($currencyId)
     {
-        switch ($currencyId) {
-            case 'ARS':
-                return '🇦🇷'; // Bandera de Argentina
-            case 'UYU':
-                return '🇺🇾'; // Bandera de Uruguay
-            case 'BRL':
-                return '🇧🇷'; // Bandera de Brasil
-            case 'PYG':
-                return '🇵🇾'; // Bandera de Paraguay
-            default:
-                return ''; // Bandera por defecto si no hay coincidencia
-        }
+        // ⚡ Bolt: Performance optimization.
+        // What: Replaced string-based switch statement with a static array map.
+        // Why: Using a static array map provides O(1) constant-time lookup, saving CPU cycles
+        //      by avoiding multiple string comparisons for simple key-value pairs during
+        //      high-throughput webhook processing.
+        // Impact: Reduces CPU time spent evaluating currency flags.
+        static $flags = [
+            'ARS' => '🇦🇷', // Bandera de Argentina
+            'UYU' => '🇺🇾', // Bandera de Uruguay
+            'BRL' => '🇧🇷', // Bandera de Brasil
+            'PYG' => '🇵🇾', // Bandera de Paraguay
+        ];
+
+        return $flags[$currencyId] ?? '';
     }
 
     private function verifyMercadoPagoSignature(Request $request)
@@ -584,8 +573,12 @@ class NotificationController extends Controller
         foreach ($parts as $part) {
             $item = explode('=', trim($part), 2);
             if (count($item) == 2) {
-                if ($item[0] == 'ts') $ts = $item[1];
-                if ($item[0] == 'v1') $v1 = $item[1];
+                if ($item[0] == 'ts') {
+                    $ts = $item[1];
+                }
+                if ($item[0] == 'v1') {
+                    $v1 = $item[1];
+                }
             }
         }
 
@@ -614,6 +607,7 @@ class NotificationController extends Controller
         // Usually "Bearer <token>"
         if (strpos($authHeader, 'Bearer ') === 0) {
             $token = substr($authHeader, 7);
+
             return hash_equals($secret, $token);
         }
 
