@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2024-11-26 - Integrating Template UI with Form Actions
+**Learning:** This app's admin panel sometimes has beautifully styled mock UI buttons (like delete icons) sitting right next to unstyled, functional plain-text links/forms. This creates confusion, causes functional dead ends, and repeating uncontextualized text (like 'Editar') confuses screen readers.
+**Action:** Always merge these mock UI elements with the actual functional forms. Wrap the SVG within the functional form's `<button type="submit">`, ensuring it carries the correct styling classes, specific `action` route, and descriptive `aria-label`s interpolating the item's title (e.g. `aria-label="Eliminar artículo: {{ $article->title }}"`).
