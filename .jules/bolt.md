@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-06-30 - [Missing Index on content tables]
+**Learning:** Content tables (`content_astral_guide`, `content_daily_astro_advice`, etc.) are frequently queried by `date` in the `SendDailyContentEmails` command, but lacked an index on this column, causing full table scans during daily batch processing.
+**Action:** Always add database indexes to columns that are frequently used in `WHERE` clauses, especially for tables used heavily in scheduled background commands, to prevent full table scans and reduce CPU/I/O overhead.

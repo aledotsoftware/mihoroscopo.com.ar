@@ -18,6 +18,7 @@ use App\Models\ContentLunarRitual;
 use App\Models\ContentProsperityRitual;
 use App\Models\ContentZodiacCompatibility;
 use App\Models\EmailLog;
+use Illuminate\Database\Schema\Blueprint;
 use Carbon\Carbon;
 
 class SendDailyContentEmailsTest extends TestCase
@@ -82,12 +83,13 @@ class SendDailyContentEmailsTest extends TestCase
         ];
 
         foreach ($contentTables as $tableName) {
-            Schema::create($tableName, function ($table) {
+            Schema::create($tableName, function (Blueprint $table) {
                 $table->id();
                 $table->date('date');
                 $table->string('zodiac_sign');
                 $table->text('content');
                 $table->timestamps();
+                $table->index('date');
             });
         }
     }
