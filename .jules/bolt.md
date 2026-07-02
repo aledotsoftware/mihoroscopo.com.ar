@@ -72,3 +72,7 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+
+## 2026-04-22 - [Optimizing getSubscriptionByEmail and getSubscriptionByExternalReference]
+**Learning:** Functions like `getSubscriptionByEmail` and `getSubscriptionByExternalReference` returned full Eloquent models without restricting the columns. This means that massive JSON/TEXT columns (e.g. `response`, `payload`) from the `subscriptions` table were unnecessarily loaded into memory even when callers only needed basic metadata (like id, status, external_reference) in high-throughput endpoints.
+**Action:** When working with heavy Eloquent tables and wrapper functions like `getSubscriptionBy*`, add an optional `$columns = ['*']` argument. Then, when calling these methods from critical or high-throughput paths, explicitly pass only the necessary fields via `select()` to drastically cut down RAM use and prevent OOMs or CPU hydration bottlenecks.
