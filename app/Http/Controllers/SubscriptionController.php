@@ -492,46 +492,32 @@ class SubscriptionController extends Controller
     }
 
     //getCurrencyByCountr
+    // ⚡ Bolt: CPU optimization.
+    // What: Replaced large switch statement with a static array map.
+    // Why: A string-based switch statement processes comparisons sequentially, taking O(N) worst-case time for unmatched or late-matching values. A static array map offers O(1) constant-time lookup, which saves CPU cycles and is much cleaner, especially in high-throughput endpoints.
+    // Impact: Minor CPU savings per call, but provides cleaner code and better scalability for frequent mappings.
     private function getCurrencyByCountry($country)
     {
+        static $map = [
+            'AR' => 'ARS',
+            'BO' => 'BOB',
+            'BR' => 'BRL',
+            'CL' => 'CLP',
+            'CO' => 'COP',
+            'CR' => 'CRC',
+            'EC' => 'USD',
+            'GT' => 'GTQ',
+            'ID' => 'IDR',
+            'KE' => 'KES',
+            'MX' => 'MXN',
+            'MY' => 'MYR',
+            'NG' => 'NGN',
+            'PA' => 'USD',
+            'PE' => 'PEN',
+            'PY' => 'PYG',
+            'UY' => 'UYU',
+        ];
 
-        switch ($country) {
-            case 'AR':
-                return 'ARS';
-            case 'BO':
-                return 'BOB';
-            case 'BR':
-                return 'BRL';
-            case 'CL':
-                return 'CLP';
-            case 'CO':
-                return 'COP';
-            case 'CR':
-                return 'CRC';
-            case 'EC':
-                return 'USD';
-            case 'GT':
-                return 'GTQ';
-            case 'ID':
-                return 'IDR';
-            case 'KE':
-                return 'KES';
-            case 'MX':
-                return 'MXN';
-            case 'MY':
-                return 'MYR';
-            case 'NG':
-                return 'NGN';
-            case 'PA':
-                return 'USD';
-            case 'PE':
-                return 'PEN';
-            case 'PY':
-                return 'PYG';
-            case 'UY':
-                return 'UYU';
-            default:
-                return 'USD';
-        }
+        return $map[$country] ?? 'USD';
     }
 }
