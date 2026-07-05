@@ -60,3 +60,6 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+## 2024-11-26 - Dead Buttons in Pricing Tables
+**Learning:** The landing page's pricing tables used non-functional `<button type="button">Elegir Plan</button>` elements that did not actually navigate anywhere. Additionally, screen readers announced "Elegir Plan, button" three times, offering no context for which plan was being selected. This created a UX dead end and poor accessibility.
+**Action:** When a call-to-action button functionally behaves like a navigation link (and the backend isn't capturing form submit data), convert it to an explicit `<a>` tag with the correct `href`, add `role="button"` for semantic similarity, and always include a specific `aria-label` (e.g., `aria-label="Elegir plan Diario"`) to ensure proper context for screen reader users.
