@@ -72,3 +72,6 @@
 ## 2026-04-21 - [Safe select() optimization for single record updates]
 **Learning:** When performing programmatic updates via Eloquent in high-concurrency flows (e.g., Webhooks), optimizing `first()` with `select()` to avoid hydrating massive JSON/TEXT columns (like `response` in the `subscriptions` table) is safe. Eloquent's `save()` method only updates dirty (modified) attributes; omitting columns via `select()` will not nullify unselected attributes in the database.
 **Action:** Always append an explicit `select(['id', 'needed_column_1', ...])` to Eloquent `first()` lookups on heavy tables inside high-throughput update paths to prevent extreme memory and CPU overhead.
+## 2026-07-05 - [Switch to Static Array Optimization]
+**Learning:** Large string-based `switch` statements inside frequently called helper methods (like `getCurrencyByCountry`) create unnecessary O(N) evaluation overhead.
+**Action:** Always prefer using a static array map (`static $map = [...];`) combined with the null coalescing operator for simple key-value lookups to achieve O(1) constant-time performance and reduce CPU cycles.
