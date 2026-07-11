@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\MercadoPagoService;
-use App\Models\Subscription;
-use Illuminate\Support\Facades\DB;
 use App\Models\ExtradataHoroscope;
-
+use App\Models\Subscription;
+use App\Services\MercadoPagoService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
-
     private $mercadoPagoService;
 
     /**
@@ -33,11 +31,10 @@ class SubscriptionController extends Controller
      * Este método almacena información adicional en la tabla `ExtradataHoroscope`
      * para una suscripción específica, incluyendo el signo zodiacal, el gclid y el nombre del usuario.
      *
-     * @param int    $subscriptionId  ID de la suscripción asociada.
-     * @param string $zodiacSign      Signo zodiacal del usuario.
-     * @param string|null $gclid      ID de clic de Google Ads (opcional).
-     * @param string $name            Nombre del usuario.
-     *
+     * @param  int  $subscriptionId  ID de la suscripción asociada.
+     * @param  string  $zodiacSign  Signo zodiacal del usuario.
+     * @param  string|null  $gclid  ID de clic de Google Ads (opcional).
+     * @param  string  $name  Nombre del usuario.
      * @return void
      */
     private function saveExtraData($subscriptionId, $name, $zodiacSign, $gclid, $gbraid, $wbraid, $li_fat_id, $li_ed, $sub_days, $cost, $click_id, $web_push_creative_id, $mobile_brand, $city_name, $browser_family, $os_type, $price, $region_name, $spot_id, $domain)
@@ -79,18 +76,17 @@ class SubscriptionController extends Controller
      * Este método almacena los datos de suscripción en la tabla `Subscription`,
      * configurando el servicio, el correo electrónico, el tipo de pago, el estado y otros detalles.
      *
-     * @param string $email              Correo electrónico del usuario.
-     * @param string $paymentType        Tipo de suscripción (gratuita o paga).
-     * @param string $externalReference  Referencia única para la suscripción.
-     * @param string $subscriptionId     ID de la suscripción (para el tipo paga).
-     * @param string $status             Estado inicial de la suscripción.
-     *
-     * @return Subscription              La instancia de la suscripción creada.
+     * @param  string  $email  Correo electrónico del usuario.
+     * @param  string  $paymentType  Tipo de suscripción (gratuita o paga).
+     * @param  string  $externalReference  Referencia única para la suscripción.
+     * @param  string  $subscriptionId  ID de la suscripción (para el tipo paga).
+     * @param  string  $status  Estado inicial de la suscripción.
+     * @return Subscription La instancia de la suscripción creada.
      */
-    private function createSubscription($email, $paymentType, $externalReference, $subscriptionId, $status, $country,   $currency,  $paymentProvider)
+    private function createSubscription($email, $paymentType, $externalReference, $subscriptionId, $status, $country, $currency, $paymentProvider)
     {
 
-        $subscription = new Subscription();
+        $subscription = new Subscription;
         $subscription->service_id = 1;
         $subscription->payment_provider_id = $paymentProvider;
         $subscription->email = $email;
@@ -101,39 +97,34 @@ class SubscriptionController extends Controller
         $subscription->currency = $currency;
         $subscription->country = $country;
         $subscription->save();
+
         return $subscription;
     }
 
-
-
-
-
     /**
      * Obtiene una suscripción existente por correo electrónico.
      *
-     * @param string $email El correo electrónico del usuario.
+     * @param  string  $email  El correo electrónico del usuario.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByEmail($email)
+    private function getSubscriptionByEmail($email, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por correo
-        return Subscription::where('email', $email)->first();
+        return Subscription::select($columns)->where('email', $email)->first();
     }
 
     /**
      * Obtiene una suscripción existente por correo electrónico.
      *
-     * @param string $email El correo electrónico del usuario.
+     * @param  string  $email  El correo electrónico del usuario.
      * @return Subscription|null Retorna la suscripción si existe o null si no existe.
      */
-    private function getSubscriptionByExternalReference($externalReference)
+    private function getSubscriptionByExternalReference($externalReference, $columns = ['*'])
     {
         // Asumimos que existe un modelo `Subscription` que permite buscar la suscripción por externalReference
 
-        return Subscription::where('external_reference', $externalReference)->first();
+        return Subscription::select($columns)->where('external_reference', $externalReference)->first();
     }
-
-
 
     public function subscribe(Request $request)
     {
@@ -160,19 +151,22 @@ class SubscriptionController extends Controller
         $domain = $request->input('domain');
         $deviceua = $request->input('deviceua');
 
-
         $paymentType = $request->input('subscription');
 
         // Verificar si el correo ya tiene una suscripción
-        $existingSubscription = $this->getSubscriptionByEmail($email);
+        // ⚡ Bolt: Memory optimization.
+        // What: Added specific columns to getSubscriptionByEmail.
+        // Why: The code only needs id, status, and external_reference. Avoid hydrating large JSON columns.
+        $existingSubscription = $this->getSubscriptionByEmail($email, ['id', 'status', 'external_reference']);
 
         if ($existingSubscription) {
             // Si la suscripción existe y está pendiente o activa, devolver el punto de inicio existente
             if (in_array($existingSubscription->status, ['pending', 'authorized'])) {
-                $init_point = url('/subscription/preferences/' . $existingSubscription->external_reference);
+                $init_point = url('/subscription/preferences/'.$existingSubscription->external_reference);
+
                 return response()->json([
                     'message' => 'Ya existe una suscripción activa para este correo.',
-                    'init_point' => $init_point
+                    'init_point' => $init_point,
                 ], 200);
             }
 
@@ -181,7 +175,7 @@ class SubscriptionController extends Controller
             $subscription = $existingSubscription;
         } else {
             // Si no existe, crear una nueva referencia y suscripción
-            $externalReference = $country . "-" . crc32(time() . mt_rand(10, 99));
+            $externalReference = $country.'-'.crc32(time().mt_rand(10, 99));
 
             // Determinar el proveedor de pagos y moneda según el país
             $paymentProvider = strtoupper($country) === 'AR' ? 1 : $this->getPaymentProviderByCountry($country);
@@ -221,7 +215,6 @@ class SubscriptionController extends Controller
                 spot_id: $spot_id,
                 domain: $domain
 
-
             );
         }
 
@@ -241,17 +234,16 @@ class SubscriptionController extends Controller
             // se completa con el external_reference y el email
             //  $initPoint = $initPoint . "?external_reference=" . $externalReference . "&email=" . $email;
 
-
-            $response = (object)[
+            $response = (object) [
                 'init_point' => $initPoint,
-                'subscription_id' => $externalReference
+                'subscription_id' => $externalReference,
             ];
         }
 
-        if (!is_object($response)) {
+        if (! is_object($response)) {
             return response()->json([
                 'error' => 'Error al procesar el pago',
-                'message' => 'No se pudo procesar la solicitud correctamente'
+                'message' => 'No se pudo procesar la solicitud correctamente',
             ], 400);
         }
 
@@ -259,12 +251,12 @@ class SubscriptionController extends Controller
         if (isset($response->subscription_id)) {
             $subscription->update([
                 'subscription_id' => $response->subscription_id,
-                'status' => 'pending'
+                'status' => 'pending',
             ]);
         }
 
         // Verificar y retornar el punto de inicio
-        if (isset($response->init_point) && !empty($response->init_point)) {
+        if (isset($response->init_point) && ! empty($response->init_point)) {
             return response()->json(['init_point' => $response->init_point])
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Allow-Methods', 'POST')
@@ -272,33 +264,15 @@ class SubscriptionController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function reactivateSubscription($externalReference, $paymentType)
     {
         // Realizar la consulta para obtener los datos de la suscripción
         // Convertir el resultado en un objeto Subscription usando external_reference
 
-        $subscription =  $this->getSubscriptionByExternalReference($externalReference);
-
+        // ⚡ Bolt: Memory optimization.
+        // What: Added specific columns to getSubscriptionByExternalReference.
+        // Why: The code only needs id, email, service_id, payment_type, subscription_id and status to perform an update.
+        $subscription = $this->getSubscriptionByExternalReference($externalReference, ['id', 'email', 'service_id', 'payment_type', 'subscription_id', 'status']);
 
         // Depurar el objeto Subscription
         if ($subscription) {
@@ -316,7 +290,7 @@ class SubscriptionController extends Controller
                 $subscription->subscription_id = $response->subscription_id;
                 $subscription->status = 'authorized';
                 $subscription->save();
-                if (isset($response->init_point) && !empty($response->init_point)) {
+                if (isset($response->init_point) && ! empty($response->init_point)) {
                     return redirect($response->init_point);
                 }
             }
@@ -329,7 +303,6 @@ class SubscriptionController extends Controller
             ->header('Access-Control-Allow-Methods', 'POST')
             ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
-
 
     public function preferences($externalReference)
     {
@@ -360,7 +333,7 @@ class SubscriptionController extends Controller
         //  var_dump($subscription);
 
         // Verificar si se encontró una suscripción
-        if (!$subscription) {
+        if (! $subscription) {
             // Manejar el caso cuando no se encuentra la suscripción
             return redirect()->back()->withErrors(['No se encontró la suscripción.']);
         }
@@ -381,12 +354,11 @@ class SubscriptionController extends Controller
      * actualiza el estado de la suscripción a "cancelled" y redirige a la página
      * de preferencias.
      *
-     * @param string $id El identificador de la suscripción. (`subscriptions`.`subscription_id`)
-     *
+     * @param  string  $id  El identificador de la suscripción. (`subscriptions`.`subscription_id`)
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
-     *         Redirige a la página de detalles de MercadoPago o a la página de
-     *         preferencias si la cancelación es exitosa. Devuelve un error JSON
-     *         si la suscripción no se encuentra.
+     *                                                                         Redirige a la página de detalles de MercadoPago o a la página de
+     *                                                                         preferencias si la cancelación es exitosa. Devuelve un error JSON
+     *                                                                         si la suscripción no se encuentra.
      */
     public function processUnsubscribe($id)
     {
@@ -405,24 +377,22 @@ class SubscriptionController extends Controller
             ->first();
 
         // Verificar si la suscripción existe
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json(['error' => 'No se encontró la suscripción.'], 404);
         }
 
         // Redirigir a la página de detalles en MercadoPago si está autorizada
-        if ($subscriptionType == 'tipo_sin_guion' && $subscription->status === "authorized") {
-            $url = "https://www.mercadopago.com.ar/subscriptions/details/" . $subscription->subscription_id;
+        if ($subscriptionType == 'tipo_sin_guion' && $subscription->status === 'authorized') {
+            $url = 'https://www.mercadopago.com.ar/subscriptions/details/'.$subscription->subscription_id;
+
             return redirect($url);
         }
 
         // En todos los demás casos, cancelar la suscripción y redirigir a preferencias
         DB::table('subscriptions')->where('id', $subscription->id)->update(['status' => 'cancelled']);
 
-        return redirect('/subscription/preferences/' . $id);
+        return redirect('/subscription/preferences/'.$id);
     }
-
-
-
 
     public function reactivate($externalReference)
     {
@@ -439,18 +409,17 @@ class SubscriptionController extends Controller
             ->update([
                 'subscription_id' => $externalReference,
                 'status' => 'authorized',
-                'payment_type' => 'gaia'
+                'payment_type' => 'gaia',
             ]);
 
         if ($affectedRows > 0) {
             // Redirigir a preferencias
-            return redirect('/subscription/preferences/' . $externalReference);
+            return redirect('/subscription/preferences/'.$externalReference);
         } else {
             // Manejo en caso de no encontrar la suscripción
             return response()->json(['error' => 'Suscripción no encontrada'], 404);
         }
     }
-
 
     public function update($externalReference)
     {
@@ -472,11 +441,10 @@ class SubscriptionController extends Controller
         ]);
     }
 
-
     /**
      * Determina el proveedor de pagos según el país.
-     * 
-     * @param string $country Código ISO del país (ej: 'AR', 'MX', etc)
+     *
+     * @param  string  $country  Código ISO del país (ej: 'AR', 'MX', etc)
      * @return int ID del proveedor de pagos:
      *             1 = MercadoPago (solo para Argentina)
      *             2 = dLocalGo (resto de países)
@@ -488,6 +456,7 @@ class SubscriptionController extends Controller
         if ($country == 'AR') {
             return 1; // MercadoPago
         }
+
         return 2; // dLocalGo
     }
 
