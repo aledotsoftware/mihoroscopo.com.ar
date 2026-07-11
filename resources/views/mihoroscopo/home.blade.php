@@ -456,7 +456,7 @@
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Diario</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
-                    <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
+                    <a href="{{ route(\'index\') }}" role="button" class="btn btn-light rounded-pill py-2 px-5" aria-label="Elegir plan Diario">Elegir Plan</a>
                 </div>
             </div>
         </div>
@@ -473,7 +473,7 @@
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Semanal</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
-                    <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
+                    <a href="{{ route(\'index\') }}" role="button" class="btn btn-light rounded-pill py-2 px-5" aria-label="Elegir plan Semanal">Elegir Plan</a>
                 </div>
             </div>
         </div>
@@ -490,7 +490,7 @@
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Horóscopo Mensual</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Acceso a Contenido Exclusivo</p>
                     <p><i class="fas fa-check text-success me-1" aria-hidden="true"></i> Notificaciones Personalizadas</p>
-                    <button class="btn btn-light rounded-pill py-2 px-5" type="button">Elegir Plan</button>
+                    <a href="{{ route(\'index\') }}" role="button" class="btn btn-light rounded-pill py-2 px-5" aria-label="Elegir plan Mensual">Elegir Plan</a>
                 </div>
             </div>
         </div>
