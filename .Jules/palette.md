@@ -60,3 +60,7 @@
 ## 2026-04-23 - Adding loading states to synchronous forms
 **Learning:** Sychronous admin forms for creating and editing models lack visual feedback during submission, leading to double-clicks and frustration.
 **Action:** Add a Javascript listener to form submissions that grabs the button using `e.submitter` and disables it after a `setTimeout` to maintain browser POST payload inclusion, changing its text to indicate a loading state.
+
+## 2024-06-19 - Functional Call-to-Action Buttons
+**Learning:** Call-to-action buttons in pricing tables (`mihoroscopo/home.blade.php`) were non-functional empty `<button type="button">` elements, which created dead ends for users trying to select a plan.
+**Action:** Always convert decorative, non-functional `<button>` elements meant to act as navigation into semantic `<a>` tags routing to the appropriate flow (e.g., checkout/landing pages) and include descriptive `aria-label`s for screen readers.
