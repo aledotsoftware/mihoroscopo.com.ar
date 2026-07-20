@@ -29,3 +29,4 @@ comandos.txt
 tudexnetworks-clientsecret.json
 .env.*
 !.env.example
+/.jules
